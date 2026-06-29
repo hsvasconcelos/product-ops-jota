@@ -38,6 +38,7 @@ from product_ops_jota.channels import WhatsAppLine, proactive_line
 from product_ops_jota.classifier import classify_conversation
 from product_ops_jota.decision import DecisionInput, decide
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme
+from product_ops_jota.handoff import build_context_pack
 from product_ops_jota.rag import Retriever
 
 DATA = Path(__file__).resolve().parents[1] / "data" / "conversas_ruins.json"
@@ -149,7 +150,7 @@ def derivar_decisao(theme, detection, docs, customer_text=""):
                          resolvability=round(resolv, 2), detection_confidence=round(det_conf, 2))
 
 
-def render_conversa(conv, detection, docs, sugestao, decisao, rag_mode) -> Panel:
+def render_conversa(conv, detection, docs, sugestao, decisao, rag_mode, pack=None) -> Panel:
     blocos = []
 
     # 1) a conversa
@@ -184,8 +185,21 @@ def render_conversa(conv, detection, docs, sugestao, decisao, rag_mode) -> Panel
         tab.add_row(d.id, d.title, f"{d.score:.3f}")
     blocos.append(tab)
 
-    # 4) a sugestão (o coração do copiloto)
-    if sugestao:
+    # 4) o coração: handoff QUENTE (pacote pro humano) OU sugestão pro atendente
+    if pack:
+        ctx = Text()
+        ctx.append(f"  cliente {pack.segment.upper()} · linha {LINE_LABEL[pack.line]}\n", style="dim")
+        ctx.append(f"  atrito: {pack.theme.value} · {pack.nature.value} · criticidade {pack.criticality:.1f}\n")
+        ctx.append(f"  evidência: {pack.evidence}\n", style="dim")
+        if pack.signals:
+            ctx.append(f"  sinais já lidos: {', '.join(pack.signals)}\n")
+        if pack.ai_offered:
+            ctx.append(f"  a IA já ofereceu: {pack.ai_offered}\n", style="dim")
+        ctx.append(f"  → fila: {pack.routing.specialty}  ·  prioridade {pack.routing.priority:.2f}\n", style="bold")
+        ctx.append(f"    {pack.routing.note}", style="dim")
+        blocos.append(Panel(ctx, border_style="red", box=ROUNDED,
+                            title="📋 PACOTE PRO ATENDENTE HUMANO (handoff quente — contexto preservado)"))
+    elif sugestao:
         sug = Text()
         sug.append(sugestao["resposta"] + "\n\n", style="white")
         sug.append("Passo a passo:\n", style="bold")
@@ -239,8 +253,16 @@ def main():
         docs = retriever.retrieve(montar_query(conv, detection.predicted_theme), top_k=TOP_K)
         sugestao = montar_sugestao(detection.predicted_theme, docs)
         customer_text = " ".join(m["text"] for m in conv["mensagens"] if m["sender"] == "customer")
-        decisao = decide(derivar_decisao(detection.predicted_theme, detection, docs, customer_text))
-        console.print(render_conversa(conv, detection, docs, sugestao, decisao, rag_mode))
+        di = derivar_decisao(detection.predicted_theme, detection, docs, customer_text)
+        decisao = decide(di)
+        # handoff quente: no humano, o atendente recebe um PACOTE DE CONTEXTO
+        pack = None
+        if decisao.action == InterceptionAction.HUMAN_HANDOFF:
+            hora = int(conv["started_at"][11:13])
+            ai_offered = (f"procedimento ancorado em {', '.join(sugestao['fontes'])}" if sugestao else None)
+            pack = build_context_pack(detection, decisao, di.criticality,
+                                      conv.get("segment", "pf"), hora, ai_offered)
+        console.print(render_conversa(conv, detection, docs, sugestao, decisao, rag_mode, pack))
 
 
 if __name__ == "__main__":

@@ -63,6 +63,29 @@ def test_decision_golden_suite():
         assert d.action.value == s["expected_action"], (s["id"], d.action.value, "esperado", s["expected_action"])
 
 
+def test_handoff_context_and_queue():
+    """Handoff quente: roteia por especialidade, respeita horário e não insiste (anti-spam)."""
+    from datetime import datetime, timedelta
+    from product_ops_jota.friction_model import SupportTheme
+    from product_ops_jota.handoff import route_to_queue, should_reintercept, REINTERCEPT_WINDOW
+
+    em_horario = route_to_queue(SupportTheme.PIX, priority=0.8, hour=14)
+    assert em_horario.specialty == "Pagamentos/Pix" and em_horario.in_hours
+    fora = route_to_queue(SupportTheme.KYC, priority=0.5, hour=23)
+    assert not fora.in_hours and "retorno prioritário" in fora.note
+
+    agora = datetime(2026, 6, 28, 12, 0, 0)
+    # já interceptado há pouco, sem escalar → não insiste
+    ok, _ = should_reintercept(SupportTheme.PIX, agora - timedelta(hours=1), agora)
+    assert ok is False
+    # mesmo recente, mas escalou → intervém de novo
+    ok, _ = should_reintercept(SupportTheme.PIX, agora - timedelta(hours=1), agora, escalating=True)
+    assert ok is True
+    # janela passou → pode de novo
+    ok, _ = should_reintercept(SupportTheme.PIX, agora - REINTERCEPT_WINDOW - timedelta(hours=1), agora)
+    assert ok is True
+
+
 def test_db_builds_and_constraints():
     conn = init_db(":memory:")
     seed_real_conversation(conn)
