@@ -1,0 +1,122 @@
+[
+  {
+    "id": "KB-PIX-001",
+    "title": "Pix enviado não caiu na conta do destinatário",
+    "category": "erro_pix",
+    "content": "Quando um Pix é enviado e o destinatário não recebe, o valor fica em processamento ou foi devolvido automaticamente. O valor enviado nunca some: se não for creditado, retorna para a conta de origem em até 30 minutos. Em casos de instabilidade ou análise antifraude o crédito pode levar alguns minutos.",
+    "steps": [
+      "Confira o status do Pix no histórico. Se estiver 'Processando', aguarde até 5 minutos.",
+      "Peça ao destinatário para conferir se a chave usada está correta e ativa.",
+      "Se o status for 'Devolvido', o valor retorna automaticamente, sem custo.",
+      "Após 30 minutos sem crédito, acione o suporte com o ID E2E para abertura de MED (Mecanismo Especial de Devolução)."
+    ]
+  },
+  {
+    "id": "KB-PIX-002",
+    "title": "Chave Pix não reconhecida ou não encontrada",
+    "category": "chave_pix_invalida",
+    "content": "Para um Pix chegar, a chave de destino (CPF, e-mail, celular ou aleatória) precisa estar REGISTRADA como chave Pix em algum banco pelo dono. Um CPF ou e-mail que existe mas não foi cadastrado como chave não funciona como destino. Esta é uma confusão comum: ter o número não significa que ele é uma chave ativa.",
+    "steps": [
+      "Confirme com o destinatário qual é a chave Pix ATIVA dele (pode ser diferente do CPF).",
+      "Peça para ele verificar as chaves cadastradas no banco onde quer receber.",
+      "Como alternativa, ele pode te enviar um QR Code de cobrança — aí não precisa de chave.",
+      "Para receber você mesmo, veja suas chaves cadastradas no Jota e cadastre uma nova se precisar."
+    ]
+  },
+  {
+    "id": "KB-PIX-003",
+    "title": "Como encontrar o comprovante de um Pix",
+    "category": "usabilidade",
+    "content": "Todo Pix gera um comprovante com o identificador de ponta a ponta (E2E), documento oficial para rastreamento e contestação.",
+    "steps": [
+      "Abra o histórico de transações.",
+      "Toque na transação de Pix desejada.",
+      "Toque em 'Compartilhar comprovante' para baixar em PDF.",
+      "O ID E2E fica no rodapé e é o que o suporte usa para rastrear."
+    ]
+  },
+  {
+    "id": "KB-KYC-001",
+    "title": "Erro na validação de biometria durante a abertura de conta",
+    "category": "kyc_falhou",
+    "content": "A validação de identidade (biometria/Unico) pode falhar por iluminação ruim, foto tremida, rosto parcialmente coberto ou instabilidade momentânea. É um passo de segurança obrigatório e pode ser refeito. O cadastro fica salvo; você não recomeça do zero.",
+    "steps": [
+      "Procure um ambiente bem iluminado, sem luz forte atrás de você.",
+      "Tire óculos, boné ou máscara e mantenha o rosto centralizado.",
+      "Toque em 'Tentar novamente' para refazer a verificação.",
+      "Se falhar 3 vezes, um atendente do time de onboarding pode validar manualmente."
+    ]
+  },
+  {
+    "id": "KB-CONECTA-001",
+    "title": "Saldo de banco conectado não atualiza (Open Finance)",
+    "category": "consentimento_openfinance",
+    "content": "Saldos via Jota Conecta param de atualizar quando o consentimento de Open Finance expira (ele tem duração configurável) ou quando a conexão com o banco é interrompida. A reconexão é rápida e segura, feita pelo app do seu banco.",
+    "steps": [
+      "Peça 'reconectar meu banco' e escolha a instituição.",
+      "Você será levado ao app do banco para autorizar novamente.",
+      "Defina a duração da conexão para evitar nova expiração.",
+      "Os saldos voltam a atualizar em seguida."
+    ]
+  },
+  {
+    "id": "KB-BOLETO-001",
+    "title": "Pagamento de boleto agendado não foi efetuado",
+    "category": "boleto_pagamento_falhou",
+    "content": "Um boleto agendado pode não ser pago no dia por saldo insuficiente no momento da execução ou por falha na confirmação. Como há risco de multa e juros, este caso é tratado com urgência.",
+    "steps": [
+      "Verifique se havia saldo suficiente na data do agendamento.",
+      "Confira o status do boleto no Radar de Boletos.",
+      "Se ainda estiver no prazo, reagende ou pague agora com saldo do Jota ou de outro banco.",
+      "Se já venceu, o suporte ajuda a obter a segunda via atualizada com o valor corrigido."
+    ]
+  },
+  {
+    "id": "KB-RENDE-001",
+    "title": "Entendendo o rendimento (100% do CDI)",
+    "category": "usabilidade",
+    "content": "O saldo no Jota rende 100% do CDI automaticamente desde o primeiro real, sem ativação. O rendimento é calculado por dia útil sobre o saldo mantido, com IR + PIS + COFINS retidos na fonte. Por isso valores que entram em fim de semana ou que ficam pouco tempo rendem menos do que a expectativa de 'render todo dia'.",
+    "steps": [
+      "Lembre que o rendimento conta dias úteis, não corridos.",
+      "O saldo precisa permanecer na conta para render — saídas reduzem a base.",
+      "Os impostos já saem retidos; o valor mostrado é aproximado.",
+      "Posso fazer uma projeção para um período específico, se quiser."
+    ]
+  },
+  {
+    "id": "KB-TAREFA-001",
+    "title": "Programação de rotina/pagamento iniciada mas não concluída",
+    "category": "tarefa_abandonada",
+    "content": "Para concluir uma rotina (ex.: pagar aluguel todo dia 5), faltam três informações: destinatário (chave Pix), valor e horário. Sem elas a rotina não fica ativa — e o cliente pode achar que ficou.",
+    "steps": [
+      "Informe a chave Pix do destinatário.",
+      "Informe o valor a pagar.",
+      "Escolha o horário do dia em que devo executar.",
+      "Confirmo e a rotina passa a rodar automaticamente todo mês."
+    ]
+  },
+  {
+    "id": "KB-CONTA-001",
+    "title": "Conta em verificação ou bloqueada por segurança",
+    "category": "conta_bloqueada",
+    "content": "Por exigência regulatória e antifraude, a conta pode entrar em verificação após movimentações atípicas. O saldo permanece íntegro e protegido. Casos de bloqueio ou suspeita de fraude são tratados por atendente especializado.",
+    "steps": [
+      "Verifique se há notificação pedindo atualização de documento.",
+      "Não compartilhe senha nem códigos com ninguém.",
+      "Um atendente de segurança assume o caso com prioridade.",
+      "Casos de conta invadida têm canal prioritário."
+    ]
+  },
+  {
+    "id": "KB-SUP-001",
+    "title": "Como funciona o atendimento humano e horários",
+    "category": "usabilidade",
+    "content": "O atendimento humano funciona das 9h às 20h, todos os dias. Fora desse horário, a IA resolve a maioria dos casos e registra os demais para retorno prioritário no início do próximo turno. O handoff acontece na mesma conversa, com o contexto preservado.",
+    "steps": [
+      "Peça 'falar com atendente' a qualquer momento.",
+      "Em horário comercial, você entra na fila da especialidade certa.",
+      "Fora do horário, seu caso é registrado e priorizado.",
+      "Casos de segurança têm canal prioritário."
+    ]
+  }
+]
