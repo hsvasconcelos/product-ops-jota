@@ -1,0 +1,16 @@
+[
+  {"query": "mandei um pix e nao chegou na conta da pessoa", "relevant": ["KB-PIX-001"]},
+  {"query": "a chave pix do meu fornecedor da erro nao encontrada", "relevant": ["KB-PIX-002"]},
+  {"query": "onde eu acho o comprovante do meu pix", "relevant": ["KB-PIX-003"]},
+  {"query": "to tentando abrir conta e a selfie nao passa", "relevant": ["KB-KYC-001"]},
+  {"query": "conectei meu outro banco e o saldo nao atualiza", "relevant": ["KB-CONECTA-001"]},
+  {"query": "meu boleto agendado nao foi pago", "relevant": ["KB-BOLETO-001"]},
+  {"query": "quanto rende o dinheiro parado na minha conta", "relevant": ["KB-RENDE-001"]},
+  {"query": "programei um pagamento mensal mas nao esta rodando", "relevant": ["KB-TAREFA-001"]},
+  {"query": "minha conta foi bloqueada por seguranca", "relevant": ["KB-CONTA-001"]},
+  {"query": "que horas tem atendente humano disponivel", "relevant": ["KB-SUP-001"]},
+  {"query": "vendi pelo fala tap e o dinheiro nao caiu", "relevant": ["KB-FALATAP-001"]},
+  {"query": "recebi uma venda na maquininha e nao to vendo o valor", "relevant": ["KB-FALATAP-001"]},
+  {"query": "quero trocar o telefone cadastrado da minha conta", "relevant": ["KB-DADOS-001"]},
+  {"query": "o app abre e fecha sozinho nao consigo entrar", "relevant": ["KB-ACESSO-001"]}
+]
