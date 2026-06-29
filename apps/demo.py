@@ -83,10 +83,10 @@ def contagens(conn) -> dict:
 def naturezas_materializadas(conn) -> list[tuple]:
     """As 3 naturezas, cada uma derivada de uma correlação DIFERENTE entre tabelas."""
     ss = conn.execute(
-        "SELECT COUNT(*) FROM conversations WHERE friction_nature='system_signaled'"
+        "SELECT COUNT(*) FROM conversations WHERE gold_nature='system_signaled'"
     ).fetchone()[0]
     bi = conn.execute(
-        "SELECT COUNT(*) FROM conversations WHERE friction_nature='behavior_inferred'"
+        "SELECT COUNT(*) FROM conversations WHERE gold_nature='behavior_inferred'"
     ).fetchone()[0]
     ad = conn.execute(
         "SELECT COUNT(*) FROM events WHERE conversation_id IS NULL"
@@ -107,15 +107,15 @@ def users_dados(conn) -> dict:
     ).fetchone()[0]
     # cruzamento: por literacia, tema dominante + criticidade média (users ⋈ conversations)
     rows = conn.execute(
-        """SELECT u.digital_literacy, c.theme, COUNT(*) n
+        """SELECT u.digital_literacy, c.gold_theme, COUNT(*) n
            FROM users u JOIN conversations c ON c.user_id=u.user_id
-           GROUP BY u.digital_literacy, c.theme"""
+           GROUP BY u.digital_literacy, c.gold_theme"""
     ).fetchall()
     por_lit: dict[str, dict[str, int]] = {}
     for litv, theme, n in rows:
         por_lit.setdefault(litv, {})[theme] = n
     crit_lit = dict(conn.execute(
-        """SELECT u.digital_literacy, ROUND(AVG(c.criticality),2)
+        """SELECT u.digital_literacy, ROUND(AVG(c.gold_criticality),2)
            FROM users u JOIN conversations c ON c.user_id=u.user_id
            GROUP BY u.digital_literacy"""
     ).fetchall())
@@ -158,7 +158,7 @@ def visao_360(conn, uid: str) -> dict:
         (uid,),
     ).fetchall()
     convs = conn.execute(
-        """SELECT conversation_id, started_at, theme, friction_nature, criticality, outcome
+        """SELECT conversation_id, started_at, gold_theme, gold_nature, gold_criticality, outcome
            FROM conversations WHERE user_id=? ORDER BY started_at""",
         (uid,),
     ).fetchall()

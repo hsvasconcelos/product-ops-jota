@@ -22,12 +22,12 @@ def main() -> None:
     print("═" * 60)
 
     print("\n▸ Volumetria por tema (o que priorizar p/ antecipar)")
-    for theme, n in q("SELECT theme, COUNT(*) FROM conversations GROUP BY theme ORDER BY 2 DESC"):
+    for theme, n in q("SELECT gold_theme, COUNT(*) FROM conversations GROUP BY gold_theme ORDER BY 2 DESC"):
         bar = "█" * (n // 5)
         print(f"  {theme:20} {n:4}  {bar}")
 
     print("\n▸ Natureza do atrito (só 2 no suporte: quem está aqui FALOU)")
-    for nat, n in q("SELECT friction_nature, COUNT(*) FROM conversations GROUP BY friction_nature"):
+    for nat, n in q("SELECT gold_nature, COUNT(*) FROM conversations GROUP BY gold_nature"):
         print(f"  {nat:20} {n:4}")
 
     print("\n▸ SLA de 1ª resposta — derivado por window function (não armazenado)")
@@ -45,8 +45,8 @@ def main() -> None:
     print(f"  {row[0]} pediram · {row[1]} atendidos · {row[0]-row[1]} ignorados")
 
     print("\n▸ Tendência semanal (semanas com mais atrito por tema — top 5)")
-    rows = q("""SELECT strftime('%Y-W%W', started_at) wk, theme, COUNT(*) n
-                FROM conversations GROUP BY wk, theme ORDER BY n DESC LIMIT 5""")
+    rows = q("""SELECT strftime('%Y-W%W', started_at) wk, gold_theme, COUNT(*) n
+                FROM conversations GROUP BY wk, gold_theme ORDER BY n DESC LIMIT 5""")
     for wk, theme, n in rows:
         print(f"  {wk}  {theme:20} {n}")
 

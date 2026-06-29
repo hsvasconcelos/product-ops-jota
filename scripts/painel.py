@@ -97,10 +97,10 @@ def overview_dados(conn: sqlite3.Connection) -> dict:
     )
     resolvidos = outcomes.get("resolved", 0)
     volumetria = conn.execute(
-        "SELECT theme, COUNT(*) n FROM conversations GROUP BY theme ORDER BY n DESC"
+        "SELECT gold_theme, COUNT(*) n FROM conversations GROUP BY gold_theme ORDER BY n DESC"
     ).fetchall()
     naturezas = conn.execute(
-        "SELECT friction_nature, COUNT(*) n FROM conversations GROUP BY friction_nature ORDER BY n DESC"
+        "SELECT gold_nature, COUNT(*) n FROM conversations GROUP BY gold_nature ORDER BY n DESC"
     ).fetchall()
     return {
         "total": total,
@@ -115,8 +115,8 @@ def overview_dados(conn: sqlite3.Connection) -> dict:
 def _semanas_por_tema(conn: sqlite3.Connection):
     """Devolve (semanas_ordenadas, {tema: {semana: n}}, {tema: total})."""
     rows = conn.execute(
-        """SELECT strftime('%Y-W%W', started_at) wk, theme, COUNT(*) n
-           FROM conversations GROUP BY wk, theme"""
+        """SELECT strftime('%Y-W%W', started_at) wk, gold_theme, COUNT(*) n
+           FROM conversations GROUP BY wk, gold_theme"""
     ).fetchall()
     semanas = sorted({wk for wk, _, _ in rows})
     por_tema: dict[str, dict[str, int]] = {}
@@ -186,7 +186,7 @@ def trend_dados(conn: sqlite3.Connection) -> dict:
 def natureza_dominante(conn: sqlite3.Connection) -> dict[str, tuple[str, float]]:
     """Por tema: (natureza predominante, % que ela representa). À prova de zero."""
     rows = conn.execute(
-        "SELECT theme, friction_nature, COUNT(*) n FROM conversations GROUP BY theme, friction_nature"
+        "SELECT gold_theme, gold_nature, COUNT(*) n FROM conversations GROUP BY gold_theme, gold_nature"
     ).fetchall()
     agg: dict[str, dict[str, int]] = {}
     for theme, nat, n in rows:
@@ -205,16 +205,16 @@ def prioritizacao_dados(conn: sqlite3.Connection) -> list[dict]:
     MECANISMO (fórmula), com os PESOS vindos das constantes do topo:
 
         volume_norm  = n_tema / n_do_tema_líder              (0–1)
-        crit_norm    = AVG(criticality) / CRIT_MAX           (0–1)
+        crit_norm    = AVG(gold_criticality) / CRIT_MAX      (0–1)
         trend        = trend_factor(...) protegido            (~0.5–2.0)
         score = SCORE_SCALE
                 * volume_norm ** PESO_VOLUME
                 * crit_norm   ** PESO_CRITICIDADE
                 * trend       ** PESO_TENDENCIA
     """
-    vols = dict(conn.execute("SELECT theme, COUNT(*) FROM conversations GROUP BY theme").fetchall())
+    vols = dict(conn.execute("SELECT gold_theme, COUNT(*) FROM conversations GROUP BY gold_theme").fetchall())
     crits = dict(
-        conn.execute("SELECT theme, AVG(criticality) FROM conversations GROUP BY theme").fetchall()
+        conn.execute("SELECT gold_theme, AVG(gold_criticality) FROM conversations GROUP BY gold_theme").fetchall()
     )
     nat_dom = natureza_dominante(conn)
     trend = trend_dados(conn)
@@ -294,7 +294,7 @@ def sla_dados(conn: sqlite3.Connection) -> dict:
 
 def temas_ordenados(conn: sqlite3.Connection) -> list[tuple[str, int]]:
     return conn.execute(
-        "SELECT theme, COUNT(*) n FROM conversations GROUP BY theme ORDER BY n DESC"
+        "SELECT gold_theme, COUNT(*) n FROM conversations GROUP BY gold_theme ORDER BY n DESC"
     ).fetchall()
 
 
@@ -304,7 +304,7 @@ ANCHOR_THEME = "account_access"
 
 # Colunas do cabeçalho da conversa lidas em conversas_do_tema (ordem importa).
 _CONV_COLS = (
-    "conversation_id, theme, friction_nature, criticality, outcome, "
+    "conversation_id, gold_theme, gold_nature, gold_criticality, outcome, "
     "asked_for_human, human_handoff_done, context_lost, "
     "sentiment_start, sentiment_end"
 )
@@ -341,7 +341,7 @@ def conversas_do_tema(conn: sqlite3.Connection, theme: str, limite: int = 10) ->
         r[0]
         for r in conn.execute(
             """SELECT conversation_id FROM conversations
-               WHERE theme=? ORDER BY criticality DESC, conversation_id LIMIT ?""",
+               WHERE gold_theme=? ORDER BY gold_criticality DESC, conversation_id LIMIT ?""",
             (theme, limite),
         ).fetchall()
     ]

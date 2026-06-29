@@ -42,13 +42,16 @@ CREATE TABLE conversations (
     user_id            TEXT NOT NULL REFERENCES users(user_id),
     channel            TEXT NOT NULL CHECK (channel IN ('support','jota')),
     started_at         TEXT NOT NULL,                      -- fato; duração é derivada
-    -- rótulos (verdade gerada; em produção viriam de classificador/eval) ──────
-    theme              TEXT NOT NULL CHECK (theme IN
+    -- GABARITO (gold): verdade gerada de cima pra baixo. O prefixo gold_ grita
+    -- "isto é gabarito, não leia pra classificar". O classificador (classifier.py)
+    -- deriva os rótulos só do que existe no mundo real (texto + eventos); o eval
+    -- compara o previsto contra estas colunas. ─────────────────────────────────
+    gold_theme         TEXT NOT NULL CHECK (gold_theme IN
                          ('account_access','pix','kyc','fala_tap','boleto',
                           'account_data','yield_open_finance','other')),
-    friction_nature    TEXT NOT NULL CHECK (friction_nature IN
+    gold_nature        TEXT NOT NULL CHECK (gold_nature IN
                          ('system_signaled','behavior_inferred','absence_detected')),
-    criticality        REAL NOT NULL CHECK (criticality BETWEEN 1 AND 5),
+    gold_criticality   REAL NOT NULL CHECK (gold_criticality BETWEEN 1 AND 5),
     outcome            TEXT NOT NULL CHECK (outcome IN
                          ('resolved','abandoned','escalated','no_response')),
     -- sinais de qualidade do atendimento (extraídos de conversa real) ─────────
@@ -82,7 +85,7 @@ CREATE TABLE events (
 
 -- índices p/ as queries do painel (correlação por usuário e tempo)
 CREATE INDEX idx_conv_user   ON conversations(user_id);
-CREATE INDEX idx_conv_theme  ON conversations(theme, started_at);
+CREATE INDEX idx_conv_theme  ON conversations(gold_theme, started_at);
 CREATE INDEX idx_msg_conv    ON messages(conversation_id, turn_index);
 CREATE INDEX idx_evt_user    ON events(user_id, occurred_at);
 CREATE INDEX idx_evt_type    ON events(event_type, occurred_at);

@@ -33,6 +33,20 @@ class FrictionNature(str, Enum):
     ABSENCE_DETECTED = "absence_detected"    # ausência de um evento esperado (anomaly)
 
 
+class SupportTheme(str, Enum):
+    """Temas do canal de suporte — fonte ÚNICA da lista (schema, painel e
+    classificador referenciam isto, não strings soltas). Ancorados no
+    ReclameAqui real do Jota."""
+    ACCOUNT_ACCESS = "account_access"
+    PIX = "pix"
+    KYC = "kyc"
+    FALA_TAP = "fala_tap"
+    BOLETO = "boleto"
+    ACCOUNT_DATA = "account_data"
+    YIELD_OPEN_FINANCE = "yield_open_finance"
+    OTHER = "other"
+
+
 class Product(str, Enum):
     ACCOUNT = "account"
     PIX = "pix"
