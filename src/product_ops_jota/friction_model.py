@@ -13,19 +13,12 @@ Princípios de engenharia aplicados aqui:
 """
 from __future__ import annotations
 
-from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, Field, model_validator
 
 
 # ───────────────────────────── Enums de domínio ─────────────────────────────
-class Segment(str, Enum):
-    PF = "pf"
-    PJ = "pj"
-    MEI = "mei"
-
-
 class FrictionNature(str, Enum):
     """Como o sinal de atrito chega ao radar — define a disciplina de detecção."""
     SYSTEM_SIGNALED = "system_signaled"      # um evento de falha foi emitido (EDA)
@@ -96,40 +89,6 @@ class InterceptionAction(str, Enum):
     AI_RESOLVE_SILENT = "ai_resolve_silent"  # resolve em background, sem incomodar
     AI_ASSIST = "ai_assist"
     HUMAN_HANDOFF = "human_handoff"
-
-
-# ───────────────────── Fatos (persistidos — imutáveis) ──────────────────────
-class CustomerFacts(BaseModel):
-    """O que de fato aconteceu. Nada aqui é derivado/calculado."""
-    customer_id: str
-    segment: Segment
-    signup_at: datetime
-    last_transaction_at: datetime | None = None
-    kyc_failed_at: datetime | None = None
-    friction_event_count: int = 0
-
-
-# ─────────────── Views derivadas (runtime — nunca persistidas) ──────────────
-def days_since_signup(facts: CustomerFacts, now: datetime) -> int:
-    return (now - facts.signup_at).days
-
-
-def days_inactive(facts: CustomerFacts, now: datetime) -> int | None:
-    if facts.last_transaction_at is None:
-        return None
-    return (now - facts.last_transaction_at).days
-
-
-def journey_stage(facts: CustomerFacts, now: datetime) -> JourneyStage:
-    """Etapa da jornada derivada dos fatos — nunca armazenada."""
-    if days_since_signup(facts, now) <= 1:
-        return JourneyStage.ONBOARDING
-    if facts.last_transaction_at is None:
-        return JourneyStage.ACTIVATION
-    inactive = days_inactive(facts, now)
-    if inactive is not None and inactive > 30:
-        return JourneyStage.AT_RISK
-    return JourneyStage.HABITUAL
 
 
 # ─────────────── Detecção: COMO o atrito é detectado (+ confiança) ──────────

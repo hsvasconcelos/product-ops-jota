@@ -45,7 +45,6 @@ class RetrievedDoc(BaseModel):
     title: str
     content: str
     steps: list[str] = Field(default_factory=list)
-    category: str
     score: float                      # score final (RRF ou BM25, conforme o modo)
 
 
@@ -146,8 +145,7 @@ class Retriever:
         for i, sc in scored[:top_k]:
             d = self.docs[i]
             out.append(RetrievedDoc(id=d["id"], title=d["title"], content=d["content"],
-                                    steps=d.get("steps", []), category=d.get("category", ""),
-                                    score=round(float(sc), 4)))
+                                    steps=d.get("steps", []), score=round(float(sc), 4)))
         return out
 
     def _maybe_rerank(self, query, scored):

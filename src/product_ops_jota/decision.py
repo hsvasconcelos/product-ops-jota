@@ -11,9 +11,8 @@ de interceptação (resolver / assistir / humano) e a PRIORIDADE na fila.
   · P7 (criticidade contextual) → criticidade define a PRIORIDADE na fila.
   · P8 (ROI do cuidado) → atrito trivial não vira interceptação ativa.
 
-Os limiares são CONFIGURAÇÃO TIPADA e versionável (policy), não mágica no
-código (mechanism) — recalibráveis sem tocar na função, com noção de versão
-ativa (o padrão de hot-reload que vimos no material de MLOps).
+Os limiares são CONFIGURAÇÃO TIPADA (policy), não mágica no código
+(mechanism) — recalibráveis sem tocar na função.
 
 Canais: AI_RESOLVE / AI_ASSIST acontecem in-thread no número do Jota.
 HUMAN_HANDOFF é uma transferência QUENTE para o número de atendimento,
@@ -28,7 +27,6 @@ from product_ops_jota.friction_model import FrictionCase, InterceptionAction
 
 # ─────────────── Limiares como política versionável (não mágica) ────────────
 class PolicyThresholds(BaseModel):
-    version: str = "v1"                     # versão ativa da policy (hot-reload)
     conf_floor: float = 0.50                # abaixo disto: não age (palpite fraco)
     roi_crit_floor: float = 2.0             # criticidade trivial...
     roi_trust_floor: float = 0.20           # ...e trust baixo → não incomoda
