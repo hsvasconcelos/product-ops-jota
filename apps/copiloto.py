@@ -34,6 +34,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from product_ops_jota.channels import WhatsAppLine, proactive_line
 from product_ops_jota.classifier import classify_conversation
 from product_ops_jota.decision import DecisionInput, decide
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme
@@ -88,6 +89,11 @@ ACK_BY_THEME = {
 }
 
 SENDER_STYLE = {"customer": "bold white", "human_agent": "green", "bot": "cyan"}
+LINE_LABEL = {
+    WhatsAppLine.SUPPORT: "Suporte (compartilhado)",
+    WhatsAppLine.PRODUCT_PF: "Produto · PF",
+    WhatsAppLine.PRODUCT_PJ: "Produto · PJ/MEI",
+}
 ACTION_LABEL = {
     InterceptionAction.AI_RESOLVE: ("IA RESOLVE in-thread", "green"),
     InterceptionAction.AI_RESOLVE_SILENT: ("IA resolve em background", "green"),
@@ -198,8 +204,11 @@ def render_conversa(conv, detection, docs, sugestao, decisao, rag_mode) -> Panel
     rot = Text()
     rot.append("  ação: ", style="dim"); rot.append(f"{label}\n", style=f"bold {cor}")
     rot.append(f"  prioridade {decisao.priority:.2f}  ·  ", style="dim")
-    rot.append(f"{decisao.reason}", style="dim")
-    blocos.append(Panel(rot, title="roteamento (decision.py)", border_style="blue", box=ROUNDED))
+    rot.append(f"{decisao.reason}\n", style="dim")
+    seg = conv.get("segment", "pf")
+    rot.append(f"  cliente {seg.upper()}  ·  chegou pela linha de Suporte  ·  número proativo (Mundo 2): ", style="dim")
+    rot.append(LINE_LABEL[proactive_line(seg)], style="bold magenta")
+    blocos.append(Panel(rot, title="roteamento (decision.py + canais)", border_style="blue", box=ROUNDED))
 
     return Panel(Group(*blocos),
                  title=f"[{conv['id']}]  {conv['descricao']}", border_style="bright_blue", box=ROUNDED)
