@@ -1,0 +1,114 @@
+[
+  {
+    "id": "ex_pix_loop",
+    "descricao": "CASO-HERÓI: loop de chave Pix — cliente tenta de novo e de novo, sem entender que a chave do destinatário não está ativa",
+    "started_at": "2026-06-20T14:02:00",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-20T14:02:00", "text": "oi, nao consigo mandar um pix"},
+      {"sender": "customer", "sent_at": "2026-06-20T14:02:30", "text": "a chave nao funciona, ja tentei 4 vezes"},
+      {"sender": "human_agent", "sent_at": "2026-06-20T14:05:00", "text": "Oi! Tenta de novo, às vezes é instabilidade."},
+      {"sender": "customer", "sent_at": "2026-06-20T14:06:10", "text": "ja falei que tentei varias vezes, da erro de chave nao encontrada"},
+      {"sender": "customer", "sent_at": "2026-06-20T14:06:40", "text": "o cpf dele ta certo, conferi"}
+    ]
+  },
+  {
+    "id": "ex_kyc_falhou",
+    "descricao": "CASO-HERÓI: KYC falhou — biometria não passou na abertura de conta (evento de sistema correlacionado)",
+    "started_at": "2026-06-21T09:30:00",
+    "eventos": [
+      {"event_type": "kyc.failed", "occurred_at": "2026-06-21T09:28:00"}
+    ],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-21T09:30:00", "text": "to tentando abrir minha conta e nao consigo"},
+      {"sender": "customer", "sent_at": "2026-06-21T09:30:20", "text": "a verificacao da selfie nao passa de jeito nenhum"},
+      {"sender": "human_agent", "sent_at": "2026-06-21T09:40:00", "text": "Entendi, vou verificar."},
+      {"sender": "customer", "sent_at": "2026-06-21T09:52:00", "text": "preciso disso pra receber um pagamento amanha, ta urgente"}
+    ]
+  },
+  {
+    "id": "ex_fala_tap_inseguranca",
+    "descricao": "CASO-HERÓI: insegurança no Fala Tap — vendeu e o dinheiro 'não caiu'; na verdade é D1 (esperado), não erro. Caso clássico de CONFIANÇA: acalmar com fato.",
+    "started_at": "2026-06-22T16:10:00",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-22T16:10:00", "text": "fiz uma venda pelo fala tap e o dinheiro nao caiu"},
+      {"sender": "customer", "sent_at": "2026-06-22T16:10:25", "text": "vendi 480 reais agora de manha, o cliente passou o cartao e aprovou"},
+      {"sender": "customer", "sent_at": "2026-06-22T16:11:00", "text": "cade meu dinheiro?? to precisando pagar um fornecedor"},
+      {"sender": "human_agent", "sent_at": "2026-06-22T16:20:00", "text": "Vou verificar com o time responsável, aguarde."}
+    ]
+  },
+  {
+    "id": "c_real_001",
+    "descricao": "CASO REAL (Hugo × suporte): app fecha sozinho, pediu humano, houve troca de atendente e o segundo chamou pelo nome errado — confiança esfriou.",
+    "started_at": "2026-06-24T09:43:46",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-24T09:43:46", "text": "olá"},
+      {"sender": "human_agent", "sent_at": "2026-06-24T09:44:04", "text": "Oi, Hugo! Sou a Aline, do suporte do Jota, pode contar comigo por aqui."},
+      {"sender": "customer", "sent_at": "2026-06-24T09:49:21", "text": "aline, nao consigo acessar meu app"},
+      {"sender": "customer", "sent_at": "2026-06-24T09:53:30", "text": "fecha sozinho"},
+      {"sender": "customer", "sent_at": "2026-06-24T09:53:43", "text": "preciso falar URGENTE c/ ser humano! agora!!"},
+      {"sender": "human_agent", "sent_at": "2026-06-24T09:57:31", "text": "Oi, Gustavo, bom dia... sou o Gustavo"},
+      {"sender": "customer", "sent_at": "2026-06-24T09:59:45", "text": "não sou o gustavo"}
+    ]
+  },
+  {
+    "id": "ex_boleto_duplicado",
+    "descricao": "Boleto pago e cobrado duas vezes — risco financeiro, cliente quer estorno (evento de sistema correlacionado)",
+    "started_at": "2026-06-23T11:00:00",
+    "eventos": [
+      {"event_type": "charge.duplicated", "occurred_at": "2026-06-23T10:50:00"}
+    ],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-23T11:00:00", "text": "fui cobrado duas vezes pelo mesmo boleto"},
+      {"sender": "customer", "sent_at": "2026-06-23T11:00:30", "text": "debitou 2x no meu cartao, tenho os dois comprovantes"},
+      {"sender": "customer", "sent_at": "2026-06-23T11:01:00", "text": "quero meu estorno, isso e um absurdo"}
+    ]
+  },
+  {
+    "id": "ex_open_finance",
+    "descricao": "Saldo de banco conectado sumiu (Open Finance) — consentimento expirou (evento de sistema)",
+    "started_at": "2026-06-25T19:15:00",
+    "eventos": [
+      {"event_type": "open_finance.consent_expired", "occurred_at": "2026-06-25T19:05:00"}
+    ],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-25T19:15:00", "text": "conectei meu outro banco e o saldo sumiu"},
+      {"sender": "customer", "sent_at": "2026-06-25T19:15:40", "text": "nao aparece mais nada do open finance"}
+    ]
+  },
+  {
+    "id": "ex_pix_pessoa_errada",
+    "descricao": "Pix de R$2000 enviado para a chave ERRADA — irreversível, dinheiro já saiu, a IA não pode desfazer. Trust altíssimo + resolubilidade baixa → deve ir pra HUMANO.",
+    "started_at": "2026-06-27T18:40:00",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-27T18:40:00", "text": "socorro, acabei de mandar um pix de 2000 reais pra chave errada"},
+      {"sender": "customer", "sent_at": "2026-06-27T18:40:20", "text": "era pra ser pro meu fornecedor mas digitei o cpf errado e ja foi"},
+      {"sender": "customer", "sent_at": "2026-06-27T18:40:45", "text": "como eu cancelo?? preciso desse dinheiro de volta AGORA"}
+    ]
+  },
+  {
+    "id": "ex_kyc_limbo",
+    "descricao": "Abertura de conta travada SEM evento de falha (limbo): mandou documentos e nada acontece. Sem evento → behavior_inferred, resolubilidade parcial → deve ir pra ASSISTE (humano no loop). Contraste com ex_kyc_falhou (com evento → resolve).",
+    "started_at": "2026-06-28T10:05:00",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-28T10:05:00", "text": "to tentando abrir minha conta faz dias"},
+      {"sender": "customer", "sent_at": "2026-06-28T10:05:30", "text": "mandei os documentos faz 3 dias e nao saiu do lugar, ninguem fala nada"},
+      {"sender": "human_agent", "sent_at": "2026-06-28T10:18:00", "text": "Vou checar com o time de onboarding."}
+    ]
+  },
+  {
+    "id": "ex_excluir_conta",
+    "descricao": "Cliente quer excluir a conta e atualizar telefone — tema de dados cadastrais (sem evento de sistema)",
+    "started_at": "2026-06-26T08:20:00",
+    "eventos": [],
+    "mensagens": [
+      {"sender": "customer", "sent_at": "2026-06-26T08:20:00", "text": "quero excluir minha conta"},
+      {"sender": "customer", "sent_at": "2026-06-26T08:20:30", "text": "e antes preciso atualizar meu telefone, mudei de numero"},
+      {"sender": "human_agent", "sent_at": "2026-06-26T08:35:00", "text": "Ok."}
+    ]
+  }
+]
