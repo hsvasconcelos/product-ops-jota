@@ -1,4 +1,5 @@
 """Testes do núcleo: schema do mapa de problemas, score de decisão e banco."""
+import json
 import sqlite3
 import sys
 from pathlib import Path
@@ -46,6 +47,20 @@ def test_score_gates():
     # detecção fraca → não age
     d = decide(DecisionInput(criticality=3, trust_risk=0.5, resolvability=0.7, detection_confidence=0.3))
     assert d.action == InterceptionAction.NO_INTERCEPT
+
+
+def test_decision_golden_suite():
+    """O roteador bate com o gabarito de produto curado — guarda de regressão da policy.
+    Se um limiar for recalibrado e quebrar uma expectativa de produto, este teste pega."""
+    golden = json.loads(
+        (Path(__file__).resolve().parents[1] / "evals" / "decision_golden.json").read_text(encoding="utf-8")
+    )
+    assert len(golden) >= 10, "gabarito de decisão muito pequeno"
+    for s in golden:
+        d = decide(DecisionInput(
+            criticality=s["criticality"], trust_risk=s["trust_risk"],
+            resolvability=s["resolvability"], detection_confidence=s["detection_confidence"]))
+        assert d.action.value == s["expected_action"], (s["id"], d.action.value, "esperado", s["expected_action"])
 
 
 def test_db_builds_and_constraints():
