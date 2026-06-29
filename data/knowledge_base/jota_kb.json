@@ -118,5 +118,41 @@
       "Fora do horário, seu caso é registrado e priorizado.",
       "Casos de segurança têm canal prioritário."
     ]
+  },
+  {
+    "id": "KB-FALATAP-001",
+    "title": "Vendi pelo Fala Tap e o dinheiro ainda não caiu na conta",
+    "category": "fala_tap_liquidacao",
+    "content": "No Fala Tap (recebimento por aproximação no celular), o prazo de crédito depende do plano de recebimento, NÃO é um erro quando o dinheiro 'ainda não caiu'. No plano D1 (padrão) o valor de uma venda aprovada hoje cai no próximo dia útil; no plano D0 o crédito é na hora (~5 segundos). Ponto-chave de confiança: assim que a venda é APROVADA, o valor está garantido pela bandeira/adquirente e não depende mais do cliente que pagou — o dinheiro não sai dele e não se perde; o que falta é só o prazo de liquidação do plano. Vendas em fim de semana ou feriado pelo plano D1 liquidam no próximo dia útil. Só é caso de suporte se a venda foi aprovada e o crédito não ocorreu APÓS o prazo do plano (ex.: passou o dia útil seguinte no D1).",
+    "steps": [
+      "Confirme no histórico que a venda está como APROVADA (e o horário da aprovação).",
+      "Verifique o plano de recebimento do lojista: D0 (na hora) ou D1 (próximo dia útil).",
+      "Se for D1 e a venda foi hoje (ou fim de semana), tranquilize: o valor está garantido desde a aprovação e cai no próximo dia útil — não é erro.",
+      "Se já passou o prazo do plano sem crédito, aí sim acione o suporte com o ID da venda para investigar a liquidação."
+    ]
+  },
+  {
+    "id": "KB-DADOS-001",
+    "title": "Alterar dados cadastrais ou excluir a conta",
+    "category": "dados_cadastrais",
+    "content": "Dados como telefone, e-mail e endereço podem ser atualizados pelo próprio cliente no app; alguns campos sensíveis (CPF, nome) exigem validação de identidade por segurança. A exclusão de conta é um direito do titular (LGPD): pode ser solicitada, mas exige saldo zerado e quitação de pendências antes de concluir, e há prazo legal de guarda de alguns registros mesmo após a exclusão. Trocar o e-mail/telefone que recebe os códigos de acesso é sensível porque protege contra sequestro de conta — por isso pode pedir reautenticação.",
+    "steps": [
+      "Para telefone, e-mail ou endereço: acesse Perfil > Dados cadastrais e edite o campo.",
+      "Se o sistema pedir, confirme sua identidade (código ou biometria) — é proteção contra fraude.",
+      "Para alterar CPF ou nome, é preciso validação com documento; um atendente conduz.",
+      "Para excluir a conta: zere o saldo e quite pendências; depois solicite a exclusão, que é registrada conforme a LGPD."
+    ]
+  },
+  {
+    "id": "KB-ACESSO-001",
+    "title": "App fecha sozinho ou não abre (não consigo acessar a conta)",
+    "category": "acesso_app",
+    "content": "Quando o app fecha sozinho logo ao abrir (crash na inicialização), o acesso e o saldo continuam SEGUROS — é um problema de execução do app no aparelho, não da conta. As causas mais comuns no Android são, em ordem: (1) MODO DESENVOLVEDOR ativo com a opção 'Não manter atividades' (Don't keep activities) marcada — ela encerra cada tela assim que abre e é a causa nº1 de 'fecha sozinho'; (2) versão desatualizada do app; (3) cache corrompido. No iPhone costuma ser versão desatualizada ou pouca memória disponível. Em quase todos os casos o cliente resolve sozinho em 1 minuto, sem precisar de suporte.",
+    "steps": [
+      "No Android, abra Configuracoes > Sistema > Opcoes do desenvolvedor e DESATIVE 'Nao manter atividades' (ou desligue o Modo desenvolvedor inteiro). Essa e a causa nº1.",
+      "Atualize o app para a ultima versao na Play Store / App Store.",
+      "Se persistir, limpe o cache do app (Configuracoes do app > Armazenamento > Limpar cache) ou reinstale — seus dados e saldo nao se perdem.",
+      "Reinicie o aparelho e abra o app de novo. Se ainda fechar, um atendente verifica logs do dispositivo com voce."
+    ]
   }
 ]
