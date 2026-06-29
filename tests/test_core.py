@@ -1,0 +1,70 @@
+"""Testes do núcleo: schema do mapa de problemas, score de decisão e banco."""
+import sqlite3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from product_ops_jota.friction_model import (
+    HERO_CASES, DetectionRule, FrictionNature, criticality_score, trust_risk_score,
+)
+from product_ops_jota.decision import decide, decide_for_case, DecisionInput, InterceptionAction
+from product_ops_jota.support_db import init_db, seed_real_conversation
+
+
+def test_hero_cases_instantiate():
+    assert len(HERO_CASES) == 3
+    for c in HERO_CASES:
+        assert 1 <= c.criticality_value <= 5
+        assert 0 <= c.trust_risk_value <= 1
+
+
+def test_detection_rule_failfast():
+    try:
+        DetectionRule(nature=FrictionNature.SYSTEM_SIGNALED)  # falta event_type
+        assert False, "deveria rejeitar"
+    except ValueError:
+        pass
+
+
+def test_score_decides_hero_cases():
+    resolv = {"pix_key_loop": 0.85, "kyc_failed_onboarding": 0.45, "fala_tap_receipt_anxiety": 0.90}
+    expected = {
+        "pix_key_loop": InterceptionAction.AI_RESOLVE,
+        "kyc_failed_onboarding": InterceptionAction.AI_ASSIST,
+        "fala_tap_receipt_anxiety": InterceptionAction.AI_RESOLVE,
+    }
+    for c in HERO_CASES:
+        d = decide_for_case(c, resolv[c.case_id])
+        assert d.action == expected[c.case_id], (c.case_id, d.action)
+
+
+def test_score_gates():
+    # trust alto + irreversível + IA não resolve → humano
+    d = decide(DecisionInput(criticality=5, trust_risk=0.9, resolvability=0.2, detection_confidence=1.0))
+    assert d.action == InterceptionAction.HUMAN_HANDOFF
+    # detecção fraca → não age
+    d = decide(DecisionInput(criticality=3, trust_risk=0.5, resolvability=0.7, detection_confidence=0.3))
+    assert d.action == InterceptionAction.NO_INTERCEPT
+
+
+def test_db_builds_and_constraints():
+    conn = init_db(":memory:")
+    seed_real_conversation(conn)
+    n = conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+    assert n == 1
+    # CHECK constraint barra theme inválido
+    try:
+        conn.execute("INSERT INTO conversations VALUES "
+                     "('x','u_hugo','support','2026-01-01','INVALID','behavior_inferred',3,'resolved',0,0,0,0,0)")
+        assert False, "deveria barrar"
+    except sqlite3.IntegrityError:
+        pass
+
+
+if __name__ == "__main__":
+    for name, fn in list(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            fn()
+            print(f"✓ {name}")
+    print("todos os testes passaram")
