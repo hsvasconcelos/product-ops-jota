@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 import time
+import unicodedata
 from html import escape as _esc
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -301,6 +302,7 @@ def analisar(sess):
     # falha → o procedimento não resolveu → humano. O fix-streak é backstop; tema novo zera.
     if sess.get("last_theme") != det.predicted_theme.value:
         sess["stuck_signals"] = 0                       # tema novo → zera a contagem de falhas
+        sess["acesso_clarify_asked"] = False            # atrito novo → pode perguntar de novo
     sess["last_theme"] = det.predicted_theme.value
     # sinal de "fix falhou": fast path keyword (in_loop); se não pegou e já houve tentativa,
     # pergunta ao LLM (robusto a fraseado oblíquo, o furo que o eval-LLM expôs).
@@ -329,7 +331,8 @@ _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comport
 def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
     """Formato 'bulletado por área' em HTML (negrito confiável) — pra plateia de engenheiros."""
     doc = docs[0] if docs else None
-    gr = {"pass": "passou", "blocked": "bloqueou (trocou por procedimento ancorado)"}.get(guardrail, "—")
+    gr = {"pass": "passou", "blocked": "bloqueou (trocou por procedimento ancorado)",
+          "skip": "não se aplica (resposta canônica, sem LLM)"}.get(guardrail, "—")
     sinais = [n for n, v in (("pediu humano", det.asked_for_human), ("frustrado", det.frustrated),
                              ("desanimado", det.disappointed), ("em loop", det.in_loop),
                              ("confuso", det.confused), ("⚠️ vulnerável", det.safety_concern)) if v]
@@ -480,6 +483,46 @@ def handle_command(chat_id, cmd, name=""):
     send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
 
 
+# "acesso" é ambíguo (app do Jota? login? WhatsApp?). Termos que apontam o WhatsApp-em-si
+# (app da Meta, fora do escopo) e termos que JÁ desambiguam (aí não precisa perguntar).
+WHATSAPP_TERMS = ("whatsapp", "whats app", "wpp", "zapzap", "zap", "whats", "watsap", "uatsap")
+ACESSO_ESPECIFICO = ("fecha", "trava", "senha", "login", "abrir conta", "abertura de conta",
+                     "biometria", "selfie", "app do jota", "aplicativo do jota", "tela branca",
+                     "atualiz", "cache", "reinstal", "esqueci")
+
+
+def _norm(t: str) -> str:
+    t = unicodedata.normalize("NFKD", t or "").lower()
+    return "".join(c for c in t if not unicodedata.combining(c))
+
+
+ACESSO_GENERICO = ("acess", "nao entro", "nao consigo entrar", "nao consigo acessar",
+                   "logar", "login", "entrar na conta")
+
+
+def _acesso_shortcircuit(text, det, sess):
+    """Antes de despejar procedimento num atrito de ACESSO (ambíguo por natureza — "acessar"
+    cai ora em account_access, ora em kyc/"abrir conta"). Roda no CLUSTER de conta:
+      1) se o cliente fala do WhatsApp-em-si → defle­te pro suporte da Meta (fora do escopo);
+      2) se é acesso GENÉRICO (sem dizer qual superfície) no 1º toque → PERGUNTA uma vez.
+    Devolve (reply, kind) ou None (segue o fluxo normal)."""
+    if det.predicted_theme not in (_T.ACCOUNT_ACCESS, _T.KYC):
+        return None
+    norm = _norm(text)
+    if any(w in norm for w in WHATSAPP_TERMS):
+        return ("Ah, entendi! Aqui é o *Jota no WhatsApp* — se o problema for no WhatsApp em si "
+                "(o app da Meta), isso foge do que eu resolvo; o caminho é o suporte do próprio "
+                "WhatsApp. 🙏\n\nMas se for pra acessar sua *conta do Jota* (app ou login), me diz "
+                "que eu te ajudo agora mesmo! 💚", "deflect")
+    generico = any(g in norm for g in ACESSO_GENERICO)
+    especifico = any(s in norm for s in ACESSO_ESPECIFICO)
+    if generico and not especifico and not sess.get("acesso_clarify_asked"):
+        sess["acesso_clarify_asked"] = True
+        return ("Pra te ajudar certinho: é pra acessar o *app do Jota* no celular, fazer *login* na "
+                "sua conta, ou é o *WhatsApp* em si? Me diz qual que eu já resolvo. 💚", "clarify")
+    return None
+
+
 def run_turn(sess, text):
     """O CÉREBRO de um turno, sem Telegram: detecta → decide → redige/handoff → atualiza
     o esgotamento. Reusado pelo bot (handle_message) E pelo simulador de conversas (eval)."""
@@ -500,18 +543,25 @@ def run_turn(sess, text):
             reply += f"\n\nE {work}, sem precisar esperar. 😉"
         kind = "handoff"
     else:
-        reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
-                      doc=doc, disappointed=det.disappointed)
-        # GUARDRAIL de saída: se a resposta do LLM não estiver ancorada, NÃO envia — troca pelo
-        # procedimento determinístico da KB (grounded por construção). Confiança é o produto.
-        ok, _why = guardrail_check(reply, doc)
-        guardrail = "pass" if ok else "blocked"
-        if not ok:
-            sug = montar_sugestao(det.predicted_theme, docs)
-            reply = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
-                     if sug else "Deixa eu confirmar isso certinho pra não te passar nada errado sobre a sua conta. 🙏")
-        sess["history"].append({"role": "assistant", "content": reply})
-        kind = "resolve"
+        # ACESSO ambíguo: deflete WhatsApp-em-si / pergunta antes de despejar (1º toque).
+        sc = _acesso_shortcircuit(text, det, sess)
+        if sc:
+            reply, kind = sc
+            guardrail = "skip"          # resposta canônica, não passa pelo LLM
+            sess["history"].append({"role": "assistant", "content": reply})
+        else:
+            reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
+                          doc=doc, disappointed=det.disappointed)
+            # GUARDRAIL de saída: se a resposta do LLM não estiver ancorada, NÃO envia — troca pelo
+            # procedimento determinístico da KB (grounded por construção). Confiança é o produto.
+            ok, _why = guardrail_check(reply, doc)
+            guardrail = "pass" if ok else "blocked"
+            if not ok:
+                sug = montar_sugestao(det.predicted_theme, docs)
+                reply = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
+                         if sug else "Deixa eu confirmar isso certinho pra não te passar nada errado sobre a sua conta. 🙏")
+            sess["history"].append({"role": "assistant", "content": reply})
+            kind = "resolve"
     trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
            "confianca": inp.detection_confidence, "criticidade": inp.criticality,
            "trust": inp.trust_risk, "resolubilidade": inp.resolvability,
