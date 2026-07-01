@@ -94,6 +94,7 @@ EVENT_THEME = {
     "tap_to_pay.payment_approved": SupportTheme.FALA_TAP,
     "session.crashed": SupportTheme.ACCOUNT_ACCESS,
     "charge.duplicated": SupportTheme.BOLETO, "payment.duplicate": SupportTheme.BOLETO,
+    "payment.charged": SupportTheme.BOLETO,   # cobrança (duplicidade → estorno) vive no tema boleto
     "open_finance.consent_expired": SupportTheme.YIELD_OPEN_FINANCE,
     "bank.sync_stale": SupportTheme.YIELD_OPEN_FINANCE,
     "data_change.requested": SupportTheme.ACCOUNT_DATA,

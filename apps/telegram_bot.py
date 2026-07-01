@@ -287,6 +287,7 @@ def analisar(sess):
     ctx = [{"role": "user", "content": sess["context_text"]}] if sess.get("context_text") else []
     hist = ctx + sess["history"]
     det = classify_conversation(_msgs(hist, base), sess["events"], sess["started_at"],
+                                expected_events=sess.get("expected_events") or None,
                                 retriever=retriever, judge=theme_judge)
     txt = " ".join(h["content"] for h in hist if h["role"] == "user")
     docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=TOP_K)
@@ -402,7 +403,7 @@ def _new_session(seg="pf", events=None, context_text="", started=None, name=""):
     return {"segment": seg, "events": events or [], "context_text": context_text,
             "started_at": started or datetime.now().isoformat(), "history": [],
             "profile": UserProfile(segment=seg), "name": name, "greeted": False,
-            "stuck_signals": 0}
+            "stuck_signals": 0, "expected_events": []}
 
 
 def _saudacao(name):
@@ -450,10 +451,13 @@ def handle_command(chat_id, cmd, name=""):
         c = SCENARIOS[sid]
         seg = c.get("segment", "pf")
         events = [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])]
-        # PROATIVO event-driven: injeta SÓ o evento (context_text="") — a detecção vem do EVENTO,
-        # não de texto de cliente. Arma o cenário e ESPERA o cliente abrir o chat (jornada real).
-        sess = _new_session(seg, events, "", c["started_at"], name=name)
+        # PROATIVO: a detecção usa os FACTS (descrição NEUTRA do que aconteceu) como contexto —
+        # tema correto sem sinal-fantasma de emoção (que vinha do texto de cliente injetado).
+        # Arma o cenário e ESPERA o cliente abrir o chat (jornada real).
+        sess = _new_session(seg, events, FACTS.get(sid, ""), c["started_at"], name=name)
         sess["proactive_pending"] = sid
+        if sid == "ex_kyc_limbo":                       # limbo = AUSÊNCIA: vigia o evento esperado
+            sess["expected_events"] = [("onboarding.completed", 60)]
         SESSIONS[chat_id] = sess
         counts: dict = {}
         for et, _ in events:
