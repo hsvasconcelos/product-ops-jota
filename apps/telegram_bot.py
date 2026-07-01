@@ -43,7 +43,7 @@ if _envf.exists():
             _k, _v = _l.split("=", 1)
             os.environ.setdefault(_k, _v)
 
-from product_ops_jota.classifier import classify_conversation              # noqa: E402
+from product_ops_jota.classifier import classify_conversation, prefer_theme  # noqa: E402
 from product_ops_jota.decision import (                                    # noqa: E402
     decide, derive_decision_input, derive_resolubilidade, UserProfile,
 )
@@ -290,7 +290,10 @@ def analisar(sess):
                                 expected_events=sess.get("expected_events") or None,
                                 retriever=retriever, judge=theme_judge)
     txt = " ".join(h["content"] for h in hist if h["role"] == "user")
-    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=TOP_K)
+    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=TOP_K + 2)
+    # o RAG respeita o tema detectado: promove o doc DO tema à frente (BM25 leve
+    # senão confunde "acessar wpp" com "reconectar banco"). Sem match, ordem original.
+    docs = prefer_theme(docs, det.predicted_theme, det.theme_confidence)[:TOP_K]
     doc = docs[0] if docs else None
     # ESGOTAMENTO: o sinal PRIMÁRIO é o do CLIENTE (determinístico, independe do reply do LLM):
     # quantas vezes ele disse "não funcionou / continua / já tentei" (in_loop). 2 sinais de
@@ -530,7 +533,8 @@ def _deliver_proactive(chat_id, sess, text):
     # (ex.: duplicidade → KB-ESTORNO-001, não KB-BOLETO-001), aí o opener fica grounded e passa.
     facts = FACTS.get(sid, "")
     if facts:
-        enriched = retriever.retrieve(f"{facts} {det.predicted_theme.value.replace('_', ' ')}", top_k=TOP_K)
+        enriched = retriever.retrieve(f"{facts} {det.predicted_theme.value.replace('_', ' ')}", top_k=TOP_K + 2)
+        enriched = prefer_theme(enriched, det.predicted_theme, det.theme_confidence)[:TOP_K]
         if enriched:
             docs = enriched
     doc = docs[0] if docs else None

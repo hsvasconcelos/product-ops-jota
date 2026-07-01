@@ -24,7 +24,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from product_ops_jota.classifier import ClassifierOutput, DOC_THEME_PREFIX
+from product_ops_jota.classifier import ClassifierOutput, doc_theme as _doc_theme
 from product_ops_jota.friction_model import (
     CriticalityFactors, ExitBarrier, FrictionCase, FrictionNature, InterceptionAction,
     Reversibility, SupportTheme, TrustRiskFactors, criticality_score, trust_risk_score,
@@ -53,6 +53,7 @@ class DecisionInput(BaseModel):
     detection_confidence: float = Field(ge=0.0, le=1.0)  # quão certo é o atrito?
     safety_flag: bool = False                          # vulnerável (ludopatia/autoexclusão) → gate de segurança
     stuck: bool = False                                # IA já tentou e o cliente segue travado (loop) → esgotamento
+    requires_human: bool = False                       # a KB marca o procedimento como privilégio/humano (ex.: excluir conta/LGPD)
 
 
 class Decision(BaseModel):
@@ -98,6 +99,15 @@ def decide(inp: DecisionInput, t: PolicyThresholds = DEFAULT_THRESHOLDS) -> Deci
     if inp.stuck:
         return out(InterceptionAction.HUMAN_HANDOFF,
                    "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
+                   warm=True)
+
+    # 0.7) Gate de POLÍTICA da KB: o procedimento é curado como `requires_human` (privilégio
+    # ou ação irreversível — ex.: excluir conta / apagar dados / LGPD). A IA NÃO orienta o
+    # cliente a se auto-destruir nem "assiste" pela metade: rota determinística pro humano,
+    # com contexto. É o Product Ops (o loop) decidindo de propósito, não capacidade marginal.
+    if inp.requires_human:
+        return out(InterceptionAction.HUMAN_HANDOFF,
+                   "procedimento exige humano por política da KB (privilégio/irreversível); humano com contexto",
                    warm=True)
 
     # 1) Gate de confiança (P4/P8): não se age sobre um palpite fraco.
@@ -283,13 +293,6 @@ def derive_trust_factors(det: ClassifierOutput, prof: UserProfile,
     )
 
 
-def _doc_theme(doc_id: str) -> SupportTheme | None:
-    for prefix, th in DOC_THEME_PREFIX.items():
-        if doc_id.startswith(prefix):
-            return th
-    return None
-
-
 def derive_resolubilidade(det: ClassifierOutput, doc=None) -> Resolubilidade:
     """Capacidade vem da KB, NÃO de uma lista de temas no código (acaba o whack-a-mole).
       · kb_existe   = temos procedimento pro atrito (todo tema menos OTHER tem doc na KB).
@@ -320,6 +323,10 @@ def derive_decision_input(det: ClassifierOutput, prof: UserProfile, customer_tex
     if det.asked_for_human:
         trust = min(1.0, trust + HEAT_TRUST_BUMP)
     resol = derive_resolubilidade(det, doc)
+    # requires_human só vale se o doc for DO TEMA detectado (anti mis-retrieval: doc errado
+    # não impõe sua política) — mesma trava do derive_resolubilidade.
+    on_topic = doc is not None and _doc_theme(doc.id) == det.predicted_theme
+    requires_human = bool(getattr(doc, "requires_human", False)) and on_topic
     return DecisionInput(
         criticality=round(crit, 2),
         trust_risk=round(trust, 2),
@@ -327,4 +334,5 @@ def derive_decision_input(det: ClassifierOutput, prof: UserProfile, customer_tex
         detection_confidence=round(min(det.theme_confidence, det.nature_confidence), 2),
         safety_flag=det.safety_concern,
         stuck=stuck,
+        requires_human=requires_human,
     )

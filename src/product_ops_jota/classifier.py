@@ -62,7 +62,10 @@ THEME_KEYWORDS: dict[SupportTheme, list[str]] = {
     SupportTheme.BOLETO: ["boleto", "estorno", "estornar", "cobrado", "cobranca", "duplicada",
                           "duas vezes", "em aberto", "paguei e continua"],
     SupportTheme.ACCOUNT_DATA: ["alterar meus dados", "alterar dados", "atualizar", "mudar meu cadastro",
-                                "mudar cadastro", "excluir minha conta", "trocar email", "trocar o email",
+                                "mudar cadastro", "excluir minha conta", "excluir a conta", "excluir conta",
+                                "excluir a minha conta", "apagar meus dados", "apagar dados", "apagar meus dado",
+                                "deletar", "encerrar conta", "encerrar minha conta", "cancelar minha conta",
+                                "cancelar a conta", "lgpd", "trocar email", "trocar o email",
                                 "atualizar meu telefone", "mudar telefone"],
     SupportTheme.YIELD_OPEN_FINANCE: ["rende", "rendimento", "rende+", "open finance", "consentimento",
                                       "conectei outro banco", "nao rende"],
@@ -83,6 +86,27 @@ DOC_THEME_PREFIX = {
     "KB-RENDE": SupportTheme.YIELD_OPEN_FINANCE, "KB-ACESSO": SupportTheme.ACCOUNT_ACCESS,
     "KB-CONTA": SupportTheme.ACCOUNT_ACCESS, "KB-DADOS": SupportTheme.ACCOUNT_DATA,
 }
+
+
+def doc_theme(doc_id: str) -> SupportTheme | None:
+    """Tema de um doc pela convenção de id (KB-ACESSO → ACCOUNT_ACCESS)."""
+    for prefix, th in DOC_THEME_PREFIX.items():
+        if doc_id.startswith(prefix):
+            return th
+    return None
+
+
+def prefer_theme(docs: list, theme: SupportTheme, confidence: float = 1.0,
+                 floor: float = 0.60) -> list:
+    """Reordena docs (estável) pondo à frente os cujo tema BATE com o tema detectado.
+    O classificador já é a melhor aposta do tema; o RAG deve respeitá-la em vez de
+    rankear só por termo — o BM25 leve confunde "acessar meu wpp" (acesso) com
+    "reconectar banco" (open finance). Age só com tema confiável e não-OTHER; sem
+    doc do tema entre os candidatos, devolve a ordem original (não inventa)."""
+    if theme == SupportTheme.OTHER or confidence < floor:
+        return docs
+    match = [d for d in docs if doc_theme(d.id) == theme]
+    return match + [d for d in docs if doc_theme(d.id) != theme] if match else docs
 
 # Evento de sistema → tema (determinístico). Quando há evento correlacionado, ele é
 # evidência FORTE do tema — funde com a semântica do texto ("determinístico onde dá").
@@ -246,7 +270,8 @@ THEME_ANCHORS: dict[SupportTheme, list[str]] = {
                                   "não consigo entrar na conta que já tenho pra ver meu saldo",
                                   "preciso acessar minha conta pra resgatar meu dinheiro e não consigo"],
     SupportTheme.ACCOUNT_DATA: ["quero alterar meus dados cadastrais", "trocar meu telefone ou email",
-                               "quero excluir a minha conta", "pedi pra excluir a conta e ela voltou"],
+                               "quero excluir a minha conta", "pedi pra excluir a conta e ela voltou",
+                               "quero apagar meus dados e encerrar a conta", "deletar minha conta pela lgpd"],
     SupportTheme.YIELD_OPEN_FINANCE: ["dúvida sobre o rendimento de 100% do cdi", "conectei outro banco e o saldo sumiu",
                                       "open finance não atualiza o saldo", "quero trazer dinheiro de outro banco"],
     SupportTheme.OTHER: ["tenho uma dúvida geral", "não encontro essa função, onde fica",

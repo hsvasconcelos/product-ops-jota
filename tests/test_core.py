@@ -100,6 +100,24 @@ def test_db_builds_and_constraints():
         pass
 
 
+def test_retrieval_respeita_tema():
+    """Regressão do bug ao vivo: em BM25 (prod), 'acessar meu wpp' rankeava o doc de
+    Open Finance na frente do de acesso. O theme-gating (prefer_theme) promove o doc
+    DO tema detectado — o RAG respeita o classificador em vez de rankear só por palavra."""
+    import os
+    os.environ["JOTA_RAG_MODE"] = "bm25"                    # força o modo do prod-leve
+    from product_ops_jota.rag import Retriever
+    from product_ops_jota.classifier import prefer_theme, doc_theme
+    from product_ops_jota.friction_model import SupportTheme
+    r = Retriever()
+    docs = r.retrieve("nao estou conseguindo acessar meu wpp", top_k=4)
+    assert doc_theme(docs[0].id) != SupportTheme.ACCOUNT_ACCESS, "pré-condição: BM25 erra sem o gate"
+    fixed = prefer_theme(docs, SupportTheme.ACCOUNT_ACCESS, 0.99)
+    assert fixed[0].id.startswith("KB-ACESSO"), f"gate falhou: veio {fixed[0].id}"
+    # sem tema confiável, NÃO reordena (não inventa)
+    assert prefer_theme(docs, SupportTheme.ACCOUNT_ACCESS, 0.10)[0].id == docs[0].id
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):
