@@ -290,9 +290,10 @@ def analisar(sess):
                                 expected_events=sess.get("expected_events") or None,
                                 retriever=retriever, judge=theme_judge)
     txt = " ".join(h["content"] for h in hist if h["role"] == "user")
-    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=TOP_K + 2)
-    # o RAG respeita o tema detectado: promove o doc DO tema à frente (BM25 leve
-    # senão confunde "acessar wpp" com "reconectar banco"). Sem match, ordem original.
+    # pool amplo (8) ANTES do gate p/ o doc do tema aparecer mesmo se rankeado no meio
+    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=8)
+    # o RAG respeita o tema detectado: promove o doc DO tema à frente (senão o léxico/denso
+    # confunde "acessar wpp" com "reconectar banco"). Sem match, ordem original.
     docs = prefer_theme(docs, det.predicted_theme, det.theme_confidence)[:TOP_K]
     doc = docs[0] if docs else None
     # ESGOTAMENTO: o sinal PRIMÁRIO é o do CLIENTE (determinístico, independe do reply do LLM):
@@ -533,7 +534,7 @@ def _deliver_proactive(chat_id, sess, text):
     # (ex.: duplicidade → KB-ESTORNO-001, não KB-BOLETO-001), aí o opener fica grounded e passa.
     facts = FACTS.get(sid, "")
     if facts:
-        enriched = retriever.retrieve(f"{facts} {det.predicted_theme.value.replace('_', ' ')}", top_k=TOP_K + 2)
+        enriched = retriever.retrieve(f"{facts} {det.predicted_theme.value.replace('_', ' ')}", top_k=8)
         enriched = prefer_theme(enriched, det.predicted_theme, det.theme_confidence)[:TOP_K]
         if enriched:
             docs = enriched

@@ -36,8 +36,9 @@ logger = logging.getLogger("product_ops_jota.rag")
 KB_PATH = Path(__file__).resolve().parents[2] / "data" / "knowledge_base" / "jota_kb.json"
 TOP_K = 3                      # docs retornados por padrão
 RRF_K = 60                     # constante da reciprocal rank fusion (padrão da literatura)
-DENSE_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"   # pequeno, multilíngue
-CROSS_ENCODER = "cross-encoder/ms-marco-MiniLM-L-6-v2"  # re-rank opcional
+DENSE_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"   # pequeno, multilíngue (local)
+CROSS_ENCODER = "cross-encoder/ms-marco-MiniLM-L-6-v2"  # re-rank opcional (local)
+DENSE_API_MODEL = "text-embedding-3-small"             # densos HOSPEDADOS (sem torch no container)
 RRF_CANDIDATES = 8             # quantos candidatos cada camada manda pra fusão
 
 
@@ -78,23 +79,30 @@ class Retriever:
         self._bm25 = BM25Okapi(self._tokenized)
 
         # ── Densos + re-rank (tranca 1 e 2) ──────────────────────────────────
-        self._dense_model = None
+        self._dense_model = None      # modelo local (sentence-transformers), se houver
+        self._oai = None              # cliente OpenAI (densos hospedados), se houver
         self._doc_embeddings = None
         self._cross_encoder = None
         self.mode = "bm25"
         motivo = self._try_load_dense()
-        if self._dense_model is not None:
-            self.mode = "hibrido"
-            logger.info("RAG: modo híbrido (BM25 + densos%s)",
+        if self._doc_embeddings is not None:
+            self.mode = "hibrido-api" if self._oai is not None else "hibrido"
+            logger.info("RAG: modo %s (BM25 + densos%s)", self.mode,
                         " + rerank" if self._cross_encoder else "")
         else:
             logger.info("RAG: modo BM25 fallback (densos indisponíveis: %s)", motivo)
 
     def _try_load_dense(self) -> str:
         """Tenta habilitar densos. Devolve o motivo da falha (string vazia se ok).
-        NUNCA levanta — o chamador segue com BM25."""
-        if os.environ.get("JOTA_RAG_MODE", "").lower() == "bm25":
+        NUNCA levanta — o chamador segue com BM25.
+          · JOTA_RAG_MODE=bm25   → força leve (sem densos)
+          · JOTA_RAG_MODE=openai → densos HOSPEDADOS (sem torch, cabe em RAM pequena)
+          · (padrão)             → densos LOCAIS (sentence-transformers), se instalados"""
+        mode = os.environ.get("JOTA_RAG_MODE", "").lower()
+        if mode == "bm25":
             return "forçado BM25 (JOTA_RAG_MODE=bm25) — deploy leve, sem torch"
+        if mode == "openai":
+            return self._load_openai_dense()
         try:
             from sentence_transformers import SentenceTransformer  # tranca 1
         except Exception as e:
@@ -114,14 +122,44 @@ class Retriever:
             self._cross_encoder = None
         return ""
 
+    def _load_openai_dense(self) -> str:
+        """Densos HOSPEDADOS (embeddings da OpenAI): qualidade híbrida SEM torch no
+        container — worker leve + embedder gerenciado (arquitetura de produção real).
+        NUNCA levanta; sem key/rede, o chamador cai no BM25."""
+        try:
+            from openai import OpenAI
+            self._oai = OpenAI()                                  # key vem do ambiente
+            self._doc_embeddings = self._oai_embed([_doc_text(d) for d in self.docs])
+        except Exception as e:
+            self._oai = None
+            self._doc_embeddings = None
+            return f"openai embeddings indisponível ({type(e).__name__})"
+        return ""
+
+    def _oai_embed(self, texts):
+        """Embeddings hospedados, normalizados (p/ cosseno). Uma chamada por lote."""
+        import numpy as np
+        resp = self._oai.embeddings.create(model=DENSE_API_MODEL, input=list(texts))
+        vecs = np.array([d.embedding for d in resp.data], dtype="float32")
+        norms = np.linalg.norm(vecs, axis=1, keepdims=True)
+        return vecs / np.clip(norms, 1e-9, None)
+
+    def _encode(self, texts):
+        """Embeddings normalizados p/ cosseno — dispatch local vs hospedado.
+        None em BM25 puro (o chamador cai no keyword)."""
+        if self._dense_model is not None:
+            return self._dense_model.encode(list(texts), normalize_embeddings=True)
+        if self._oai is not None:
+            return self._oai_embed(texts)
+        return None
+
     # ── ranking helpers ──────────────────────────────────────────────────────
     def _bm25_ranking(self, query: str) -> list[int]:
         scores = self._bm25.get_scores(_tokenize(query))
         return sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
 
     def _dense_ranking(self, query: str) -> list[int]:
-        import numpy as np
-        q = self._dense_model.encode([query], normalize_embeddings=True)[0]
+        q = self._encode([query])[0]
         sims = self._doc_embeddings @ q          # cosseno (já normalizado)
         return sorted(range(len(sims)), key=lambda i: float(sims[i]), reverse=True)
 
@@ -136,13 +174,11 @@ class Retriever:
     def embed(self, texts):
         """Embeddings normalizados (p/ classificação semântica por cosseno). None se
         rodando em modo BM25 (densos indisponíveis) — o chamador cai no keyword."""
-        if self._dense_model is None:
-            return None
-        return self._dense_model.encode(list(texts), normalize_embeddings=True)
+        return self._encode(list(texts))
 
     def retrieve(self, query: str, top_k: int = TOP_K) -> list[RetrievedDoc]:
         """Recupera os top_k docs mais relevantes. Funciona em qualquer modo."""
-        if self.mode == "hibrido":
+        if self._doc_embeddings is not None:          # híbrido (densos locais OU hospedados)
             fused = self._rrf([self._bm25_ranking(query), self._dense_ranking(query)])
             ordered = sorted(fused, key=lambda i: fused[i], reverse=True)
             scored = [(i, fused[i]) for i in ordered]

@@ -250,7 +250,7 @@ def main():
     for conv in conversas:
         messages, events, started_at = _adaptar(conv)
         detection = classify_conversation(messages, events, started_at)
-        docs = retriever.retrieve(montar_query(conv, detection.predicted_theme), top_k=TOP_K + 2)
+        docs = retriever.retrieve(montar_query(conv, detection.predicted_theme), top_k=8)
         docs = prefer_theme(docs, detection.predicted_theme, detection.theme_confidence)[:TOP_K]
         sugestao = montar_sugestao(detection.predicted_theme, docs)
         customer_text = " ".join(m["text"] for m in conv["mensagens"] if m["sender"] == "customer")

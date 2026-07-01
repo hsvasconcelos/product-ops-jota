@@ -1,10 +1,16 @@
 # Deploy do bot Telegram — sempre no ar (sem depender do notebook)
 
-O bot faz **long polling** (não precisa de URL pública/webhook), roda em modo **híbrido**
-(BM25 + densos + rerank — os modelos são assados na imagem no build, sem download em runtime).
-É a mesma qualidade do dev: detecção de tema 87.6%, retrieval Hit@3 100%. Imagem ~2GB (torch
-CPU-only), RAM de runtime ~1GB. O modo leve BM25 (`JOTA_RAG_MODE=bm25`) segue disponível como
-fallback, mas medimos que degrada o tema pra ~76% e confunde o retrieval — por isso prod = híbrido.
+O bot faz **long polling** (não precisa de URL pública/webhook), roda em modo **híbrido via densos
+HOSPEDADOS** (`JOTA_RAG_MODE=openai`): BM25 + embeddings da OpenAI (`text-embedding-3-small`) + RRF,
+**sem torch**. Worker stateless leve + embedder gerenciado = arquitetura de produção real. Imagem
+~650MB, RAM ~200MB → cabe no plano trial do Railway. Qualidade medida: tema 90.5%, natureza 100%,
+retrieval Hit@k 92.9% cru / ~100% com o gate de tema (`prefer_theme`) no fluxo do bot — iguala/supera
+o híbrido local. Custo dos embeddings desprezível (1 chamada por mensagem). O bot já depende da OpenAI
+(LLM da resposta), então o embedder hospedado não adiciona ponto de falha novo.
+
+> **Variantes do RAG** (`JOTA_RAG_MODE`): `openai` (padrão do deploy) · `bm25` (só léxico, offline,
+> sem custo de API) · *(sem a var)* densos LOCAIS com torch (~2.9GB, precisa de ~1GB RAM — estoura
+> o trial com OOM/exit 137; preservado no git commit `6ac3fa8` pra quando subir o tier).
 
 Precisa de **2 secrets** (nunca no código):
 - `TELEGRAM_BOT_TOKEN` (do @BotFather)
