@@ -1,8 +1,10 @@
 # Deploy do bot Telegram — sempre no ar (sem depender do notebook)
 
-O bot faz **long polling** (não precisa de URL pública/webhook), roda em modo **BM25 leve**
-(`JOTA_RAG_MODE=bm25`, sem torch — imagem ~650MB, RAM de runtime ~200MB). Qualidade validada
-nesse modo: reativo 15/15, proativo 7/7 (o LLM-judge compensa o tema semântico).
+O bot faz **long polling** (não precisa de URL pública/webhook), roda em modo **híbrido**
+(BM25 + densos + rerank — os modelos são assados na imagem no build, sem download em runtime).
+É a mesma qualidade do dev: detecção de tema 87.6%, retrieval Hit@3 100%. Imagem ~2GB (torch
+CPU-only), RAM de runtime ~1GB. O modo leve BM25 (`JOTA_RAG_MODE=bm25`) segue disponível como
+fallback, mas medimos que degrada o tema pra ~76% e confunde o retrieval — por isso prod = híbrido.
 
 Precisa de **2 secrets** (nunca no código):
 - `TELEGRAM_BOT_TOKEN` (do @BotFather)
