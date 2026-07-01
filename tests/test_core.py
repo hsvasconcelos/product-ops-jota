@@ -118,6 +118,21 @@ def test_retrieval_respeita_tema():
     assert prefer_theme(docs, SupportTheme.ACCOUNT_ACCESS, 0.10)[0].id == docs[0].id
 
 
+def test_retrieval_duplicidade_vs_agendado():
+    """Regressão do cluster de repetição: 'cobrado duas vezes no boleto' (duplicidade→estorno)
+    caía no KB-BOLETO-001 (boleto agendado não pago), o bot dava passos irrelevantes e repetia.
+    O KB-ESTORNO enriquecido com a linguagem do cliente deve ganhar o ranking — sem roubar o
+    caso de boleto agendado (sub-doc irmão, mesmo tema)."""
+    import os
+    os.environ["JOTA_RAG_MODE"] = "bm25"
+    from product_ops_jota.rag import Retriever
+    r = Retriever()
+    dup = r.retrieve("fui cobrado duas vezes no mesmo boleto como resolver", top_k=2)
+    assert dup[0].id.startswith("KB-ESTORNO"), f"duplicidade veio {dup[0].id}"
+    agendado = r.retrieve("meu boleto agendado nao foi pago", top_k=2)
+    assert agendado[0].id.startswith("KB-BOLETO"), f"agendado veio {agendado[0].id}"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):

@@ -172,7 +172,7 @@
     "id": "KB-ESTORNO-001",
     "title": "Cobrança em duplicidade e estorno automático",
     "category": "estorno_duplicidade",
-    "content": "Quando o sistema identifica duas cobranças idênticas — mesmo valor, mesmo destino, em um intervalo curto — trata como cobrança em duplicidade. O estorno da cobrança duplicada é automático: o cliente não precisa pedir, e o valor volta para a conta de origem em até 1 dia útil. A cobrança legítima é mantida.",
+    "content": "Fui cobrado duas vezes no mesmo boleto, cobrança dobrada, debitaram o boleto em dobro, paguei o boleto e cobraram de novo, duas cobranças iguais do mesmo boleto ou pagamento — tudo isso é cobrança em duplicidade. Quando o sistema identifica duas cobranças idênticas — mesmo valor, mesmo destino, em um intervalo curto — trata como duplicidade. O estorno da cobrança duplicada é automático: o cliente não precisa pedir, e o valor volta para a conta de origem em até 1 dia útil. A cobrança legítima é mantida.",
     "steps": [
       "Confirmar as duas cobranças idênticas (mesmo valor, destino e dia).",
       "Estornar automaticamente a cobrança duplicada — a original permanece.",
