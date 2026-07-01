@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jota · Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --teal:#008069; --teal-d:#006e5a; --bg:#efeae2; --in:#fff; --out:#d9fdd3;
+    --side:#fff; --line:#e9edef; --muted:#667781; --ink:#111b21;
+    --prox:#1f9d8f; --reat:#3a6ea5; --eng:#0b141a;
+  }
+  body{ font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--ink);
+        height:100vh; display:flex; background:#d1d7db; overflow:hidden; }
+
+  /* ── sidebar ── */
+  .side{ width:300px; min-width:260px; background:var(--side); border-right:1px solid var(--line);
+         display:flex; flex-direction:column; }
+  .side .top{ background:var(--teal); color:#fff; padding:15px 16px; }
+  .side .top h1{ font-size:17px; font-weight:600; }
+  .side .top p{ font-size:12px; opacity:.85; margin-top:2px; }
+  .group{ padding:10px 14px 4px; font-size:11px; font-weight:700; letter-spacing:.4px;
+          color:var(--muted); text-transform:uppercase; }
+  .chats{ overflow-y:auto; flex:1; }
+  .chat{ display:flex; gap:11px; padding:10px 14px; cursor:pointer; border-bottom:1px solid #f3f3f3; align-items:center; }
+  .chat:hover{ background:#f5f6f6; } .chat.active{ background:#f0f2f5; }
+  .av{ width:42px; height:42px; border-radius:50%; background:#dfe5e7; display:flex;
+       align-items:center; justify-content:center; font-size:21px; flex-shrink:0; }
+  .chat .meta{ flex:1; min-width:0; }
+  .chat .nome{ font-size:14.5px; font-weight:500; display:flex; justify-content:space-between; gap:6px; }
+  .chat .prev{ font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden;
+               text-overflow:ellipsis; margin-top:2px; }
+  .tag{ font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:10px; color:#fff; flex-shrink:0; }
+  .tag.proativo{ background:var(--prox); } .tag.reativo{ background:var(--reat); }
+
+  /* ── chat pane ── */
+  .pane{ flex:1; display:flex; flex-direction:column; background:var(--bg); min-width:380px; }
+  .ph{ flex:1; display:flex; align-items:center; justify-content:center; color:var(--muted);
+       font-size:15px; text-align:center; padding:40px; flex-direction:column; gap:10px; }
+  .head{ background:#f0f2f5; padding:10px 16px; display:flex; align-items:center; gap:12px;
+         border-bottom:1px solid var(--line); }
+  .head .nome{ font-size:16px; font-weight:600; } .head .sub{ font-size:12px; color:var(--muted); }
+  .ctx{ background:#fff8e1; border-bottom:1px solid #f0e6c0; padding:12px 18px; font-size:13.5px;
+        color:#5b4e22; display:flex; gap:14px; align-items:center; }
+  .ctx .txt{ flex:1; } .ctx b{ color:#3d3414; }
+  .btn{ border:none; border-radius:20px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; }
+  .btn.start{ background:var(--teal); color:#fff; white-space:nowrap; }
+  .msgs{ flex:1; overflow-y:auto; padding:18px 6% 18px; display:flex; flex-direction:column; gap:8px; }
+  .row{ display:flex; } .row.out{ justify-content:flex-end; } .row.center{ justify-content:center; }
+  .bub{ max-width:74%; padding:7px 11px 8px; border-radius:8px; font-size:14.2px; line-height:1.4;
+        box-shadow:0 1px .5px rgba(11,20,26,.13); white-space:pre-wrap; }
+  .row.in .bub{ background:var(--in); border-top-left-radius:0; }
+  .row.out .bub{ background:var(--out); border-top-right-radius:0; }
+  .who{ font-size:12px; font-weight:700; color:var(--teal-d); margin-bottom:2px; }
+  .sys{ background:#cfe9ba; color:#3a5a2a; font-size:12.5px; padding:6px 14px; border-radius:8px;
+        max-width:88%; text-align:center; }
+  .card{ background:#fff; border-left:4px solid #f0b400; border-radius:8px; padding:12px 14px;
+         max-width:90%; box-shadow:0 1px 2px rgba(0,0,0,.1); }
+  .card.handoff{ border-left-color:#d9534f; background:#fdf2f2; }
+  .card .ttl{ font-size:12px; font-weight:700; color:#8a6d00; margin-bottom:6px; }
+  .card.handoff .ttl{ color:#b03a36; }
+  .card .steps{ margin:8px 0 4px 18px; font-size:13.5px; } .card .steps li{ margin:3px 0; }
+  .card .src{ font-size:11px; color:var(--muted); font-style:italic; margin-top:8px; }
+  .typing{ font-size:13px; color:var(--muted); font-style:italic; padding:4px 11px; }
+  .input{ background:#f0f2f5; padding:10px 16px; display:flex; gap:10px; align-items:center; }
+  .input input{ flex:1; border:none; border-radius:22px; padding:11px 16px; font-size:14.5px; outline:none; }
+  .input button{ background:var(--teal); color:#fff; border:none; width:42px; height:42px;
+                 border-radius:50%; font-size:18px; cursor:pointer; }
+
+  /* ── engenharia (painel direito, sempre visível na conversa) ── */
+  .eng{ width:350px; min-width:320px; background:var(--eng); color:#e9edef; display:flex;
+        flex-direction:column; }
+  .eng .et{ padding:14px 16px 10px; border-bottom:1px solid #1f2c33; }
+  .eng .et h2{ font-size:13px; font-weight:700; letter-spacing:.3px; }
+  .eng .et p{ font-size:11px; color:#8696a0; margin-top:3px; }
+  .eng .body{ overflow-y:auto; padding:12px 14px 30px; flex:1; }
+  .eng .empty{ color:#5d6b73; font-size:13px; padding:30px 6px; text-align:center; }
+  .stage{ background:#111c24; border:1px solid #1f2c33; border-radius:10px; padding:11px 13px; margin-bottom:11px; }
+  .stage .sh{ font-size:11.5px; font-weight:700; color:#9fd9cf; margin-bottom:8px; display:flex; gap:7px; align-items:center; }
+  .stage .sn{ background:#1f9d8f; color:#04231f; width:18px; height:18px; border-radius:50%;
+              font-size:11px; display:flex; align-items:center; justify-content:center; font-weight:800; }
+  .kv{ display:flex; justify-content:space-between; gap:10px; padding:3px 0; font-size:12.5px; }
+  .kv span{ color:#8696a0; } .kv b{ color:#fff; font-weight:600; text-align:right; }
+  .chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+  .chip{ background:#1d3a35; color:#9fd9cf; font-size:10.5px; padding:2px 8px; border-radius:10px; }
+  .trecho{ background:#0a1418; border-radius:6px; padding:8px 10px; font-size:12px; color:#c7d1d6;
+           line-height:1.45; margin-top:7px; font-style:italic; }
+  .regra{ background:#10261f; border:1px solid #1f7a4d; border-radius:7px; padding:8px 10px;
+          font-size:12.5px; color:#dfeee8; margin-bottom:8px; line-height:1.45; }
+  .regra b{ color:#9fe8c9; } .rconf{ color:#7fa896; font-size:11px; margin-top:4px; }
+  .pill{ padding:2px 9px; border-radius:10px; font-size:11px; font-weight:700; color:#fff; }
+  .a-resolve{ background:#1f7a4d; } .a-assist{ background:#9a7d00; } .a-human{ background:#a33; }
+  .a-silent{ background:#2a6b8a; } .a-none{ background:#444; }
+  .why{ font-size:11.5px; color:#aebac1; font-style:italic; line-height:1.4; margin-top:7px; }
+  .steps2{ margin:6px 0 2px 16px; font-size:12.5px; color:#dfe7ea; } .steps2 li{ margin:4px 0; }
+  .src2{ font-size:10.5px; color:#7a8a91; margin-top:8px; }
+  /* radar ao vivo (durante o replay) */
+  .rtit{ color:#9fd9cf; font-size:12.5px; font-weight:700; margin-bottom:12px; }
+  .rsig{ background:#111c24; border:1px solid #1f2c33; border-left:3px solid #2a6b8a; border-radius:7px;
+         padding:8px 10px; margin-bottom:8px; font-size:12.5px; animation:pop .28s ease-out; }
+  .rsig.beh{ border-left-color:#9a7d00; } .rsig.abs{ border-left-color:#7a5cc7; } .rsig.trip{ border-left-color:#1f9d8f; }
+  .rk{ color:#8696a0; font-size:10px; text-transform:uppercase; letter-spacing:.4px; }
+  .rsig b{ color:#fff; } .rc{ background:#2a6b8a; color:#cfe6f5; border-radius:8px; padding:1px 7px; font-size:10.5px; margin-left:4px; }
+  .rd{ color:#aebac1; font-size:11.5px; margin-top:4px; line-height:1.35; }
+  .rtrip{ background:#1f7a4d; color:#eafff4; font-weight:800; text-align:center; padding:9px; border-radius:7px;
+          margin:4px 0 2px; animation:flash .5s ease-out; }
+  @keyframes pop{ from{opacity:0; transform:translateY(7px);} to{opacity:1; transform:none;} }
+  @keyframes flash{ 0%{transform:scale(.92); opacity:.2;} 100%{transform:scale(1); opacity:1;} }
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="top"><h1>Jota · Demo</h1><p>atendimento proativo — Mundo 1 × Mundo 2</p></div>
+    <div class="chats" id="chats"></div>
+  </aside>
+
+  <main class="pane">
+    <div class="ph" id="placeholder">
+      <div style="font-size:40px">💬</div>
+      <div>Escolha uma conversa na lateral pra começar a demo.</div>
+    </div>
+    <div class="head hidden" id="head">
+      <div class="av" id="hav"></div>
+      <div><div class="nome" id="hnome"></div><div class="sub" id="hsub"></div></div>
+    </div>
+    <div class="ctx hidden" id="ctx">
+      <div class="txt" id="ctxtxt"></div>
+      <button class="btn start" id="startBtn">▶ Iniciar conversa</button>
+    </div>
+    <div class="msgs hidden" id="msgs"></div>
+    <div class="input hidden" id="inputbar">
+      <input id="txt" placeholder="responder como cliente…" autocomplete="off">
+      <button id="sendBtn">➤</button>
+    </div>
+  </main>
+
+  <aside class="eng">
+    <div class="et">
+      <h2>⚙️ Engenharia da resposta</h2>
+      <p>a lógica objetiva, visível em cada conversa</p>
+    </div>
+    <div class="body" id="eng"><div class="empty">Inicie uma conversa pra ver a detecção → RAG → resposta → passo a passo.</div></div>
+  </aside>
+
+<script>
+const $ = s => document.querySelector(s);
+let current = null, started = false, scenarios = {};
+const ACT_CLASS = {ai_resolve:'a-resolve', ai_resolve_silent:'a-silent', ai_assist:'a-assist',
+                   human_handoff:'a-human', no_intercept:'a-none'};
+const esc = t => (t||'').replace(/</g,'&lt;');
+// formatação estilo WhatsApp: *negrito* e _itálico_ (sobre texto já escapado)
+function fmt(t){
+  t = esc(t);
+  t = t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');        // **negrito** (se vier)
+  t = t.replace(/\*(?!\s)([^*\n]+?)(?<!\s)\*/g,'<strong>$1</strong>'); // *negrito* WhatsApp
+  t = t.replace(/_(?!\s)([^_\n]+?)(?<!\s)_/g,'<em>$1</em>');     // _itálico_
+  return t;
+}
+
+async function load(){
+  const list = await (await fetch('/api/scenarios')).json();
+  list.forEach(s => scenarios[s.id]=s);
+  const g = {proativo:[], reativo:[]}; list.forEach(s => g[s.modo].push(s));
+  $('#chats').innerHTML =
+    '<div class="group">Produto · proativo (Mundo 2)</div>' + g.proativo.map(item).join('') +
+    '<div class="group">Atendimento · reativo (Mundo 1)</div>' + g.reativo.map(item).join('');
+  document.querySelectorAll('.chat').forEach(el => el.onclick = () => select(el.dataset.id));
+}
+const item = s => `<div class="chat" data-id="${s.id}"><div class="av">${s.emoji}</div>
+  <div class="meta"><div class="nome">${s.nome}<span class="tag ${s.modo}">${s.modo}</span></div>
+  <div class="prev">${esc(s.preview)}</div></div></div>`;
+
+function select(id){
+  current = id; started = false;
+  const s = scenarios[id];
+  document.querySelectorAll('.chat').forEach(c => c.classList.toggle('active', c.dataset.id===id));
+  $('#placeholder').classList.add('hidden'); $('#head').classList.remove('hidden');
+  $('#hav').textContent = s.emoji; $('#hnome').textContent = s.nome;
+  $('#hsub').textContent = (s.modo==='proativo' ? 'Produto · o Jota fala primeiro'
+                            : 'Atendimento · a IA sugere ao atendente') + ' · ' + s.segment.toUpperCase();
+  $('#ctxtxt').innerHTML = '<b>Contexto:</b> ' + esc(s.contexto);
+  $('#startBtn').textContent = s.modo==='proativo' ? '▶ Reproduzir a cena' : '▶ Iniciar conversa';
+  $('#ctx').classList.remove('hidden');
+  $('#msgs').classList.add('hidden'); $('#msgs').innerHTML='';
+  $('#inputbar').classList.add('hidden');
+  $('#eng').innerHTML = '<div class="empty">Clique em ▶ Iniciar conversa.</div>';
+}
+
+$('#startBtn').onclick = async () => {
+  started = true;
+  $('#ctx').classList.add('hidden'); $('#msgs').classList.remove('hidden');
+  $('#inputbar').classList.remove('hidden'); $('#msgs').innerHTML='';
+  if (scenarios[current].modo === 'proativo') {
+    await play();                          // replay: atrito nascendo → radar → interceptação
+  } else {
+    const r = await post('/api/start', {id: current});
+    renderEng(r.brain); await renderMessages(r.messages);
+  }
+  $('#txt').focus();
+};
+
+// ── REPLAY proativo: a conversa nascendo + radar ao vivo ──
+async function play(){
+  const r = await post('/api/replay', {id: current});
+  radarReset();
+  for (const b of r.beats){
+    await sleep(b.t);
+    if (b.tipo === 'user'){ addMsg({side:'out', kind:'customer', text:b.texto}); scrollDown(); }
+    else if (b.tipo === 'jota'){ await typing(600); addMsg({side:'in', kind:'jota', author:'Jota', text:b.texto}); scrollDown(); }
+    if (b.sinal){ radarSignal(b); }        // evento / ausência / sinal comportamental
+  }
+  radarTrip();                             // limiar cruzado
+  await sleep(800);
+  renderEng(r.brain);                      // revela os 4 estágios (regra já visível)
+  await typing(900);
+  addMsg({side:'in', kind:'jota', author:'Jota', text:r.interception});
+  scrollDown();
+}
+function radarReset(){
+  $('#eng').innerHTML = `<div class="rtit">📡 Radar — sinais em tempo real</div><div id="rlog"></div>`;
+}
+function radarSignal(b){
+  const cls = b.tipo==='ausencia' ? 'abs' : (b.tipo==='evento' ? '' : 'beh');
+  const rk  = b.tipo==='ausencia' ? 'ausência' : (b.tipo==='evento' ? 'evento de sistema' : 'comportamento');
+  const cont = b.conta ? `<span class="rc">${esc(b.conta)}</span>` : '';
+  const log = $('#rlog'); if(!log) return;
+  log.insertAdjacentHTML('beforeend',
+    `<div class="rsig ${cls}${b.trip?' trip':''}"><span class="rk">${rk}</span> <b>${esc(b.sinal)}</b>${cont}
+       ${b.detalhe?`<div class="rd">${esc(b.detalhe)}</div>`:''}</div>`);
+  log.scrollTop = log.scrollHeight;
+}
+function radarTrip(){
+  const log = $('#rlog'); if(!log) return;
+  log.insertAdjacentHTML('beforeend', `<div class="rtrip">⚡ limiar cruzado — interceptar agora</div>`);
+  log.scrollTop = log.scrollHeight;
+}
+$('#sendBtn').onclick = send;
+$('#txt').addEventListener('keydown', e => { if(e.key==='Enter') send(); });
+async function send(){
+  const t = $('#txt').value.trim(); if(!t || !started) return;
+  $('#txt').value='';
+  const r = await post('/api/message', {id: current, text: t});
+  renderEng(r.brain); await renderMessages(r.messages);
+}
+const post = async (url, body) => (await fetch(url,{method:'POST',
+  headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})).json();
+
+async function renderMessages(msgs){
+  for(const m of msgs){
+    if(m.kind==='jota') await typing(700);
+    addMsg(m); scrollDown();
+    if(m.kind==='jota') await sleep(120);
+  }
+}
+function addMsg(m){
+  const box = $('#msgs');
+  if(m.kind==='system'){
+    box.insertAdjacentHTML('beforeend', `<div class="row center"><div class="sys">${fmt(m.text)}</div></div>`);
+  } else if(m.kind==='suggestion' || m.kind==='handoff'){
+    const steps = (m.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+    const src = m.fontes ? `<div class="src">fontes (ancoragem): ${m.fontes.join(', ')}</div>` : '';
+    box.insertAdjacentHTML('beforeend',
+      `<div class="row center"><div class="card ${m.kind==='handoff'?'handoff':''}">
+         <div class="ttl">${m.author||'💡 Sugestão'}</div><div>${fmt(m.text)}</div>
+         ${steps?`<ol class="steps">${steps}</ol>`:''}${src}</div></div>`);
+  } else {
+    const who = m.kind==='jota' ? `<div class="who">${m.author}</div>` : '';
+    box.insertAdjacentHTML('beforeend',
+      `<div class="row ${m.side}"><div class="bub">${who}${fmt(m.text)}</div></div>`);
+  }
+}
+
+function renderEng(b){
+  if(!b){ return; }
+  const cls = ACT_CLASS[b.acao] || 'a-none';
+  const kw = (b.keywords||[]).map(k=>`<span class="chip">${esc(k)}</span>`).join('');
+  const evt = b.evento ? `<div class="kv"><span>evento correlacionado</span><b>${esc(b.evento)}</b></div>` : '';
+  const sin = b.sinais.length ? `<div class="chips">${b.sinais.map(s=>`<span class="chip">${s}</span>`).join('')}</div>` : '';
+  const regra = b.regra ? `<div class="regra">⚡ <b>regra disparada:</b> ${esc(b.regra.texto)}
+    <div class="rconf">natureza ${b.regra.nature} · confiança base ${b.regra.confianca}</div></div>` : '';
+  const steps = (b.passos||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  $('#eng').innerHTML = `
+    <div class="stage">
+      <div class="sh"><span class="sn">1</span>Detecção objetiva de atrito</div>
+      ${regra}
+      <div class="kv"><span>tema</span><b>${b.tema} (${b.tema_conf})</b></div>
+      <div class="kv"><span>natureza</span><b>${b.natureza} (${b.nat_conf})</b></div>
+      ${evt}
+      ${kw?`<div class="kv"><span>palavras-chave</span><b></b></div><div class="chips">${kw}</div>`:''}
+      ${sin}
+    </div>
+    <div class="stage">
+      <div class="sh"><span class="sn">2</span>Evidência recuperada (RAG · ${b.rag_mode})</div>
+      ${b.doc ? `<div class="kv"><span>doc</span><b>${b.doc}</b></div>
+        <div class="kv"><span>título</span><b>${esc(b.doc_titulo)}</b></div>
+        <div class="kv"><span>score</span><b>${b.doc_score}</b></div>
+        <div class="trecho">${esc(b.doc_trecho)}</div>` : '<div class="why">nenhum doc relevante</div>'}
+    </div>
+    <div class="stage">
+      <div class="sh"><span class="sn">3</span>Decisão / roteamento</div>
+      <div class="kv"><span>ação</span><b><span class="pill ${cls}">${b.acao_label}</span></b></div>
+      <div class="kv"><span>prioridade</span><b>${b.prioridade.toFixed(2)}</b></div>
+      <div class="kv"><span>linha proativa</span><b>${b.linha}</b></div>
+      <div class="why">${esc(b.motivo)}</div>
+    </div>
+    <div class="stage">
+      <div class="sh"><span class="sn">4</span>Passo a passo de resolução</div>
+      ${steps?`<ol class="steps2">${steps}</ol>`:'<div class="why">—</div>'}
+      ${b.doc?`<div class="src2">ancorado em: ${b.doc}</div>`:''}
+    </div>`;
+}
+
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+async function typing(ms){
+  const box=$('#msgs');
+  box.insertAdjacentHTML('beforeend','<div class="row in" id="typing"><div class="typing">Jota está digitando…</div></div>');
+  scrollDown(); await sleep(ms);
+  const t=$('#typing'); if(t) t.remove();
+}
+function scrollDown(){ const m=$('#msgs'); m.scrollTop=m.scrollHeight; }
+load();
+</script>
+</body>
+</html>

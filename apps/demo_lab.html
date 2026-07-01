@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jota | Case Product Ops</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --teal:#0aa486; --teal-deep:#0b5a49; --ink:#13201c; --muted:#5f726b;
+    --line:#e6ebe9; --bg:#fbfcfb; --surface:#fff;
+    --pos:#168f6b; --watch:#b5821b; --neg:#c24a3e; --slate:#3a6b7d;
+    --r:10px;
+  }
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg);line-height:1.55;
+       font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px 80px}
+  a{color:var(--teal-deep);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* topbar + nav */
+  .top{background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(8px);
+       border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .top .row{max-width:1040px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+  .mark{width:34px;height:34px;border-radius:9px;background:var(--teal);color:#fff;display:flex;
+        align-items:center;justify-content:center;font-weight:800;font-size:18px;letter-spacing:-.5px}
+  .brand b{font-size:15.5px;font-weight:700;letter-spacing:-.2px;display:block;line-height:1.2}
+  .brand span{font-size:11.5px;color:var(--muted)}
+  .top .spacer{flex:1}
+  nav{display:flex;gap:2px;align-items:center}
+  nav button{border:none;background:none;font:inherit;font-size:13.5px;color:var(--muted);
+             padding:18px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-15px}
+  nav button:hover{color:var(--ink)}
+  nav button.on{color:var(--teal-deep);border-bottom-color:var(--teal);font-weight:600}
+  nav a.ext{font-size:13px;color:var(--teal-deep);padding:7px 13px;border:1px solid var(--line);
+            border-radius:8px;margin-left:10px;font-weight:600}
+  nav a.ext:hover{background:#f1f6f4;text-decoration:none}
+
+  section{display:none;animation:fade .25s ease}
+  section.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){section{animation:none}}
+
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+           color:var(--muted);margin:42px 0 14px}
+  .lead{font-size:29px;font-weight:750;letter-spacing:-.7px;line-height:1.15;max-width:18ch;
+        text-wrap:balance;margin:30px 0 10px}
+  .lead.full{max-width:24ch}
+  .lead .hl{color:var(--teal-deep)}
+  .sub{font-size:15.5px;color:var(--muted);max-width:64ch;line-height:1.6}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);
+         border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .card{background:var(--surface);padding:16px 18px}
+  .card .v{font-size:24px;font-weight:750;letter-spacing:-.5px;color:var(--ink)}
+  .card .k{font-size:11.5px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+
+  /* tese */
+  .tese{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;position:relative}
+  .step .n{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.08em}
+  .step b{font-size:15px;display:block;margin:8px 0 6px;letter-spacing:-.2px}
+  .step p{font-size:13.5px;color:var(--muted)}
+  .step .arrow{position:absolute;right:-12px;top:34px;color:var(--line);font-size:16px}
+  @media(max-width:760px){.tese,.two,.stats{grid-template-columns:1fr 1fr}.step .arrow{display:none}}
+
+  /* dois mundos */
+  .two{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .world{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;
+         border-top:3px solid var(--line)}
+  .world.m1{border-top-color:var(--slate)} .world.m2{border-top-color:var(--teal)} .world.abs{border-top-color:var(--watch)}
+  .world .t{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .world .big{font-size:34px;font-weight:750;letter-spacing:-1px;margin:8px 0 2px}
+  .world.m1 .big{color:var(--slate)} .world.m2 .big{color:var(--teal-deep)} .world.abs .big{color:var(--watch)}
+  .world .s{font-size:13px;color:var(--muted)}
+
+  /* barras */
+  .bars{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+  .barrow{display:flex;align-items:center;gap:14px;padding:6px 0;font-size:13.5px}
+  .barrow .nm{width:180px;color:var(--ink)}
+  .barrow .track{flex:1;height:8px;background:#eef3f1;border-radius:99px;overflow:hidden}
+  .barrow .fill{height:100%;background:var(--teal);border-radius:99px}
+  .barrow .ct{width:52px;text-align:right;font-weight:700;color:var(--teal-deep)}
+
+  /* blocos de conteúdo */
+  .blk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;margin-bottom:16px}
+  .blk h3{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+  .blk p{font-size:14.5px;color:#2b3b36;margin:8px 0}
+  .why{background:#f3f8f6;border:1px solid #dfeae6;border-radius:8px;padding:13px 15px;margin-top:14px}
+  .why .lbl{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:4px}
+  .why p,.why{font-size:13.5px;color:#28433a}
+  .pill{display:inline-flex;align-items:center;gap:7px;background:#f1f5f3;color:var(--ink);font-size:12.5px;
+        font-weight:600;padding:5px 11px;border-radius:7px;margin:3px 6px 3px 0;border:1px solid var(--line)}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot.t{background:var(--teal)} .dot.w{background:var(--watch)} .dot.s{background:var(--slate)}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+  .tag.det{background:#e2f1ec;color:var(--teal-deep)} .tag.fuzzy{background:#f7eed8;color:var(--watch)}
+  .tag.interp{background:#eef1f3;color:var(--slate)}
+
+  /* metric chips (before/after) */
+  .metric{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+  .metric .m{border:1px solid var(--line);border-radius:9px;padding:12px 16px;min-width:120px;background:var(--surface)}
+  .metric .m .mv{font-size:23px;font-weight:750;letter-spacing:-.5px}
+  .metric .m .mk{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .metric .m.good{border-color:#bfe3d4} .metric .m.good .mv{color:var(--pos)}
+  .metric .m.bad{border-color:#f0cfca} .metric .m.bad .mv{color:var(--neg)}
+
+  pre{background:#0e1a16;color:#dbe7e2;border-radius:9px;padding:13px 16px;overflow-x:auto;
+      font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--teal-deep)}
+  .gate{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f0f3f2;font-size:14px}
+  .gate:last-child{border-bottom:none}
+  .gate .g{background:#eef5f2;color:var(--teal-deep);width:22px;height:22px;border-radius:6px;font-size:12px;
+           font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+  /* funil do atendimento */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .fstep{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px}
+  .fstep b{font-size:13.5px;color:var(--teal-deep);letter-spacing:-.2px}
+  .fstep span{display:block;font-size:12.5px;color:var(--muted);margin-top:5px}
+  @media(max-width:760px){.flow{grid-template-columns:1fr 1fr}}
+  .fbar{display:flex;height:32px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+  .fbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;font-weight:700}
+  .flegend{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:11px}
+  .flegend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:7px;vertical-align:middle}
+  .barrow .fill.exec{background:var(--slate)} .barrow .fill.rev{background:var(--neg)} .barrow .fill.kb{background:var(--watch)}
+  .barrow .nm.wide{width:auto;flex:1}
+  /* pacote de contexto (handoff quente) */
+  .pack{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .pack .ph{background:#fbf6ee;border-bottom:1px solid #efe4ce;padding:11px 16px;font-size:11.5px;font-weight:800;
+            color:var(--watch);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:8px}
+  .pack .pr{display:flex;gap:14px;padding:10px 16px;border-bottom:1px solid #f1f4f3;font-size:13.5px}
+  .pack .pr:last-child{border-bottom:none}
+  .pack .pk{width:118px;color:var(--muted);flex-shrink:0;font-size:12.5px}
+  .pack .pv{color:var(--ink)}
+  .pack .pv .mono{color:var(--teal-deep)}
+
+  /* sql */
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .preset{font-size:12.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+          padding:7px 13px;border-radius:7px;cursor:pointer}
+  .preset:hover{border-color:var(--teal);color:var(--teal-deep)}
+  textarea{width:100%;min-height:118px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;
+           border:1px solid var(--line);border-radius:8px;padding:13px;color:#0c3a30;background:#fbfdfc;resize:vertical}
+  textarea:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:var(--teal)}
+  .runbar{display:flex;align-items:center;gap:12px;margin-top:11px}
+  .runbar .note{font-size:11.5px;color:var(--muted);flex:1}
+  .run{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:10px 22px;font:inherit;
+       font-size:13.5px;font-weight:700;cursor:pointer}
+  .run:hover{background:var(--teal-deep)}
+  .res{margin-top:16px;overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th{text-align:left;background:#f4f8f6;color:var(--teal-deep);font-weight:700;padding:9px 13px;
+     border-bottom:1px solid var(--line);white-space:nowrap;font-size:12px;letter-spacing:.02em}
+  td{padding:8px 13px;border-bottom:1px solid #f1f4f3;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:#fafcfb}
+  .resmeta{font-size:11.5px;color:var(--muted);margin-top:9px}
+  .err{color:var(--neg);font-size:13px;background:#fdf3f2;border:1px solid #f0d4d0;border-radius:8px;padding:11px 13px}
+</style>
+</head>
+<body>
+  <div class="top"><div class="row">
+    <div class="mark">J</div>
+    <div class="brand"><b>Jota</b><span>Case Product Ops · atendimento proativo</span></div>
+    <div class="spacer"></div>
+    <nav id="nav">
+      <button data-s="home" class="on">Visão geral</button>
+      <button data-s="atendimento">Atendimento</button>
+      <button data-s="invisivel">Motor invisível</button>
+      <button data-s="logica">A lógica</button>
+      <a class="ext" href="/">Interceptação ↗</a>
+    </nav>
+  </div></div>
+
+  <div class="wrap">
+
+    <!-- VISÃO GERAL -->
+    <section id="home" class="on">
+      <div class="lead full">Escalar de <span class="hl">300 mil para 1 milhão</span> sem a operação de atendimento crescer junto.</div>
+      <div class="sub">A tese: transformar atrito em interceptação, e cada interceptação em prevenção — com um só modelo que atua no atendimento (reativo) e no produto (proativo).</div>
+
+      <div class="eyebrow">A base que construímos</div>
+      <div class="stats" id="stats"></div>
+
+      <div class="eyebrow">Um só modelo, do atendimento ao produto</div>
+      <div class="tese">
+        <div class="step"><div class="n">01</div><b>Atendimento é o laboratório</b>
+          <p>Toda conversa de suporte é analisada — tema, natureza, sinais. Descobrimos o que deveria ser antecipado.</p><div class="arrow">→</div></div>
+        <div class="step"><div class="n">02</div><b>Pega o erro invisível</b>
+          <p>O mesmo motor enxerga a ausência — o atrito que ninguém reclama (limbo, exclusão não cumprida).</p><div class="arrow">→</div></div>
+        <div class="step"><div class="n">03</div><b>Vira o modelo proativo</b>
+          <p>Cada atrito aprendido vira regra ou KB, e o mesmo motor age no produto, antes do chamado existir.</p></div>
+      </div>
+
+      <div class="eyebrow">Os dois mundos, o mesmo motor</div>
+      <div class="two" id="two"></div>
+
+      <div class="eyebrow">Padrões de erro · volumetria por tema</div>
+      <div class="bars" id="bars"></div>
+
+      <div class="eyebrow">Explorador SQL · as queries por trás</div>
+      <div class="blk" style="padding:18px 20px">
+        <div class="presets" id="presets"></div>
+        <textarea id="sql" spellcheck="false">SELECT channel AS mundo, COUNT(*) AS conversas
+FROM conversations
+GROUP BY channel;</textarea>
+        <div class="runbar">
+          <div class="note">read-only · apenas SELECT/WITH · limite 1000 linhas · base <code>jota_support.db</code> · ⌘+Enter executa</div>
+          <button class="run" id="run">Executar</button>
+        </div>
+        <div class="res" id="res"></div>
+      </div>
+    </section>
+
+    <!-- ATENDIMENTO -->
+    <section id="atendimento">
+      <div class="lead">Mundo 1 — o atendimento é o <span class="hl">laboratório</span>.</div>
+      <div class="sub">Todo chamado é um <b>sintoma</b>: alguém precisou de um humano porque algo no produto não se resolveu sozinho. O trabalho do laboratório é diagnosticar <b>de quê</b> — e provar, no dado rotulado, o que o motor faria com cada chamado antes de a gente confiar nele pra agir proativo.</div>
+
+      <div class="eyebrow">O mesmo motor, quatro tempos</div>
+      <div class="flow">
+        <div class="fstep"><b>1 · Chega</b><span>o cliente escreve no número de suporte</span></div>
+        <div class="fstep"><b>2 · Detecta</b><span>tema, natureza e sinais — auditável, em tempo real</span></div>
+        <div class="fstep"><b>3 · Decide</b><span>resolve sozinha · assiste · humano — por resolubilidade e risco</span></div>
+        <div class="fstep"><b>4 · Entrega</b><span>se humano, com o pacote de contexto — nunca um bounce frio</span></div>
+      </div>
+      <div class="why" style="margin-top:16px"><span class="lbl">Por que importa</span>É o <b>mesmo motor</b> que vai agir proativo no Mundo 2. O atendimento é onde ele ganha confiança no dado rotulado antes de a gente soltar. Lab → produção não é dois builds — é um modelo se graduando.</div>
+
+      <div class="eyebrow">O funil de triagem — o motor real rodado nos <span id="f_total">5.001</span> chamados</div>
+      <div class="blk">
+        <div class="fbar" id="fbar"></div>
+        <div class="flegend" id="flegend"></div>
+        <div class="why"><span class="lbl">Honestidade</span>Não é produção: é o que o motor <b>decidiria</b> sobre os rótulos que temos (tema detectado a <b id="f_acc">88%</b> vs. gabarito). Dá pra defender a direção, não a casa decimal.</div>
+      </div>
+
+      <div class="eyebrow">Por que um chamado não resolve sozinho — a cascata da resolubilidade</div>
+      <div class="blk">
+        <p>Resolubilidade = <b>(há procedimento na base)</b> × <b>(a IA consegue executar)</b> × <b>(a ação é reversível)</b>. O fator que falha é o <b>gargalo</b> — e cada gargalo é backlog acionável.</p>
+        <div class="bars" id="gargalos" style="margin-top:14px"></div>
+        <div class="why"><span class="lbl">Racional</span>O maior balde não é defeito — é <b>privilégio</b>: acesso e dados (LGPD) exigem decisão humana. Vira a maior alavanca de contenção: automação segura de recuperação de acesso. "Irreversível" (dinheiro pro destino errado) é humano <b>de propósito</b>, não falha.</div>
+      </div>
+
+      <div class="eyebrow">Quando vai pra humano — o handoff quente</div>
+      <div class="blk">
+        <h3>O atendente não investiga. Ele decide.</h3>
+        <p>Hoje, antes de escalar, uma conversa arrasta <b id="h_turns">13,8</b> turnos e <b id="h_ignored">241</b> pedidos de humano ficaram sem resposta. O handoff quente troca a investigação por <b>um card</b>: o que aconteceu, o que a IA já tentou, e o que falta decidir.</p>
+        <div class="metric" id="h_metric"></div>
+        <div class="pack" id="pack" style="margin-top:6px"></div>
+        <div class="why"><span class="lbl">Racional</span>O pacote é <b>derivado na hora</b> da detecção + decisão (store facts, derive views), roteado pra especialidade certa com ciência de horário. Combate direto à perda de contexto — o atendente não pergunta tudo de novo.</div>
+        <p style="margin-top:12px"><a href="/">Ver no chat — o copiloto sugerindo ao atendente →</a></p>
+      </div>
+    </section>
+
+    <!-- MOTOR INVISÍVEL -->
+    <section id="invisivel">
+      <div class="lead">Mundo 2 — o motor que vê o <span class="hl">invisível</span>.</div>
+      <div class="sub">O atrito mais perigoso é o que ninguém reclama. O atendimento reativo só age quando o cliente levanta a mão. O proativo enxerga o que não aconteceu.</div>
+
+      <div class="eyebrow">As três formas de detectar atrito</div>
+      <div class="blk">
+        <p><span class="pill"><span class="dot t"></span>sistema</span> evento do backend (kyc.failed, payment.duplicate) — certeza alta, determinístico.</p>
+        <p><span class="pill"><span class="dot t"></span>comportamento</span> padrão na conversa ou no uso (retentativa, loop, frustração, confusão) — contador determinístico + sinal calibrado.</p>
+        <p><span class="pill"><span class="dot w"></span>ausência</span> evento esperado que <b>não veio</b> (limbo de onboarding, exclusão pedida e não cumprida) — timer determinístico. Ninguém reclama disso.</p>
+        <div class="why"><span class="lbl">O diferencial</span>Capturamos <b id="abs_n">931</b> atritos de ausência — clientes presos que jamais abririam um chamado. O help-desk reativo nunca os veria.</div>
+      </div>
+      <div class="blk">
+        <h3>Como agimos — proativo de alto nível</h3>
+        <p>O Jota age com os dados que já tem (eventos e base) — afirma e resolve, não interroga o que já sabe. Antecipa as dúvidas que a própria mensagem gera. Multi-toque: intercepta, observa, re-intercepta e só então handoff quente. Nunca um bounce frio.</p>
+        <div class="metric" id="m_inv"></div>
+        <p style="margin-top:12px"><a href="/">Ver no chat — o atrito nascendo até a interceptação →</a></p>
+      </div>
+    </section>
+
+    <!-- A LÓGICA -->
+    <section id="logica">
+      <div class="lead">A lógica do modelo — e o <span class="hl">racional</span> de cada decisão.</div>
+      <div class="sub">O desafio do case é intelectual. Aqui está como o motor pensa, por que cada peça é assim, e a evidência de que funciona.</div>
+
+      <div class="eyebrow">Princípio transversal</div>
+      <div class="blk">
+        <h3>Determinístico &gt; interpretativo</h3>
+        <p>Num produto financeiro, confiança é previsibilidade mais auditabilidade. O sistema é determinístico onde <b>decide</b> e interpretativo só onde <b>redige</b>.</p>
+        <p><span class="tag det">determinístico</span> &nbsp;evento · contador (retentativa) · timer (ausência) · decisão (gates) · escolha do doc (score)</p>
+        <p><span class="tag fuzzy">calibrado, com limiar</span> &nbsp;intenção · frustração · confusão — nunca "vibe": cada sinal expõe valor e limiar</p>
+        <p><span class="tag interp">interpretativo, contido</span> &nbsp;só a redação da resposta (LLM), sobre algo já decidido e ancorado</p>
+        <div class="why"><span class="lbl">Racional</span>A interpretação pode <b>detectar</b>, mas a <b>ação sempre passa por gate determinístico</b>. Mesma entrada, mesma decisão. Tira o LLM e o sistema ainda detecta, decide e roteia.</div>
+      </div>
+
+      <div class="eyebrow">1 · Detecção</div>
+      <div class="blk">
+        <h3>Entender o atrito em tempo real</h3>
+        <p>Recebe as mensagens do cliente, os eventos de produto (correlacionados por usuário e tempo) e o contexto (perfil). Devolve tema, natureza e sinais auditáveis — cada sinal com valor, limiar e se é determinístico.</p>
+        <p>O <b>tema</b> era o elo frágil: keyword parecia ótimo no dado fácil, mas desabou no texto real. Consertamos com <b>fusão</b> — o evento manda quando existe (kyc.failed → kyc, 97% de confiança) somado à <b>intenção semântica</b> (cosseno do texto contra âncoras de tema, robusto a paráfrase e typo).</p>
+        <div class="metric">
+          <div class="m bad"><div class="mv">58%</div><div class="mk">keyword · texto real</div></div>
+          <div class="m"><div class="mv">73,6%</div><div class="mk">+ evento</div></div>
+          <div class="m good"><div class="mv">86%</div><div class="mk">+ semântica</div></div>
+          <div class="m good"><div class="mv">99,8%</div><div class="mk">natureza</div></div>
+        </div>
+        <div class="why"><span class="lbl">Racional</span>Não nos enganamos com dado fácil — geramos dado realista, ele expôs a fragilidade do keyword (de 95% para 58%) e recuperamos com método (86%), sem perder auditabilidade. É a diferença entre parecer e ser.</div>
+      </div>
+
+      <div class="eyebrow">2 · Decisão</div>
+      <div class="blk">
+        <h3>Resolver, assistir ou chamar humano</h3>
+        <p>Quatro sinais alimentam a decisão:</p>
+        <p><span class="pill">criticidade</span><span class="pill">trust_risk</span><span class="pill">resolubilidade</span><span class="pill">confiança da detecção</span></p>
+        <p class="mono">resolubilidade = (tem procedimento na KB?) × (executável por tool?) × (é reversível?)</p>
+        <p><b>Economia da interceptação</b> — interceptar custa (janela de 24h do WhatsApp):</p>
+        <pre>intercepta  SE  E[valor] > custo
+  valor = P(virar chamado) × custo_do_chamado + confiança_retida
+  custo = custo_da_proativa (fora da janela 24h) + risco_de_irritar</pre>
+        <div style="margin-top:6px">
+          <div class="gate"><div class="g">1</div><div><b>Confiança baixa</b> → não age, observa mais. Protege contra falso positivo.</div></div>
+          <div class="gate"><div class="g">2</div><div><b>ROI e custo</b> → trivial e de baixo risco → resolve em silêncio ou não toca. Não gasta proativa à toa.</div></div>
+          <div class="gate"><div class="g">3</div><div><b>Confiança em jogo sem prova</b> → humano quente, com o pacote de contexto.</div></div>
+          <div class="gate"><div class="g">4</div><div><b>Capacidade</b> → IA ancorada resolve in-thread; parcial, assiste.</div></div>
+          <div class="gate"><div class="g">5</div><div><b>Segurança e vulnerável</b> (ex.: ludopatia) → humano sempre, prioridade máxima. A IA se recusa a resolver.</div></div>
+        </div>
+        <div class="why"><span class="lbl">Racional</span>A melhor ajuda é no menor nível que protege a confiança — silêncio &gt; in-thread &gt; assiste &gt; humano. E multi-toque: nunca um bounce frio. É assim que se equilibra cuidado, custo e carga humana.</div>
+      </div>
+
+      <div class="eyebrow">3 · O loop</div>
+      <div class="blk">
+        <h3>Como escala sem quebrar</h3>
+        <p>Atrito tratado por humano (ou não resolvido) é clusterizado. Ao cruzar um limiar de frequência — dor real, não opinião — é promovido a: regra de detecção (vira proativo), doc de KB (a IA passa a resolver ancorada) ou ticket de produto (conserta na raiz).</p>
+        <div class="why"><span class="lbl">Racional</span>Sem o loop, a carga humana cresce linear com os clientes e 300k→1M quebra. Com o loop, os <b>tipos</b> de atrito caem e a carga humana fica quase plana. Por isso é <b>um só modelo</b>: o que ele aprende no atendimento é exatamente o que passa a antecipar no produto.</div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fmt=n=>Number(n).toLocaleString('pt-BR');
+const pct=n=>String(n).replace('.',',');
+
+$('#nav').querySelectorAll('button[data-s]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('on'));
+  $('#'+b.dataset.s).classList.add('on');
+  $('#nav').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); window.scrollTo(0,0);
+});
+
+async function load(){
+  const o=await (await fetch('/api/lab/overview')).json();
+  $('#stats').innerHTML=[
+    ['conversas',o.total],['suporte · M1',o.suporte],['produto · M2',o.produto],
+    ['usuários',o.users],['mensagens',o.mensagens],['eventos',o.eventos]
+  ].map(([k,v])=>`<div class="card"><div class="v">${fmt(v)}</div><div class="k">${k}</div></div>`).join('');
+  $('#two').innerHTML=`
+    <div class="world m1"><div class="t">Mundo 1 · Suporte (reativo)</div><div class="big">${pct(o.resol_suporte)}%</div><div class="s">resolvido — o cliente teve que reclamar</div></div>
+    <div class="world m2"><div class="t">Mundo 2 · Produto (proativo)</div><div class="big">${pct(o.resol_produto)}%</div><div class="s">resolvido — o Jota agiu antes do chamado</div></div>
+    <div class="world abs"><div class="t">Erros invisíveis capturados</div><div class="big">${fmt(o.ausencias)}</div><div class="s">ausências — o atrito que ninguém reclama</div></div>`;
+  const max=Math.max(...o.temas.map(t=>t[1]));
+  $('#bars').innerHTML=o.temas.map(([t,n])=>`<div class="barrow"><div class="nm">${t}</div><div class="track"><div class="fill" style="width:${Math.round(100*n/max)}%"></div></div><div class="ct">${fmt(n)}</div></div>`).join('');
+  $('#abs_n').textContent=fmt(o.ausencias);
+  loadAtendimento();
+  $('#m_inv').innerHTML=`
+    <div class="m good"><div class="mv">${pct(o.resol_produto)}%</div><div class="mk">resolvido · proativo</div></div>
+    <div class="m"><div class="mv">${fmt(o.ausencias)}</div><div class="mk">ausências capturadas</div></div>`;
+  const ps=await (await fetch('/api/lab/presets')).json();
+  $('#presets').innerHTML=ps.map((p,i)=>`<button class="preset" data-i="${i}">${p.nome}</button>`).join('');
+  $('#presets').querySelectorAll('.preset').forEach(b=>b.onclick=()=>{$('#sql').value=ps[+b.dataset.i].sql;run();});
+  run();
+}
+async function loadAtendimento(){
+  const a=await (await fetch('/api/lab/atendimento')).json();
+  if(a.error) return;
+  const dec=n=>String(n).replace('.',',');
+  const COL={'IA resolve sozinha':'var(--teal)','IA assiste o humano':'var(--slate)','Vai pra humano':'var(--watch)'};
+  $('#f_total').textContent=fmt(a.total);
+  $('#f_acc').textContent=a.theme_accuracy+'%';
+  $('#fbar').innerHTML=a.triagem.map(t=>`<span style="flex:${t.pct};background:${COL[t.balde]}">${t.pct>=6?t.pct+'%':''}</span>`).join('');
+  $('#flegend').innerHTML=a.triagem.map(t=>`<span><i style="background:${COL[t.balde]}"></i>${t.balde} · <b>${t.pct}%</b> · ${fmt(t.n)}</span>`).join('');
+  const gs=a.resolubilidade.gargalos, gmax=Math.max(...gs.map(g=>g.n));
+  const gcls=g=>g.startsWith('não ex')?'exec':g.startsWith('irrev')?'rev':'kb';
+  $('#gargalos').innerHTML=gs.map(g=>`<div class="barrow"><div class="nm wide">${g.motivo.split(' — ')[0]} <span style="color:var(--muted)">— ${g.motivo.split(' — ')[1]||''}</span></div><div class="track" style="max-width:200px"><div class="fill ${gcls(g.motivo)}" style="width:${Math.round(100*g.n/gmax)}%"></div></div><div class="ct">${g.pct}%</div></div>`).join('');
+  const ch=a.custo_humano;
+  $('#h_turns').textContent=dec(ch.turnos_medios);
+  $('#h_ignored').textContent=fmt(ch.pedidos_humano_ignorados);
+  $('#h_metric').innerHTML=`
+    <div class="m bad"><div class="mv">${dec(ch.turnos_medios)}</div><div class="mk">turnos antes de escalar · hoje</div></div>
+    <div class="m bad"><div class="mv">${ch.context_lost_pct}%</div><div class="mk">perdem contexto na troca</div></div>
+    <div class="m good"><div class="mv">1</div><div class="mk">card de contexto · com o handoff</div></div>`;
+  const p=a.exemplos_handoff[0];
+  const row=(k,v)=>`<div class="pr"><div class="pk">${k}</div><div class="pv">${v}</div></div>`;
+  if(p) $('#pack').innerHTML=
+    `<div class="ph"><span class="dot w"></span>Pacote pro atendente · ${p.conversation_id}</div>`+
+    row('O cliente disse','“'+p.trecho+'”')+
+    row('Atrito',`<span class="mono">${p.tema}</span> · ${p.natureza} · criticidade ${dec(p.criticidade)}`)+
+    row('Sinais lidos',(p.sinais&&p.sinais.length)?p.sinais.join(', '):'—')+
+    row('Por que humano',p.motivo)+
+    row('Gargalo',p.gargalo)+
+    row('Fila',`${p.fila} · prioridade ${dec(p.prioridade)} · ${p.in_hours?'em horário':'fora do horário'}`);
+}
+async function run(){
+  const r=await (await fetch('/api/lab/query',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({sql:$('#sql').value})})).json();
+  if(r.error){ $('#res').innerHTML=`<div class="err">${r.error}</div>`; return; }
+  const head='<tr>'+r.columns.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  const body=r.rows.map(row=>'<tr>'+row.map(c=>`<td>${c===null?'∅':c}</td>`).join('')+'</tr>').join('');
+  $('#res').innerHTML=`<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  $('#res').insertAdjacentHTML('afterend','');
+  $('#res').innerHTML+=`<div class="resmeta">${r.n} linha(s)${r.n>=1000?' · limite':''}</div>`;
+}
+$('#run').onclick=run;
+$('#sql').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter')run();});
+load();
+</script>
+</body>
+</html>

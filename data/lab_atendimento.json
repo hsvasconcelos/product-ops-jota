@@ -1,0 +1,199 @@
+{
+  "total": 5001,
+  "theme_accuracy": 87.4,
+  "triagem": [
+    {
+      "balde": "IA resolve sozinha",
+      "n": 2154,
+      "pct": 43.1
+    },
+    {
+      "balde": "IA assiste o humano",
+      "n": 27,
+      "pct": 0.5
+    },
+    {
+      "balde": "Vai pra humano",
+      "n": 2820,
+      "pct": 56.4
+    }
+  ],
+  "funnel": [
+    {
+      "acao": "ai_resolve",
+      "n": 2154,
+      "pct": 43.1
+    },
+    {
+      "acao": "ai_resolve_silent",
+      "n": 0,
+      "pct": 0.0
+    },
+    {
+      "acao": "ai_assist",
+      "n": 27,
+      "pct": 0.5
+    },
+    {
+      "acao": "human_handoff",
+      "n": 2632,
+      "pct": 52.6
+    },
+    {
+      "acao": "no_intercept",
+      "n": 188,
+      "pct": 3.8
+    }
+  ],
+  "resolubilidade": {
+    "passam": {
+      "kb_existe": 4844,
+      "executavel": 4557,
+      "reversivel": 5001
+    },
+    "gargalos": [
+      {
+        "motivo": "não executável pela IA — precisa de privilégio/decisão humana",
+        "n": 287,
+        "pct": 5.7
+      },
+      {
+        "motivo": "sem procedimento na base — lacuna de conteúdo (acionável)",
+        "n": 157,
+        "pct": 3.1
+      }
+    ]
+  },
+  "by_theme": {
+    "pix": {
+      "ai_resolve": 578,
+      "human_handoff": 559,
+      "no_intercept": 20
+    },
+    "account_access": {
+      "ai_resolve": 456,
+      "human_handoff": 628,
+      "no_intercept": 60,
+      "ai_assist": 1
+    },
+    "kyc": {
+      "ai_resolve": 297,
+      "human_handoff": 455,
+      "no_intercept": 18,
+      "ai_assist": 9
+    },
+    "fala_tap": {
+      "ai_resolve": 348,
+      "human_handoff": 301,
+      "no_intercept": 19
+    },
+    "boleto": {
+      "ai_resolve": 314,
+      "human_handoff": 225,
+      "no_intercept": 10
+    },
+    "account_data": {
+      "human_handoff": 248,
+      "ai_assist": 17,
+      "ai_resolve": 51,
+      "no_intercept": 4
+    },
+    "yield_open_finance": {
+      "ai_resolve": 110,
+      "human_handoff": 109,
+      "no_intercept": 7
+    },
+    "other": {
+      "human_handoff": 107,
+      "no_intercept": 50
+    }
+  },
+  "custo_humano": {
+    "escalados": 718,
+    "turnos_medios": 13.8,
+    "context_lost_pct": 7.9,
+    "pediram_humano_pct": 31.8,
+    "turnos_medios_handoff": 13.5,
+    "pedidos_humano_ignorados": 241
+  },
+  "exemplos_handoff": [
+    {
+      "conversation_id": "c_02387",
+      "tema": "account_access",
+      "natureza": "behavior_inferred",
+      "criticidade": 4.68,
+      "evidencia": "padrões no texto: —",
+      "sinais": [
+        "pediu humano",
+        "em loop"
+      ],
+      "fila": "Acesso & Segurança",
+      "prioridade": 0.55,
+      "in_hours": true,
+      "fila_nota": "em horário → entra na fila Acesso & Segurança",
+      "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
+      "gargalo": null,
+      "resolubilidade": 1.0,
+      "turnos_cliente": 8,
+      "trecho": "Parece que houve um problema com a atualização de saldo ao vincular outra conta."
+    },
+    {
+      "conversation_id": "c_01962",
+      "tema": "other",
+      "natureza": "behavior_inferred",
+      "criticidade": 1.0,
+      "evidencia": "padrões no texto: —",
+      "sinais": [
+        "pediu humano"
+      ],
+      "fila": "Geral",
+      "prioridade": 0.1,
+      "in_hours": true,
+      "fila_nota": "em horário → entra na fila Geral",
+      "motivo": "baixa capacidade da IA (0.06); humano com contexto",
+      "gargalo": "sem procedimento na base — lacuna de conteúdo (acionável)",
+      "resolubilidade": 0.113,
+      "turnos_cliente": 7,
+      "trecho": "tem como explicar onde o fala tap funciona?"
+    },
+    {
+      "conversation_id": "c_03682",
+      "tema": "kyc",
+      "natureza": "behavior_inferred",
+      "criticidade": 3.12,
+      "evidencia": "padrões no texto: —",
+      "sinais": [
+        "em loop"
+      ],
+      "fila": "Onboarding/KYC",
+      "prioridade": 0.32,
+      "in_hours": true,
+      "fila_nota": "em horário → entra na fila Onboarding/KYC",
+      "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
+      "gargalo": null,
+      "resolubilidade": 1.0,
+      "turnos_cliente": 7,
+      "trecho": "pq minha conta ainda existe"
+    },
+    {
+      "conversation_id": "c_02529",
+      "tema": "fala_tap",
+      "natureza": "system_signaled",
+      "criticidade": 3.6,
+      "evidencia": "evento de sistema: tap_to_pay.settlement_delayed",
+      "sinais": [
+        "pediu humano",
+        "em loop"
+      ],
+      "fila": "Recebimento (PJ)",
+      "prioridade": 0.39,
+      "in_hours": true,
+      "fila_nota": "em horário → entra na fila Recebimento (PJ)",
+      "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
+      "gargalo": null,
+      "resolubilidade": 1.0,
+      "turnos_cliente": 11,
+      "trecho": "Fiz uma venda pelo Fala Tap e o pagamento não caiu conforme esperado, gostaria de assistência."
+    }
+  ]
+}
