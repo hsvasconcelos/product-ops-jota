@@ -4,3 +4,6 @@ __pycache__/
 .venv/
 *.egg-info/
 qr_jota.png
+
+# prep pessoal da apresentacao (nao vai pro repo)
+prep/
