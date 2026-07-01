@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 import time
+from html import escape as _esc
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -261,21 +262,27 @@ _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comport
 
 
 def _brain_text(det, docs, dec, inp) -> str:
+    """Formato 'bulletado por área' em HTML (negrito confiável) — pra plateia de engenheiros."""
     doc = docs[0] if docs else None
     sinais = [n for n, v in (("pediu humano", det.asked_for_human), ("frustrado", det.frustrated),
                              ("desanimado", det.disappointed), ("em loop", det.in_loop),
                              ("confuso", det.confused), ("⚠️ vulnerável", det.safety_concern)) if v]
     emoji = _ACTION_EMOJI.get(dec.action, "")
+    nat = _NAT_PT.get(det.predicted_nature.value, det.predicted_nature.value)
+    fonte = _esc(f"{doc.id} — {doc.title}") if doc else "nada ancorado"
     return (
-        "🧠 *como o motor pensou*\n\n"
-        f"🔎 *detectou:* {det.predicted_theme.value} · {_NAT_PT.get(det.predicted_nature.value, det.predicted_nature.value)} "
-        f"_({det.theme_confidence:.0%} de certeza)_\n"
-        f"📡 *sinais:* {', '.join(sinais) or 'nenhum'}\n"
-        f"📊 *4 números:* criticidade {inp.criticality} · confiança-em-jogo {inp.trust_risk} · "
-        f"resolubilidade {inp.resolvability} · certeza {inp.detection_confidence}\n\n"
-        f"{emoji} *decisão: {ACTION_LABEL.get(dec.action, dec.action.value)}*  ·  prioridade {dec.priority}\n"
-        f"_↳ {dec.reason}_\n"
-        f"📚 *fonte:* {doc.id if doc else '—'}" + (f" — {doc.title}" if doc else " (nada ancorado)")
+        "🕵🏻‍♀️ <b>Debug</b>\n\n"
+        "<b>Detecção</b>\n"
+        f"• tema: <b>{_esc(det.predicted_theme.value)}</b> ({det.theme_confidence:.0%})\n"
+        f"• natureza: {_esc(nat)}\n"
+        f"• sinais: {_esc(', '.join(sinais) or 'nenhum')}\n\n"
+        "<b>Decisão</b>\n"
+        f"• criticidade {inp.criticality} · trust {inp.trust_risk} · resolub {inp.resolvability} · certeza {inp.detection_confidence}\n"
+        f"• capacidade {dec.ai_capability} · pressão→humano {dec.handoff_pressure}\n"
+        f"• {emoji} <b>{_esc(ACTION_LABEL.get(dec.action, dec.action.value))}</b> · prio {dec.priority}\n"
+        f"  ↳ {_esc(dec.reason)}\n\n"
+        "<b>RAG</b>\n"
+        f"• {fonte}"
     )
 
 
@@ -283,22 +290,23 @@ def _handoff_card(det, dec, inp, sess) -> str:
     hora = datetime.fromisoformat(sess["started_at"]).hour
     pack = build_context_pack(det, dec, inp.criticality, sess["profile"].segment, hora)
     return (
-        "📋 *Pacote pro atendente humano* (handoff quente)\n"
-        f"cliente: {pack.segment.upper()} · atrito: `{pack.theme.value}` · {pack.nature.value} · crit {pack.criticality}\n"
-        f"evidência: {pack.evidence}\n"
-        f"sinais: {', '.join(pack.signals) or '—'}\n"
-        f"→ fila *{pack.routing.specialty}* · prioridade {pack.routing.priority:.2f}\n"
-        f"_{pack.routing.note}_"
+        "📋 <b>Pacote pro atendente humano</b> (handoff quente)\n"
+        f"• cliente: {_esc(pack.segment.upper())} · atrito: {_esc(pack.theme.value)} · {_esc(pack.nature.value)} · crit {pack.criticality}\n"
+        f"• evidência: {_esc(pack.evidence)}\n"
+        f"• sinais: {_esc(', '.join(pack.signals) or '—')}\n"
+        f"• fila: <b>{_esc(pack.routing.specialty)}</b> · prioridade {pack.routing.priority:.2f}\n"
+        f"• {_esc(pack.routing.note)}"
     )
 
 
 # ─── Telegram API (httpx) ────────────────────────────────────────────────────
-def send(chat_id, text):
-    """Manda em Markdown; se o Telegram rejeitar (char especial do LLM/cérebro),
-    reenvia em TEXTO PURO — nunca cai calado (dead air na demo)."""
+def send(chat_id, text, html=False):
+    """Manda em Markdown (ou HTML se html=True — negrito confiável no debug); se o Telegram
+    rejeitar, reenvia em TEXTO PURO — nunca cai calado (dead air na demo)."""
+    mode = "HTML" if html else "Markdown"
     try:
         r = httpx.post(f"{API}/sendMessage", json={"chat_id": chat_id, "text": text,
-                                                   "parse_mode": "Markdown"}, timeout=20)
+                                                   "parse_mode": mode}, timeout=20)
         if not r.json().get("ok"):
             httpx.post(f"{API}/sendMessage", json={"chat_id": chat_id, "text": text}, timeout=20)
     except Exception as e:
@@ -365,13 +373,14 @@ def handle_command(chat_id, cmd, name=""):
         return
     if cmd == "/reset":
         SESSIONS[chat_id] = _new_session(name=name)
-        send(chat_id, "🧹 Conversa zerada. Pode mandar um novo caso do zero.")
+        send(chat_id, "🧹 Conversa reiniciada. Pode enviar um novo caso.")
         return
     if cmd == "/debug":
         if chat_id in DEBUG:
-            DEBUG.discard(chat_id); send(chat_id, "🧠 debug *off*")
+            DEBUG.discard(chat_id); send(chat_id, "🕵🏻‍♀️ Debug desativado.")
         else:
-            DEBUG.add(chat_id); send(chat_id, "🧠 debug *on* — vou mostrar o cérebro a cada turno")
+            DEBUG.add(chat_id)
+            send(chat_id, "🕵🏻‍♀️ Debug ativo. Vou mostrar a engenharia por trás de cada interação.")
         return
     if cmd in COMMANDS:
         c = SCENARIOS[COMMANDS[cmd]]
@@ -388,7 +397,7 @@ def handle_command(chat_id, cmd, name=""):
         sess["history"].append({"role": "assistant", "content": opener})
         send(chat_id, opener)
         if chat_id in DEBUG:
-            send(chat_id, _brain_text(det, docs, dec, inp))
+            send(chat_id, _brain_text(det, docs, dec, inp), html=True)
         return
     send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
 
@@ -431,9 +440,9 @@ def handle_message(chat_id, text, name=""):
     r = run_turn(sess, text)
     send(chat_id, r["reply"])
     if r["kind"] == "handoff" and chat_id in DEBUG:
-        send(chat_id, _handoff_card(r["det"], r["dec"], r["inp"], sess))
+        send(chat_id, _handoff_card(r["det"], r["dec"], r["inp"], sess), html=True)
     if chat_id in DEBUG:
-        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"]))
+        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"]), html=True)
 
 
 def main():
