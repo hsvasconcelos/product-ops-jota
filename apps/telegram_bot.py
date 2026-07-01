@@ -210,13 +210,14 @@ def analisar(sess):
     # quantas vezes ele disse "não funcionou / continua / já tentei" (in_loop). 2 sinais de
     # falha → o procedimento não resolveu → humano. O fix-streak é backstop; tema novo zera.
     if sess.get("last_theme") != det.predicted_theme.value:
-        sess["resolve_streak"], sess["stuck_signals"] = 0, 0
+        sess["stuck_signals"] = 0                       # tema novo → zera a contagem de falhas
     sess["last_theme"] = det.predicted_theme.value
     if det.in_loop:
         sess["stuck_signals"] = sess.get("stuck_signals", 0) + 1
-    streak = sess.get("resolve_streak", 0)
-    stuck = (sess.get("stuck_signals", 0) >= 2 or streak >= 3
-             or (streak >= 2 and (det.frustrated or det.disappointed)))
+    sig = sess.get("stuck_signals", 0)
+    # esgotamento = o CLIENTE sinalizou falha (não conversa longa!): 2 "não funcionou",
+    # ou 1 + emoção. Conversa produtiva e longa NÃO escala — só falha repetida.
+    stuck = sig >= 2 or (sig >= 1 and (det.frustrated or det.disappointed))
     inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck)
     # streak é incrementado em handle_message SÓ quando entrega um fix real (pergunta de
     # esclarecimento não conta) — senão o esgotamento dispara cedo demais.
@@ -305,7 +306,7 @@ def _new_session(seg="pf", events=None, context_text="", started=None, name=""):
     return {"segment": seg, "events": events or [], "context_text": context_text,
             "started_at": started or datetime.now().isoformat(), "history": [],
             "profile": UserProfile(segment=seg), "name": name, "greeted": False,
-            "resolve_streak": 0, "stuck_signals": 0}
+            "stuck_signals": 0}
 
 
 def _saudacao(name):
@@ -381,17 +382,11 @@ def run_turn(sess, text):
         work = WORKAROUND.get(det.predicted_theme)
         if work:
             reply += f"\n\nE {work}, sem precisar esperar. 😉"
-        sess["resolve_streak"] = 0
         kind = "handoff"
     else:
         reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
                       doc=docs[0] if docs else None, disappointed=det.disappointed)
         sess["history"].append({"role": "assistant", "content": reply})
-        # conta como tentativa SÓ se entregou um fix (pergunta/coletar info é livre): "?" em
-        # qualquer lugar e sem passos numerados = clarificação, não gasta o esgotamento.
-        is_clarify = ("?" in reply) and not any(f"{i}." in reply for i in (1, 2, 3, 4, 5))
-        if not is_clarify:
-            sess["resolve_streak"] = sess.get("resolve_streak", 0) + 1
         kind = "resolve"
     return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply, "kind": kind}
 

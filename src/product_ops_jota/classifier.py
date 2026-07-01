@@ -126,14 +126,15 @@ COLD_FRUSTRATION_PATTERNS = ["triste", "tristeza", "que pena", "decepcionad", "d
                              "desisti", "cansei", "nao adianta", "perdi a vontade", "frustrad",
                              "magoad", "sem animo", "nao consegue me ajudar", "ninguem me ajuda",
                              "ninguem resolve", "que saco"]
-# SEGURANÇA / vulnerabilidade — ludopatia, autoexclusão. Dispara o gate de segurança:
-# a IA se RECUSA de propósito e passa pra humano com prioridade máxima (#4). Tight de
-# propósito: aqui falso-positivo força humano à toa, então só marcadores inequívocos.
-VULNERABILITY_PATTERNS = ["nao consigo parar de apostar", "nao consigo parar de jogar",
-                          "vicio em aposta", "vicio em apostas", "vicio em jogo", "ludopatia",
-                          "me ajuda a parar de apostar", "perdi tudo apostando", "perdi tudo no jogo",
-                          "gastei tudo em aposta", "to viciado", "to viciada",
-                          "me bloqueia pra eu nao gastar", "bloqueia minha conta pra eu parar"]
+# SEGURANÇA / vulnerabilidade — ludopatia, autoexclusão. Dispara o gate de segurança.
+# stems propositalmente LARGOS: em segurança, falso-positivo (escalar à toa) é o lado
+# seguro; falso-negativo (não ver um vulnerável) é o custo alto. Validado pelo eval-LLM,
+# que pegou "viciado em apostas, não consigo parar de gastar" passando batido no keyword exato.
+VULNERABILITY_PATTERNS = ["viciad", "vicio", "ludopat", "aposta", "apostei", "apostando",
+                          "jogo do tigrinho", "nao consigo parar de gastar", "nao consigo parar de jogar",
+                          "nao consigo parar de apostar", "parar de gastar", "parar de jogar",
+                          "parar de apostar", "perdi tudo apostando", "perdi tudo no jogo",
+                          "me bloqueia pra eu nao gastar", "bloqueia minha conta pra", "bloquear minha conta pra"]
 
 # Limiares CALIBRADOS (auditáveis) — policy, recalibrável sem tocar na lógica.
 LOOP_SIMILARITY_MIN = 0.85       # similaridade p/ considerar 2 msgs "a mesma" (repetição)
