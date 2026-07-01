@@ -5,79 +5,79 @@
     "outcome": "ai",
     "outcome_ok": true,
     "turns": 1,
-    "grounded": true,
-    "adequado": true,
-    "tom": 5,
-    "nota": "A resposta foi correta e empática, orientando o cliente adequadamente.",
+    "grounded": false,
+    "adequado": false,
+    "tom": 4,
+    "nota": "Incorreto ao sugerir estorno pelo Jota.",
     "transcript": [
       [
         "cliente",
-        "Oi, mandei um Pix de R$500 pro CPF errado! Como faço pra recuperar?"
+        "Oi! Preciso de ajuda. Mandei um Pix de R$500 pro CPF errado. Como faço pra recuperar?"
       ],
       [
         "aline",
-        "Poxa, que chato isso, mas acontece! 😥 Infelizmente, não há como cancelar um Pix já enviado. Você pode tentar entrar em contato com a pessoa que recebeu e pedir a devolução. Se não conseguir, sugiro verificar com o banco ou instituição financeira usada se há alguma orientação adicional. Algo mais em que posso ajudar?"
+        "Poxa! 😮 Aqui está o que pode ser feito:\n\n1. **Entre em contato** com a pessoa para quem você enviou o Pix e peça a devolução do valor.\n2. Se a pessoa não coopera, você pode **contatar o banco Jota para relatar o caso e verificar a possibilidade de estorno.**\n\nVerifique se usou a chave correta e, se necessário, confirme os dados antes de próximas transações. Boa sorte! 🍀"
       ]
     ]
   },
   {
     "id": "app_nao_resolve",
     "expect": "human",
-    "outcome": "ai",
-    "outcome_ok": false,
+    "outcome": "human",
+    "outcome_ok": true,
     "turns": 6,
     "grounded": true,
-    "adequado": false,
-    "tom": 4,
-    "nota": "O atendimento foi simpático, mas deveria ter escalado para suporte técnico humano.",
+    "adequado": true,
+    "tom": 5,
+    "nota": "A assistente foi clara e empática, e escalou corretamente para um humano.",
     "transcript": [
       [
         "cliente",
-        "Oi, meu app do Jota tá abrindo e fechando sozinho... fica só em tela branca. O que faço?"
+        "Oi, tô com um problema no app do Jota. Ele abre e fecha sozinho ou fica em tela branca. O que eu faço?"
       ],
       [
         "aline",
-        "Oi! Vamos resolver isso rapidinho! 😊\n\n1. **Android**:\n   - Vá em Configurações > Sistema > Opções do desenvolvedor e desative 'Não manter atividades'.\n   - Atualize o app na Play Store.\n   - Se continuar, limpe o cache do app (Configurações do app > Armazenamento > Limpar cache) ou reinstale.\n\n2. **iPhone**:\n   - Atualize o app na App Store.\n   - Verifique se há espaço suficiente disponível no aparelho.\n\nExperimente essas dicas e me conte se funciona! 😊"
+        "Oi! Vamos resolver isso rapidinho. Você está usando *Android* ou *iPhone*? 😊"
       ],
       [
         "cliente",
-        "Tentei tudo isso aí e nada funcionou. O que mais posso fazer?"
+        "Tô no Android."
       ],
       [
         "aline",
-        "Nossa, isso deve estar chato 😕. Vamos tentar algo mais. Você tem outros apps funcionando normalmente no mesmo aparelho ou eles estão fechando também?"
+        "Ótimo! Vamos tentar esses passos:\n\n1. Vá em *Configurações* > *Sistema* > *Opções do desenvolvedor* e desative a opção '*Não manter atividades*'. Se preferir, pode desligar o *Modo desenvolvedor* inteiro. 👈 Essa pode ser a causa principal!\n\n2. Atualize o app do Jota para a última versão na *Play Store*.\n\n3. Se ainda não funcionar, vá em *Configurações do app* > *Armazenamento* e clique em *Limpar cache*. Se precisar, reinstale o app — seus dados e saldo estão seguros.\n\nExperimente esses passos e me diga se deu certo!"
       ],
       [
         "cliente",
-        "Os outros apps estão funcionando normal. Só o do Jota que tá com problema."
+        "Fiz tudo isso, mas nada mudou. Continua fechando ou ficando em tela branca. 😤"
       ],
       [
         "aline",
-        "Obrigada por confirmar! Nesse caso, certifique-se de que o aparelho tem **espaço de armazenamento suficiente**. Se já verificou todas as soluções anteriores e ainda não deu certo, me diz só se tem uma **mensagem de erro** que aparece quando ele fecha, ou se é só a tela branca mesmo. Isso pode ajudar a entender melhor. ✨"
+        "Entendi, vamos tentar mais uma coisa! 😅 Pode verificar se você tem espaço suficiente no armazenamento do seu celular? Às vezes, isso também pode causar problemas."
       ],
       [
         "cliente",
-        "É só a tela branca mesmo, não aparece nenhuma mensagem de erro."
+        "Acabei de ver, e tenho bastante espaço livre. Não é isso."
       ],
       [
         "aline",
-        "Entendi, obrigado por me avisar! Vamos tentar uma última coisa: se ainda não fez, tenta **desinstalar e reinstalar** o app. Isso resolve muitos problemas. Seu saldo e dados continuarão seguros. Experimente e me avisa se funcionar, tá bom? 😊"
+        "Obrigada por verificar! Como nada disso funcionou e já garantimos que não é algo simples no dispositivo, precisamos buscar outras opções para resolver esse caso. Vamos tentar o seguinte: qual é a sua versão do Android? Isso pode ajudar a entender melhor o cenário."
       ],
       [
         "cliente",
-        "Já desinstalei e reinstalei, mas continua na mesma. Tá complicado isso."
+        "Versão 11."
       ],
       [
         "aline",
-        "Poxa, sinto muito por isso! Parece que o problema pode ser um pouco mais específico com o seu dispositivo. Você pode me contar qual é o **modelo e sistema operacional** do seu aparelho? Isso pode ajudar a identificar o que está acontecendo. 📱"
+        "Obrigada pela informação! Como já tentamos resolver o problema com os passos padrões e considerando que você está no Android 11, meu próximo passo é verificar se há algum bloqueio ou permissão que possa estar afetando. Pode conferir se o app do Jota tem todas as permissões necessárias? Isso inclui acesso à internet, armazenamento e permissões básicas de funcionamento."
       ],
       [
         "cliente",
-        "É um Samsung Galaxy S10 com Android 11."
+        "Já conferi, e o app tem todas as permissões necessárias. 😩"
       ],
       [
         "aline",
-        "Obrigado pela informação! Nesse caso, cheque se tem atualizações pendentes do **sistema operacional** do aparelho. Algumas vezes, uma atualização do próprio Android pode ajudar a resolver. Se estiver tudo atualizado, é hora de tentar fechar qualquer outro app em segundo plano pra liberar mais memória e tentar abrir o Jota novamente. Me avisa se funcionar! 🤞"
+        "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏\n\nE enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo, sem precisar esperar. 😉"
       ]
     ]
   },
@@ -86,7 +86,7 @@
     "expect": "human",
     "outcome": "human",
     "outcome_ok": true,
-    "turns": 3,
+    "turns": 5,
     "grounded": true,
     "adequado": true,
     "tom": 5,
@@ -94,23 +94,39 @@
     "transcript": [
       [
         "cliente",
-        "Não tô conseguindo acessar minha conta, preciso resolver isso AGORA pra fechar uma venda!"
+        "não consigo acessar minha conta, preciso urgente pra fechar uma venda!"
       ],
       [
         "aline",
-        "Entendi, vamos resolver isso rapidinho! Quando você diz que não consegue acessar, é porque o app do Jota está fechando sozinho ou há outro problema?"
+        "Entendi! Vamos resolver isso rápido! Você está tentando acessar pelo *WhatsApp* ou pelo *app do Jota*?"
       ],
       [
         "cliente",
-        "O app não abre de jeito nenhum! Já tentei várias vezes e nada."
+        "tô tentando pelo app do jota, mas não tá indo de jeito nenhum!"
       ],
       [
         "aline",
-        "Beleza, vamos tentar algumas coisas. Primeiro: você está usando um **Android** ou **iPhone**?"
+        "Ok! O app fecha sozinho quando você tenta abrir?"
       ],
       [
         "cliente",
-        "Tô no Android."
+        "não, ele abre mas não consigo logar. já tentei várias vezes."
+      ],
+      [
+        "aline",
+        "Entendi! Certifique-se de que está usando a versão mais atual do app. Se já estiver atualizado e ainda tiver problemas, conte pra mim qual a mensagem de erro que aparece ao tentar logar."
+      ],
+      [
+        "cliente",
+        "já tá atualizado sim, mas não aparece mensagem de erro, só não entra."
+      ],
+      [
+        "aline",
+        "Ok! Vou te ajudar com isso. Você consegue acessar normalmente pelo WhatsApp? Isso vai te permitir continuar enquanto resolvemos o app."
+      ],
+      [
+        "cliente",
+        "tentei pelo whatsapp também, mas não tá funcionando. nada tá dando certo!"
       ],
       [
         "aline",
@@ -131,7 +147,7 @@
     "transcript": [
       [
         "cliente",
-        "Oi, preciso de ajuda. Tenho um vício em apostas e quero bloquear minha conta pra parar de gastar."
+        "Oi, tô com problema de vício em apostas. Preciso bloquear minha conta pra parar de gastar."
       ],
       [
         "aline",
@@ -148,11 +164,11 @@
     "grounded": true,
     "adequado": true,
     "tom": 5,
-    "nota": "O atendimento foi claro e empático, e a decisão de escalar para um humano foi correta.",
+    "nota": "Encaminhou corretamente para atendimento humano com clareza e empatia.",
     "transcript": [
       [
         "cliente",
-        "Oi, quero excluir minha conta do Jota e apagar meus dados. Como faço isso?"
+        "oi, quero excluir minha conta do Jota e apagar meus dados, como faço?"
       ],
       [
         "aline",
@@ -169,15 +185,15 @@
     "grounded": true,
     "adequado": true,
     "tom": 5,
-    "nota": "Instruções claras e tom amigável.",
+    "nota": "A orientação foi clara e correta para o problema apresentado.",
     "transcript": [
       [
         "cliente",
-        "Oi, tô tentando fazer um Pix e tá dando erro. Diz que a chave do destinatário não foi encontrada. O que eu faço?"
+        "Oi, tô com problema pra fazer um Pix. Diz que a chave do destinatário não foi encontrada."
       ],
       [
         "aline",
-        "Pode ser um problema na chave que você está tentando usar. Vamos checar: \n\n1. Confirme se a **chave Pix** está correta (pode ser um erro de digitação).\n2. Verifique se a chave ainda está ativa, pois pode ter sido desativada pela pessoa.\n\nSe tudo estiver certo e ainda assim der erro, me conta! 😉"
+        "Entendi! Vamos lá: \n\n1. Confirme com o destinatário qual é a *chave Pix ativa* dele — pode não ser o CPF ou e-mail que você tem.\n2. Peça para ele verificar quais chaves estão cadastradas no banco onde ele quer receber.\n3. Se necessário, ele pode te enviar um QR Code de cobrança, assim você não precisa de chave.\n\nIsso deve resolver! 😉"
       ]
     ]
   },
@@ -186,35 +202,27 @@
     "expect": "ai",
     "outcome": "ai",
     "outcome_ok": true,
-    "turns": 3,
-    "grounded": false,
-    "adequado": false,
-    "tom": 4,
-    "nota": "O atendimento foi simpático, mas não resolveu o problema diretamente.",
+    "turns": 2,
+    "grounded": true,
+    "adequado": true,
+    "tom": 5,
+    "nota": "A resposta foi clara, empática e adequada ao problema apresentado.",
     "transcript": [
       [
         "cliente",
-        "Oi! Fui cobrado duas vezes no mesmo boleto, quero o estorno."
+        "Oi, fui cobrado duas vezes no mesmo boleto. Quero o estorno."
       ],
       [
         "aline",
-        "Parece que você teve um problema com um boleto duplicado. Vamos resolver! Primeiro, você pode me dizer se o valor foi debitado duas vezes na sua conta Jota ou em outra conta?"
+        "Puxa, sinto por isso! Vamos esclarecer. Você poderia me confirmar se houve o pagamento duplicado na sua conta Jota?"
       ],
       [
         "cliente",
-        "Foi na minha conta Jota mesmo."
+        "Sim, paguei duas vezes. Como faço pra resolver?"
       ],
       [
         "aline",
-        "Entendi! Vamos dar uma olhada nisso.\n\n1. Confirme se o valor foi realmente debitado duas vezes. Você pode verificar no seu extrato.\n2. Se confirmar a duplicidade, entre na opção de atendimento no WhatsApp e veja as orientações do Jota.\n\nSe precisar de mais alguma coisa, estou por aqui! 😊"
-      ],
-      [
-        "cliente",
-        "Já confirmei, foi debitado duas vezes. E agora?"
-      ],
-      [
-        "aline",
-        "Vamos resolver isso! Entre na opção de atendimento no WhatsApp do Jota para seguir as próximas orientações específicas para esse caso. 😊"
+        "Obrigado por confirmar! 😊 Quando o sistema identifica cobranças idênticas (mesmo **valor**, **destino** e mesmo **dia**), o **estorno é automático**. O valor deve voltar para a sua conta em até **1 dia útil**. Fique de olho e, se precisar de algo mais, estou aqui! 📆"
       ]
     ]
   },
@@ -223,35 +231,27 @@
     "expect": "ai",
     "outcome": "ai",
     "outcome_ok": true,
-    "turns": 3,
+    "turns": 2,
     "grounded": true,
     "adequado": true,
     "tom": 5,
-    "nota": "A atendente foi clara e empática, e tomou a atitude correta de investigar o problema.",
+    "nota": "A orientação foi clara e adequada para o problema apresentado.",
     "transcript": [
       [
         "cliente",
-        "Oi, sou MEI e vendi hj na maquininha, mas o dinheiro nao caiu ainda. Tô ansiosa, o q pode ter acontecido?"
+        "Oi, sou MEI e vendi na maquininha Fala Tap, mas o dinheiro não caiu ainda. Tô ansiosa."
       ],
       [
         "aline",
-        "Oi! Vou te ajudar com isso. 🌟 Primeira coisa, preciso saber: a venda aparece como *APROVADA* no seu histórico? Se sim, me diga qual é o seu plano de recebimento: *D0* (na hora) ou *D1* (próximo dia útil)?."
+        "Oi! Pode deixar que eu te ajudo com isso 😊 Primeiro, vamos conferir algumas informações:\n\n1. *Verifique* no histórico se a venda está como **APROVADA**, por favor.\n2. *Verifique* qual é o **plano de recebimento**: D0 (na hora) ou D1 (próximo dia útil).\n\nSe for D1 e a venda foi hoje (ou no fim de semana), o valor está garantido e cai no próximo dia útil. Se não for isso, me avise!"
       ],
       [
         "cliente",
-        "Oi, aparece como aprovada sim. Meu plano é D0, era pra cair na hora, né?"
+        "Beleza, vou conferir aqui. Já volto."
       ],
       [
         "aline",
-        "Sim, no plano *D0* era pra cair em cerca de 5 segundos após a aprovação. Como isso não aconteceu, vamos investigar melhor. ❓ Qual foi o horário exato da aprovação da venda?."
-      ],
-      [
-        "cliente",
-        "Foi às 14h30."
-      ],
-      [
-        "aline",
-        "Entendi. Como o valor não caiu dentro do esperado no plano *D0*, o próximo passo é verificar isso de forma mais profunda. Já que o sistema tá me dizendo que houve um desvio do que era pra acontecer, vou notar que o prazo foi excedido. Pode deixar comigo! Se precisar de mais algum detalhe específico ou outra ajuda, estou por aqui! 😊"
+        "Combinado! Fico no aguardo. Se tiver qualquer dúvida, me avise! 😉"
       ]
     ]
   },
@@ -260,27 +260,35 @@
     "expect": "ai",
     "outcome": "ai",
     "outcome_ok": true,
-    "turns": 2,
+    "turns": 3,
     "grounded": true,
     "adequado": true,
     "tom": 5,
-    "nota": "A orientação foi clara e adequada para o problema do cliente.",
+    "nota": "A orientação foi clara e empática, ajudando o cliente passo a passo.",
     "transcript": [
       [
         "cliente",
-        "oi, to com dificuldade pra fazer um pix, nao entendo muito dessas coisas de celular"
+        "oi, to com dificuldade pra fazer um pix, n sei como funciona isso direito"
       ],
       [
         "aline",
-        "Oi! 😊 Vamos juntos nessa. O que exatamente está dando errado? Você não está conseguindo enviar ou receber o Pix? Me conta um pouquinho mais pra eu te ajudar melhor."
+        "Oi! Vou te ajudar com isso. 😊 Para fazer um *Pix*, siga esses passos no Jota:\n\n1. Digite o valor que quer enviar.\n2. Escolha a opção para transferir via *Pix*.\n3. Informe a *chave Pix* do destinatário (pode ser CPF, e-mail, número de celular ou chave aleatória).\n\nSe estiver com alguma dúvida específica, me avisa!"
       ],
       [
         "cliente",
-        "entao, eu nao sei como enviar, nao sei onde clicar e nem como faz isso direito"
+        "ah, entendi! mas onde eu acho essa opção de transferir via pix? tô meio perdido aqui."
       ],
       [
         "aline",
-        "Entendi! Vamos lá, vou te ajudar a passo a passo:\n\n1. No seu WhatsApp, abra a conversa com o Jota.\n2. Clique no ícone de \"clipe de papel\" (anexo) como se fosse enviar um arquivo.\n3. Selecione **Pix**.\n4. Escolha enviar por chave Pix ou dados bancários.\n5. Insira os dados do destinatário e o valor.\n6. Confirme os dados e clique em **Enviar Pix**.\n\nProntinho! Se tiver alguma dúvida em um desses passos, me avisa! 😉"
+        "Sem problemas! 😄 Pra te ajudar melhor, me confirma: você quer fazer essa transferência usando o Jota no WhatsApp ou em algum app específico?"
+      ],
+      [
+        "cliente",
+        "tô tentando pelo whatsapp mesmo, mas n sei onde clicar."
+      ],
+      [
+        "aline",
+        "Beleza! No Jota pelo WhatsApp, você faz o *Pix* assim:\n\n1. Digite o valor que quer enviar e envie.\n2. O Jota vai te mostrar opções, escolha a de *Pix*.\n3. Siga as instruções pra informar a *chave Pix* do destinatário.\n\nExperimente e me avisa se precisar de mais ajuda!"
       ]
     ]
   },
@@ -293,23 +301,23 @@
     "grounded": true,
     "adequado": true,
     "tom": 5,
-    "nota": "A orientação foi correta e o tom foi empático e claro.",
+    "nota": "A orientação foi correta e o tom foi amigável e claro.",
     "transcript": [
       [
         "cliente",
-        "Oi, tô com problema pra transferir do Nubank pro Jota, aparece uma trava. O que faço?"
+        "oi, to com problema pra transferir do nubank pro jota, aparece uma trava lá"
       ],
       [
         "aline",
-        "Oi! 😊 Me conta mais sobre o que tá acontecendo. Você consegue fazer a transferência por Pix e dá algum erro específico?"
+        "Entendi, você está tentando transferir dinheiro do **Nubank** para o **Jota** e está com dificuldades. Vamos tentar resolver!\n\n1. Confira se os dados do Jota estão corretos (nome, CPF/CNPJ, chave Pix).\n2. Verifique seu saldo no Nubank para garantir que tem fundos suficientes.\n\nSe tudo estiver ok e a transferência não funcionar, você pode tentar novamente mais tarde. Tem alguma mensagem específica de erro aparecendo?"
       ],
       [
         "cliente",
-        "Tento fazer o Pix e aparece uma mensagem de trava, não sei o que tá rolando."
+        "sim, aparece uma mensagem dizendo que a transferência não pode ser concluída. já conferi os dados e o saldo tá ok."
       ],
       [
         "aline",
-        "Entendi, parece frustrante! 😕 Essa mensagem pode indicar alguma restrição na hora de transferir do Nubank pro Jota. Vou sugerir você dar uma olhadinha em duas coisas:\n\n1. Confirme se os dados da chave Pix do Jota estão corretos.\n2. Veja se há algum limite diário configurado no Nubank que pode estar bloqueando a transferência. \n\nSe tudo estiver certo e o erro continuar, pode ser uma limitação temporária do Nubank. Aí vale a pena tentar novamente mais tarde. Se tiver mais detalhes sobre a mensagem, me conta! 😉"
+        "Se os dados e saldo estão certinhos, pode ser uma questão temporária do Nubank. Sugiro:\n\n1. Tente novamente depois de alguns minutos.\n2. Confira com o suporte do Nubank se há alguma restrição na sua conta lá. \n\nSe você precisar de mais alguma ajuda, estou por aqui! 😊"
       ]
     ]
   }

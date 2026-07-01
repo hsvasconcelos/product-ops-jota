@@ -164,6 +164,25 @@ def theme_judge(text):
     return None
 
 
+def stuck_judge(prior_bot: str, customer_msg: str) -> bool:
+    """Fuzzy: a resposta do cliente indica que a tentativa anterior NÃO resolveu / segue travado?
+    Determinístico onde o keyword confia; LLM só no resíduo (fraseado oblíquo). None-safe."""
+    if LLM is None:
+        return False
+    try:
+        r = LLM.chat.completions.create(
+            model=OPENAI_MODEL, temperature=0, max_tokens=4,
+            messages=[{"role": "system", "content":
+                       "O atendente sugeriu que o cliente TENTASSE algo. A resposta do cliente diz que ele "
+                       "JÁ TENTOU essa sugestão e ela NÃO resolveu (segue travado)? Responda 'sim' SÓ se ele "
+                       "tentou e falhou. Se ele está apenas descrevendo/confirmando o problema, dando uma "
+                       "informação que o atendente pediu, ou aceitando a orientação, responda 'nao'."},
+                      {"role": "user", "content": f"Atendente: {prior_bot[:300]}\nCliente: {customer_msg[:300]}"}])
+        return "sim" in (r.choices[0].message.content or "").strip().lower()
+    except Exception:
+        return False
+
+
 def gerar(history, theme, seg, doc, disappointed=False, opener=False) -> str:
     # quando a IA resolve, tira passos de escalação/jargão do procedimento (a decisão
     # de chamar humano é do gate, não do texto — e jargão assusta o leigo).
@@ -212,7 +231,15 @@ def analisar(sess):
     if sess.get("last_theme") != det.predicted_theme.value:
         sess["stuck_signals"] = 0                       # tema novo → zera a contagem de falhas
     sess["last_theme"] = det.predicted_theme.value
-    if det.in_loop:
+    # sinal de "fix falhou": fast path keyword (in_loop); se não pegou e já houve tentativa,
+    # pergunta ao LLM (robusto a fraseado oblíquo, o furo que o eval-LLM expôs).
+    signaled = det.in_loop
+    if not signaled:
+        prior_bot = next((h["content"] for h in reversed(sess["history"][:-1])
+                          if h["role"] == "assistant"), None)
+        if prior_bot:
+            signaled = stuck_judge(prior_bot, sess["history"][-1]["content"])
+    if signaled:
         sess["stuck_signals"] = sess.get("stuck_signals", 0) + 1
     sig = sess.get("stuck_signals", 0)
     # esgotamento = o CLIENTE sinalizou falha (não conversa longa!): 2 "não funcionou",
