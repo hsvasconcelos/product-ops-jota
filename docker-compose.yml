@@ -1,0 +1,55 @@
+# Demo · Jota — Evolution API (gateway WhatsApp não-oficial) + o bot do Jota.
+# Tudo numa caixa só: sobe com `docker compose up -d`. Ver WHATSAPP_DEMO.md.
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: evolution
+      POSTGRES_DB: evolution
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes: [redis_data:/data]
+    restart: unless-stopped
+
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7
+    ports: ["8080:8080"]
+    depends_on: [postgres, redis]
+    environment:
+      SERVER_URL: ${SERVER_URL:-http://localhost:8080}
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://evolution:evolution@postgres:5432/evolution
+      DATABASE_SAVE_DATA_INSTANCE: "true"
+      DATABASE_SAVE_DATA_NEW_MESSAGE: "true"
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://redis:6379/6
+      CACHE_REDIS_PREFIX_KEY: evolution
+      CACHE_REDIS_SAVE_INSTANCES: "true"
+      CACHE_LOCAL_ENABLED: "false"
+    volumes: [evolution_instances:/evolution/instances]
+    restart: unless-stopped
+
+  bot:
+    build: { context: ., dockerfile: Dockerfile.bot }
+    ports: ["8000:8000"]          # health/observabilidade no host (Evolution já fala interno)
+    # código montado p/ iterar sem rebuild: editar + `docker-compose restart bot`
+    volumes: ["./apps:/app/apps", "./src:/app/src", "./data:/app/data"]
+    depends_on: [evolution]
+    environment:
+      EVOLUTION_URL: http://evolution:8080
+      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
+      EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE:-jota}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  evolution_instances:
