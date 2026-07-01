@@ -278,11 +278,6 @@ def analisar(sess):
     return det, docs, decide(inp), inp
 
 
-_ACTION_EMOJI = {
-    InterceptionAction.AI_RESOLVE: "🟢", InterceptionAction.AI_RESOLVE_SILENT: "🟢",
-    InterceptionAction.AI_ASSIST: "🟡", InterceptionAction.HUMAN_HANDOFF: "🔴",
-    InterceptionAction.NO_INTERCEPT: "⚪",
-}
 _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comportamento",
            "absence_detected": "ausência (silenciosa)"}
 
@@ -290,11 +285,10 @@ _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comport
 def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
     """Formato 'bulletado por área' em HTML (negrito confiável) — pra plateia de engenheiros."""
     doc = docs[0] if docs else None
-    gr = {"pass": "✅ passou", "blocked": "🛑 bloqueou (trocou por procedimento ancorado)"}.get(guardrail, "—")
+    gr = {"pass": "passou", "blocked": "bloqueou (trocou por procedimento ancorado)"}.get(guardrail, "—")
     sinais = [n for n, v in (("pediu humano", det.asked_for_human), ("frustrado", det.frustrated),
                              ("desanimado", det.disappointed), ("em loop", det.in_loop),
                              ("confuso", det.confused), ("⚠️ vulnerável", det.safety_concern)) if v]
-    emoji = _ACTION_EMOJI.get(dec.action, "")
     nat = _NAT_PT.get(det.predicted_nature.value, det.predicted_nature.value)
     fonte = _esc(f"{doc.id} — {doc.title}") if doc else "nada ancorado"
     return (
@@ -306,7 +300,7 @@ def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
         "<b>Decisão</b>\n"
         f"• criticidade {inp.criticality} · trust {inp.trust_risk} · resolub {inp.resolvability} · certeza {inp.detection_confidence}\n"
         f"• capacidade {dec.ai_capability} · pressão→humano {dec.handoff_pressure}\n"
-        f"• {emoji} <b>{_esc(ACTION_LABEL.get(dec.action, dec.action.value))}</b> · prio {dec.priority}\n"
+        f"• <b>{_esc(ACTION_LABEL.get(dec.action, dec.action.value))}</b> · prio {dec.priority}\n"
         f"  ↳ {_esc(dec.reason)}\n\n"
         "<b>RAG + guardrail</b>\n"
         f"• fonte: {fonte}\n"
