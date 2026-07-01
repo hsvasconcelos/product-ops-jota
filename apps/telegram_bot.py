@@ -206,14 +206,17 @@ def analisar(sess):
     txt = " ".join(h["content"] for h in hist if h["role"] == "user")
     docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=TOP_K)
     doc = docs[0] if docs else None
-    # ESGOTAMENTO ESTRUTURAL (independe de COMO o cliente escreve "não funcionou" — detectar
-    # isso por frase é whack-a-mole): a IA já tentou N vezes no MESMO tema e o cliente segue
-    # ali → o procedimento falhou. Frustração/desânimo aceleram; tema novo zera a contagem.
+    # ESGOTAMENTO: o sinal PRIMÁRIO é o do CLIENTE (determinístico, independe do reply do LLM):
+    # quantas vezes ele disse "não funcionou / continua / já tentei" (in_loop). 2 sinais de
+    # falha → o procedimento não resolveu → humano. O fix-streak é backstop; tema novo zera.
     if sess.get("last_theme") != det.predicted_theme.value:
-        sess["resolve_streak"] = 0
+        sess["resolve_streak"], sess["stuck_signals"] = 0, 0
     sess["last_theme"] = det.predicted_theme.value
+    if det.in_loop:
+        sess["stuck_signals"] = sess.get("stuck_signals", 0) + 1
     streak = sess.get("resolve_streak", 0)
-    stuck = streak >= 3 or (streak >= 2 and (det.frustrated or det.disappointed or det.in_loop))
+    stuck = (sess.get("stuck_signals", 0) >= 2 or streak >= 3
+             or (streak >= 2 and (det.frustrated or det.disappointed)))
     inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck)
     # streak é incrementado em handle_message SÓ quando entrega um fix real (pergunta de
     # esclarecimento não conta) — senão o esgotamento dispara cedo demais.
@@ -302,7 +305,7 @@ def _new_session(seg="pf", events=None, context_text="", started=None, name=""):
     return {"segment": seg, "events": events or [], "context_text": context_text,
             "started_at": started or datetime.now().isoformat(), "history": [],
             "profile": UserProfile(segment=seg), "name": name, "greeted": False,
-            "resolve_streak": 0}
+            "resolve_streak": 0, "stuck_signals": 0}
 
 
 def _saudacao(name):
@@ -362,6 +365,37 @@ def handle_command(chat_id, cmd, name=""):
     send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
 
 
+def run_turn(sess, text):
+    """O CÉREBRO de um turno, sem Telegram: detecta → decide → redige/handoff → atualiza
+    o esgotamento. Reusado pelo bot (handle_message) E pelo simulador de conversas (eval)."""
+    sess["history"].append({"role": "user", "content": text})
+    det, docs, dec, inp = analisar(sess)
+    if dec.action == InterceptionAction.HUMAN_HANDOFF:
+        em_horario = 9 <= datetime.now().hour < 20
+        sla = ("Como é horário comercial (9h–20h), te retornam em seguida."
+               if em_horario else
+               "O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade.")
+        reply = ("Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua "
+                 f"com você e te retorna *aqui mesmo, neste número*. {sla} Todo o contexto vai junto, "
+                 "você não repete nada. 🙏")
+        work = WORKAROUND.get(det.predicted_theme)
+        if work:
+            reply += f"\n\nE {work}, sem precisar esperar. 😉"
+        sess["resolve_streak"] = 0
+        kind = "handoff"
+    else:
+        reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
+                      doc=docs[0] if docs else None, disappointed=det.disappointed)
+        sess["history"].append({"role": "assistant", "content": reply})
+        # conta como tentativa SÓ se entregou um fix (pergunta/coletar info é livre): "?" em
+        # qualquer lugar e sem passos numerados = clarificação, não gasta o esgotamento.
+        is_clarify = ("?" in reply) and not any(f"{i}." in reply for i in (1, 2, 3, 4, 5))
+        if not is_clarify:
+            sess["resolve_streak"] = sess.get("resolve_streak", 0) + 1
+        kind = "resolve"
+    return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply, "kind": kind}
+
+
 def handle_message(chat_id, text, name=""):
     sess = SESSIONS.get(chat_id) or _new_session(name=name)
     SESSIONS[chat_id] = sess
@@ -371,36 +405,13 @@ def handle_message(chat_id, text, name=""):
     if not sess.get("greeted"):
         sess["greeted"] = True
         send(chat_id, _saudacao_curta(sess.get("name", "")))
-    sess["history"].append({"role": "user", "content": text})
-    det, docs, dec, inp = analisar(sess)
     typing(chat_id)
-
-    if dec.action == InterceptionAction.HUMAN_HANDOFF:
-        em_horario = 9 <= datetime.now().hour < 20
-        sla = ("Como é horário comercial (9h–20h), te retornam em seguida."
-               if em_horario else
-               "O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade.")
-        msg = ("Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua "
-               f"com você e te retorna *aqui mesmo, neste número*. {sla} Todo o contexto vai junto, "
-               "você não repete nada. 🙏")
-        work = WORKAROUND.get(det.predicted_theme)
-        if work:
-            msg += f"\n\nE {work}, sem precisar esperar. 😉"
-        send(chat_id, msg)
-        sess["resolve_streak"] = 0
-        if chat_id in DEBUG:
-            send(chat_id, _handoff_card(det, dec, inp, sess))
-    else:
-        reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
-                      doc=docs[0] if docs else None, disappointed=det.disappointed)
-        sess["history"].append({"role": "assistant", "content": reply})
-        send(chat_id, reply)
-        # conta como tentativa de resolução SÓ se entregou um fix (não só uma pergunta)
-        is_clarify = reply.strip().endswith("?") and not any(f"{i}." in reply for i in (1, 2, 3, 4, 5))
-        if not is_clarify:
-            sess["resolve_streak"] = sess.get("resolve_streak", 0) + 1
+    r = run_turn(sess, text)
+    send(chat_id, r["reply"])
+    if r["kind"] == "handoff" and chat_id in DEBUG:
+        send(chat_id, _handoff_card(r["det"], r["dec"], r["inp"], sess))
     if chat_id in DEBUG:
-        send(chat_id, _brain_text(det, docs, dec, inp))
+        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"]))
 
 
 def main():
