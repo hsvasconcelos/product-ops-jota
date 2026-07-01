@@ -447,27 +447,25 @@ def handle_command(chat_id, cmd, name=""):
         sid = COMMANDS[cmd]
         c = SCENARIOS[sid]
         seg = c.get("segment", "pf")
-        ctx = " ".join(m["text"] for m in c["mensagens"] if m["sender"] == "customer")
         events = [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])]
-        sess = _new_session(seg, events, ctx, c["started_at"], name=name)
+        # PROATIVO event-driven: injeta SÓ o evento (context_text="") — a detecção vem do EVENTO,
+        # não de texto de cliente. Arma o cenário e ESPERA o cliente abrir o chat (jornada real).
+        sess = _new_session(seg, events, "", c["started_at"], name=name)
+        sess["proactive_pending"] = sid
         SESSIONS[chat_id] = sess
-        det, docs, dec, inp = analisar(sess)
-        evs = sorted({et for et, _ in events})
-        if evs:
-            banner = ("🔔 <b>Evento no sistema:</b> <code>" + ", ".join(_esc(e) for e in evs)
-                      + "</code> — agindo antes de você pedir.")
+        counts: dict = {}
+        for et, _ in events:
+            counts[et] = counts.get(et, 0) + 1
+        hora = events[0][1][11:16] if events else ""
+        if events:
+            label = ", ".join(_esc(et) + (f" ×{n}" if n > 1 else "") for et, n in counts.items())
+            banner = f"🔔 <b>Evento detectado:</b> <code>{label}</code>" + (f" — {hora}" if hora else "")
         elif sid == "ex_kyc_limbo":
-            banner = "🔔 <b>Ausência detectada</b> — onboarding parou sem erro; agindo antes de você pedir."
+            banner = "🔔 <b>Ausência detectada</b> — onboarding parou sem erro."
         else:
-            banner = "🔔 <b>Atrito detectado</b> — agindo antes do chamado existir."
+            banner = "🔔 <b>Atrito detectado.</b>"
         send(chat_id, banner, html=True)
-        typing(chat_id)
-        opener = gerar([], det.predicted_theme, seg, docs[0] if docs else None,
-                       det.disappointed, opener=True, fatos=FACTS.get(sid, ""))
-        sess["history"].append({"role": "assistant", "content": opener})
-        send(chat_id, opener)
-        if chat_id in DEBUG:
-            send(chat_id, _brain_text(det, docs, dec, inp), html=True)
+        send(chat_id, "_(o cliente abre o chat — manda uma mensagem — e a Aline já atende sabendo do evento)_")
         return
     send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
 
@@ -515,11 +513,41 @@ def run_turn(sess, text):
             "kind": kind, "guardrail": guardrail}
 
 
+def _deliver_proactive(chat_id, sess, text):
+    """Cenário /demo-* armado: o cliente abriu o chat → a Aline se apresenta e AGE sobre o EVENTO
+    (proativo, já sabe o que aconteceu). Detecção event-driven; o opener também passa pelo guardrail."""
+    sid = sess.pop("proactive_pending")
+    sess["history"].append({"role": "user", "content": text})
+    typing(chat_id)
+    det, docs, dec, inp = analisar(sess)
+    doc = docs[0] if docs else None
+    opener = gerar([], det.predicted_theme, sess["segment"], doc, opener=True, fatos=FACTS.get(sid, ""))
+    ok, _why = guardrail_check(opener, doc)
+    guardrail = "pass" if ok else "blocked"
+    if not ok:
+        sug = montar_sugestao(det.predicted_theme, docs)
+        opener = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
+                  if sug else opener)
+    sess["history"].append({"role": "assistant", "content": opener})
+    if not sess.get("greeted"):
+        sess["greeted"] = True
+        send(chat_id, _saudacao_curta(sess.get("name", "")))
+    send(chat_id, opener)
+    trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
+           "confianca": inp.detection_confidence, "acao": "proativo", "kind": "proativo",
+           "fonte": doc.id if doc else None, "guardrail": guardrail, "cliente_msg": text[:200]})
+    if chat_id in DEBUG:
+        send(chat_id, _brain_text(det, docs, dec, inp, guardrail), html=True)
+
+
 def handle_message(chat_id, text, name=""):
     sess = SESSIONS.get(chat_id) or _new_session(name=name)
     SESSIONS[chat_id] = sess
     if name and not sess.get("name"):
         sess["name"] = name
+    if sess.get("proactive_pending"):          # cenário /demo-* armado → entrega proativa
+        _deliver_proactive(chat_id, sess, text)
+        return
     # 1º contato sem /start: a Aline se apresenta (curto — o cliente já trouxe o problema)
     if not sess.get("greeted"):
         sess["greeted"] = True
