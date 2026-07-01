@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import os
 import re
 import unicodedata
 from pathlib import Path
@@ -92,6 +93,8 @@ class Retriever:
     def _try_load_dense(self) -> str:
         """Tenta habilitar densos. Devolve o motivo da falha (string vazia se ok).
         NUNCA levanta — o chamador segue com BM25."""
+        if os.environ.get("JOTA_RAG_MODE", "").lower() == "bm25":
+            return "forçado BM25 (JOTA_RAG_MODE=bm25) — deploy leve, sem torch"
         try:
             from sentence_transformers import SentenceTransformer  # tranca 1
         except Exception as e:
