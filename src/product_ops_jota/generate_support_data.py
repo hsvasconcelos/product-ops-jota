@@ -1,5 +1,5 @@
 """
-Atalaia · Support Lab — Gerador de conversas sintéticas (Mundo 1)
+Jota · Support Lab — Gerador de conversas sintéticas (Mundo 1)
 =================================================================
 Gera N conversas REALISTAS e ROTULADAS no banco de suporte.
 
@@ -16,9 +16,37 @@ No canal de suporte só existem 2 naturezas (quem está aqui FALOU):
 """
 from __future__ import annotations
 
+import json
 import random
 import sqlite3
 from datetime import datetime, timedelta
+from pathlib import Path
+
+# ─── Banco de frases REALISTAS (gerado uma vez via LLM, ancorado na voz real) ──
+# O gerador AMOSTRA dele com seed: realismo do LLM + reprodutibilidade do código.
+# Sem o banco, cai nos templates abaixo (degradação graciosa).
+_BANK_PATH = Path(__file__).resolve().parents[2] / "data" / "banco_frases.json"
+_BANK_CACHE: dict | None = None
+
+
+def _bank() -> dict:
+    global _BANK_CACHE
+    if _BANK_CACHE is None:
+        _BANK_CACHE = json.loads(_BANK_PATH.read_text("utf-8")) if _BANK_PATH.exists() else {}
+    return _BANK_CACHE
+
+
+# tema (gold) → chave(s) de atrito no banco; o gerador sorteia uma por conversa.
+THEME_FRICTION = {
+    "account_access": ["account_access"],
+    "pix": ["pix_chave_invalida", "pix_pessoa_errada"],
+    "kyc": ["kyc_biometria", "onboarding_limbo"],
+    "fala_tap": ["fala_tap_travado"],
+    "boleto": ["estorno_duplicado", "boleto"],
+    "account_data": ["account_dados_exclusao"],
+    "yield_open_finance": ["open_finance", "rende"],
+    "other": ["confusao_canal"],
+}
 
 # ─── Distribuição de temas (ancorada no ReclameAqui + produto) ──────────────
 THEME_WEIGHTS = {
@@ -63,6 +91,25 @@ ORPHAN_EVENT_WEIGHTS = {
 BASE_CRITICALITY = {
     "account_access": 3, "pix": 3, "kyc": 3, "fala_tap": 4,
     "boleto": 3, "account_data": 2, "yield_open_finance": 2, "other": 2,
+}
+
+# Mundo 2 — abertura proativa do Jota por tema (templated; o showcase de qualidade
+# é a demo web com LLM. Aqui é dado em volume p/ o funil de escala).
+PRODUCT_PROACTIVE = {
+    "account_access": "Oi! Notei que o app travou aí algumas vezes. Tenta atualizar pela loja; se continuar, eu resolvo por aqui. 💙",
+    "pix": "Oi! Vi que seu Pix não foi — a chave usada não está ativa no destino. Quer que eu gere um QR de cobrança pra facilitar?",
+    "kyc": "Oi! Sua verificação travou na selfie. Procure um lugar bem iluminado e tente de novo — tô de olho aqui pra te ajudar.",
+    "fala_tap": "Oi! Sua venda no Fala Tap foi aprovada ✅ Como seu plano é D1, o valor cai no próximo dia útil, garantido. Te aviso quando entrar.",
+    "boleto": "Oi! Identifiquei uma cobrança em duplicidade e já estornei a duplicada — volta em até 1 dia útil. Não precisa fazer nada. 💙",
+    "account_data": "Oi! Sua solicitação de alteração está em análise — te aviso assim que concluir, beleza?",
+    "yield_open_finance": "Oi! O saldo do seu banco conectado pode levar uns minutos pra atualizar — já estou ressincronizando aqui.",
+    "other": "Oi! Passando pra te ajudar com um ponto da sua conta. Precisa de algo?",
+}
+# evento de INÍCIO (a conclusão esperada não vem → ausência)
+ABSENCE_START = {
+    "kyc": "kyc.started", "account_access": "session.started", "account_data": "deletion.requested",
+    "fala_tap": "tap_to_pay.started", "pix": "pix.initiated", "boleto": "boleto.scheduled",
+    "yield_open_finance": "open_finance.consent_started", "other": "flow.started",
 }
 
 SEGMENTS = (["mei"] * 45 + ["pf"] * 40 + ["pj"] * 15)   # Jota é forte em empreendedor
@@ -146,8 +193,10 @@ AGENT_STEP = {
 }
 AGENT_HOLD = ["Só um momento que já verifico isso pra você.", "Deixa eu checar aqui no sistema, um instante.",
               "Estou olhando o seu caso agora, aguenta um pouquinho.", "Já te retorno com uma posição."]
-CUSTOMER_DETAIL = ["é android", "to no iphone", "aparece sim uma mensagem de erro", "nao aparece nada, so trava",
-                   "ja tentei isso e nao deu", "fiz exatamente isso e continua igual", "ok, fiz aqui", "ta feito"]
+# Respostas NEUTRAS de troubleshooting — coerentes com qualquer tema (sem device-específico).
+# O detalhe coerente com o ATRITO vem dos followups do banco (ver detalhe() abaixo).
+GENERIC_REPLY = ["ja tentei isso e nao deu", "fiz exatamente isso e continua igual", "ok, fiz aqui",
+                 "ta feito", "fiz e nao mudou nada", "ok", "fiz aqui e continua igual", "nao resolveu"]
 
 # Impaciência crescente (nível 1 → 3). Nível 3 só entra no arco furioso.
 IMPATIENT = {
@@ -187,13 +236,16 @@ def _pick(weights: dict) -> str:
     return list(weights)[-1]
 
 
-def generate(conn: sqlite3.Connection, n_conversations: int = 1000, seed: int = 42) -> None:
+def generate(conn: sqlite3.Connection, n_support: int = 1000, n_product: int = 0,
+             seed: int = 42) -> None:
     random.seed(seed)
     cur = conn.cursor()
 
     # usuários: ~0.8 por conversa (alguns voltam mais de uma vez)
-    n_users = int(n_conversations * 0.8)
+    n_users = int((n_support + n_product) * 0.8)
     users = []
+    user_lit: dict[str, str] = {}                 # uid → literacia (estilo da frase)
+    user_seg: dict[str, str] = {}                 # uid → segmento (PF/PJ/MEI)
     for i in range(n_users):
         uid = f"u_{i:05d}"
         seg = random.choice(SEGMENTS)
@@ -201,9 +253,10 @@ def generate(conn: sqlite3.Connection, n_conversations: int = 1000, seed: int = 
         age = random.choices(AGE_BANDS, weights=[20, 40, 30, 10])[0]
         signup = _now_minus(random.uniform(1, 540)).isoformat()
         users.append(uid)
+        user_lit[uid], user_seg[uid] = lit, seg
         cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (uid, seg, signup, age, lit))
 
-    for c in range(n_conversations):
+    for c in range(n_support):
         cid = f"c_{c:05d}"
         uid = random.choice(users)
         theme = _pick(THEME_WEIGHTS)
@@ -248,10 +301,36 @@ def generate(conn: sqlite3.Connection, n_conversations: int = 1000, seed: int = 
             cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
                         (f"e_{c:05d}", uid, cid, EVENT_BY_THEME[theme], evt_at))
 
-        # mensagens: monta a conversa
+        # mensagens: monta a conversa (texto do cliente vindo do banco de frases,
+        # no estilo da literacia do usuário)
+        friction_key = random.choice(THEME_FRICTION.get(theme, [theme]))
         _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
                            agent_switch, context_lost, frustrated, crit,
-                           started, mostly_audio=(random.random() < 0.2))
+                           started, mostly_audio=(random.random() < 0.2),
+                           friction_key=friction_key, literacy=user_lit[uid])
+
+    # ── MUNDO 2 — conversas de PRODUTO (proativas, channel='jota') ────────────
+    for c in range(n_product):
+        cid = f"cp_{c:05d}"
+        uid = random.choice(users)
+        theme = _pick(THEME_WEIGHTS)
+        # no produto as 3 naturezas valem (inclui a AUSÊNCIA, o atrito silencioso)
+        nature = random.choices(["system_signaled", "behavior_inferred", "absence_detected"],
+                                weights=[50, 30, 20])[0]
+        crit = BASE_CRITICALITY[theme]
+        if theme == "fala_tap":
+            crit = min(crit * 1.3, 5)
+        crit = round(max(min(crit + random.uniform(-0.5, 0.5), 5.0), 1.0), 2)
+        outcome = random.choices(["resolved", "escalated", "no_response"], weights=[80, 15, 5])[0]
+        handoff = 1 if outcome == "escalated" else 0          # humano em caso sensível
+        sent_start = round(random.uniform(-0.3, 0.2), 2)
+        sent_end = round(random.uniform(0.3, 0.8) if outcome == "resolved"
+                         else random.uniform(-0.6, 0.0), 2)
+        started = _now_minus(random.uniform(0, 90))
+        cur.execute("INSERT INTO conversations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (cid, uid, "jota", started.isoformat(), theme, nature, crit, outcome,
+                     0, handoff, 0, sent_start, sent_end))
+        _generate_product_conversation(cur, cid, uid, user_seg[uid], theme, nature, started)
 
     # ── Eventos de sistema SEM conversa (conversation_id = NULL) ──────────────
     # O cliente teve a falha e NÃO reclamou. Isso NÃO é uma natureza do suporte
@@ -260,13 +339,13 @@ def generate(conn: sqlite3.Connection, n_conversations: int = 1000, seed: int = 
     # propósito — assim não desloca a sequência aleatória e cada conversa acima
     # continua idêntica (determinismo). IDs neutros, continuando a sequência
     # `e_xxxxx` após o range das conversas para não colidir com os correlacionados.
-    n_orphan = int(n_conversations * 0.4)
+    n_orphan = int(n_support * 0.4)
     for k in range(n_orphan):
         uid = random.choice(users)
         evt = _pick(ORPHAN_EVENT_WEIGHTS)
         evt_at = _now_minus(random.uniform(0, 90)).isoformat()
         cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
-                    (f"e_{n_conversations + k:05d}", uid, None, evt, evt_at))
+                    (f"e_{n_support + k:05d}", uid, None, evt, evt_at))
 
     conn.commit()
 
@@ -297,9 +376,45 @@ def _gap(curto: tuple, longo: tuple, p_longo: float) -> float:
     return random.uniform(*longo) if random.random() < p_longo else random.uniform(*curto)
 
 
+def _generate_product_conversation(cur, cid, uid, seg, theme, nature, started):
+    """Mundo 2: o Jota fala PRIMEIRO (proativo). system_signaled tem evento
+    correlacionado; absence_detected tem só o evento de INÍCIO (a conclusão é ausente)."""
+    eid = f"ep_{cid}"
+    if nature == "system_signaled":
+        cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
+                    (eid, uid, cid, EVENT_BY_THEME.get(theme, "generic.error"),
+                     (started - timedelta(minutes=random.randint(1, 20))).isoformat()))
+    elif nature == "absence_detected":
+        cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
+                    (eid, uid, cid, ABSENCE_START.get(theme, "flow.started"),
+                     (started - timedelta(minutes=random.randint(30, 180))).isoformat()))
+    cur.execute("INSERT INTO messages VALUES (?,?,?,?,?,?,?,?)",
+                (f"m_{cid}_00", cid, 0, "bot", "Jota", started.isoformat(), "text",
+                 PRODUCT_PROACTIVE.get(theme, PRODUCT_PROACTIVE["other"])))
+    if random.random() < 0.6:
+        t = started + timedelta(minutes=random.uniform(0.5, 30))
+        reply = random.choice(["obrigado!", "ah entendi, valeu", "mas e agora?",
+                               "ainda to com duvida", "showw", "ok"])
+        cur.execute("INSERT INTO messages VALUES (?,?,?,?,?,?,?,?)",
+                    (f"m_{cid}_01", cid, 1, "customer", None, t.isoformat(), "text", reply))
+
+
+def _problema(friction_key: str, literacy: str, theme: str) -> str:
+    """Primeira fala do problema — do banco realista, no estilo da literacia."""
+    ops = _bank().get(friction_key, {}).get("openers", {})
+    pool = ops.get(literacy) or ops.get("medium") or [p for v in ops.values() for p in v]
+    return random.choice(pool) if pool else random.choice(PROBLEM_TEXT[theme])
+
+
+def _detalhe_problema(friction_key: str, theme: str) -> str:
+    """Detalhe/insistência seguinte — do banco (followups)."""
+    fus = _bank().get(friction_key, {}).get("followups", [])
+    return random.choice(fus) if fus else random.choice(PROBLEM_DETAIL[theme])
+
+
 def _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
                        agent_switch, context_lost, frustrated, crit,
-                       started, mostly_audio):
+                       started, mostly_audio, friction_key="", literacy="medium"):
     t = started
     turn = 0
     agent_a = random.choice(AGENT_NAMES)
@@ -319,12 +434,14 @@ def _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
                      modality if sender == "customer" else "text", text))
         turn += 1
 
+    # pool coerente: followups do banco (do MESMO atrito) + respostas neutras de ação
+    _pool_detalhe = (_bank().get(friction_key, {}).get("followups", []) + GENERIC_REPLY) or GENERIC_REPLY
     _detalhe_usado: list[str] = []
 
     def detalhe() -> str:
-        """Resposta do cliente sem repetir as 2 últimas (evita soar robótico)."""
-        opts = [d for d in CUSTOMER_DETAIL if d not in _detalhe_usado[-2:]]
-        d = random.choice(opts or CUSTOMER_DETAIL)
+        """Resposta do cliente coerente com o atrito, sem repetir as 2 últimas."""
+        opts = [d for d in _pool_detalhe if d not in _detalhe_usado[-2:]]
+        d = random.choice(opts or _pool_detalhe)
         _detalhe_usado.append(d)
         return d
 
@@ -342,9 +459,9 @@ def _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
         gap_min=_gap((0.5, 18), (60, 1600), 0.35 if lenta else 0.12))
 
     # ── 2. cliente expõe o problema (em rajadas, estilo WhatsApp) ─────────────
-    add("customer", random.choice(PROBLEM_TEXT[theme]), gap_min=_gap((0.3, 4), (5, 20), 0.2))
+    add("customer", _problema(friction_key, literacy, theme), gap_min=_gap((0.3, 4), (5, 20), 0.2))
     if random.random() < 0.7:
-        add("customer", random.choice(PROBLEM_DETAIL[theme]), gap_min=random.uniform(0.2, 2))
+        add("customer", _detalhe_problema(friction_key, theme), gap_min=random.uniform(0.2, 2))
     espera_cliente(nivel_min=2)
 
     # ── 3. diagnóstico: atendente pergunta, cliente responde ──────────────────
@@ -375,7 +492,7 @@ def _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
         agente_final = agent_b
         if context_lost:
             # cliente repete, irritado, a informação que já tinha dado
-            add("customer", f"{random.choice(REPEAT_PREFIX)}, {random.choice(PROBLEM_TEXT[theme])}",
+            add("customer", f"{random.choice(REPEAT_PREFIX)}, {_problema(friction_key, literacy, theme)}",
                 gap_min=random.uniform(0.5, 6))
 
     # ── 6. pedido de humano (tom pelo arco) e eventual handoff ────────────────

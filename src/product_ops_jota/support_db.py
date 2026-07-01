@@ -1,5 +1,5 @@
 """
-Atalaia · Support Lab — Database (Mundo 1)
+Jota · Support Lab — Database (Mundo 1)
 ==========================================
 O banco do "atendimento como laboratório": as conversas do número de SUPORTE,
 modeladas pra que o painel as analise, meça e priorize o que antecipar no produto.

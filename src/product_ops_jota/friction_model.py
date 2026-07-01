@@ -1,5 +1,5 @@
 """
-Atalaia · Friction Model
+Jota · Friction Model
 =========================
 Modelo de domínio do "mapa de problemas": como um atrito é detectado,
 quão crítico ele é, quanto risco de confiança carrega, e qual a ação típica.

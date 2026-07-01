@@ -46,6 +46,7 @@ class RetrievedDoc(BaseModel):
     content: str
     steps: list[str] = Field(default_factory=list)
     score: float                      # score final (RRF ou BM25, conforme o modo)
+    requires_human: bool = False      # a KB diz que ESTE procedimento precisa de humano (privilégio)
 
 
 def _normalize(text: str) -> str:
@@ -129,6 +130,13 @@ class Retriever:
                 fused[idx] = fused.get(idx, 0.0) + 1.0 / (RRF_K + rank + 1)
         return fused
 
+    def embed(self, texts):
+        """Embeddings normalizados (p/ classificação semântica por cosseno). None se
+        rodando em modo BM25 (densos indisponíveis) — o chamador cai no keyword."""
+        if self._dense_model is None:
+            return None
+        return self._dense_model.encode(list(texts), normalize_embeddings=True)
+
     def retrieve(self, query: str, top_k: int = TOP_K) -> list[RetrievedDoc]:
         """Recupera os top_k docs mais relevantes. Funciona em qualquer modo."""
         if self.mode == "hibrido":
@@ -145,7 +153,8 @@ class Retriever:
         for i, sc in scored[:top_k]:
             d = self.docs[i]
             out.append(RetrievedDoc(id=d["id"], title=d["title"], content=d["content"],
-                                    steps=d.get("steps", []), score=round(float(sc), 4)))
+                                    steps=d.get("steps", []), score=round(float(sc), 4),
+                                    requires_human=d.get("requires_human", False)))
         return out
 
     def _maybe_rerank(self, query, scored):
