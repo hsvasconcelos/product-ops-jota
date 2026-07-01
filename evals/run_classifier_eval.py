@@ -38,14 +38,18 @@ DB = Path(__file__).resolve().parents[1] / "data" / "jota_support.db"
 console = Console()
 
 
-def coletar(conn):
-    """Para cada conversa: prevê (do bruto) e lê o gabarito (só aqui)."""
-    ids = [r[0] for r in conn.execute("SELECT conversation_id FROM conversations").fetchall()]
+def coletar(conn, retriever=None, limit=None):
+    """Para cada conversa: prevê (do bruto) e lê o gabarito (só aqui).
+    retriever: se passado, tema é SEMÂNTICO (o motor real). limit: amostra p/ velocidade."""
+    sql = "SELECT conversation_id FROM conversations"
+    if limit:
+        sql += f" LIMIT {int(limit)}"
+    ids = [r[0] for r in conn.execute(sql).fetchall()]
     y = {"theme_true": [], "theme_pred": [], "nature_true": [], "nature_pred": [],
          "human_true": [], "human_pred": []}
     for cid in ids:
         messages, events, started_at = load_raw_conversation(conn, cid)
-        pred = classify_conversation(messages, events, started_at)
+        pred = classify_conversation(messages, events, started_at, retriever=retriever)
         # gabarito + fato observável (lidos só no avaliador)
         gold_theme, gold_nature, asked_human = conn.execute(
             "SELECT gold_theme, gold_nature, asked_for_human FROM conversations WHERE conversation_id=?",

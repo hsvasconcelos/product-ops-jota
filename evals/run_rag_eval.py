@@ -44,11 +44,10 @@ def rank_of_relevant(docs, relevant) -> int | None:
     return None
 
 
-def main():
+def metrics(retriever=None):
+    """Métricas de ranking (Hit@k, P@1, MRR) — reusável pelo harness."""
     queries = json.loads(GOLDEN.read_text(encoding="utf-8"))
-    r = Retriever()
-    mode = "modo híbrido" if r.mode == "hibrido" else "modo BM25 fallback"
-
+    r = retriever or Retriever()
     rows, hits, p1, rr_sum = [], 0, 0, 0.0
     for q in queries:
         docs = r.retrieve(q["query"], top_k=TOP_K)
@@ -59,8 +58,16 @@ def main():
         p1 += int(top1 in q["relevant"])
         rr_sum += (1.0 / rank) if rank else 0.0
         rows.append((q["query"], q["relevant"][0], top1, rank, hit))
-
     n = len(queries)
+    return {"n": n, "mode": r.mode, "hit_at_k": hits / n, "p_at_1": p1 / n,
+            "mrr": rr_sum / n, "rows": rows}
+
+
+def main():
+    m = metrics()
+    r_mode = m["mode"]
+    mode = "modo híbrido" if r_mode == "hibrido" else "modo BM25 fallback"
+    rows, hits, p1, rr_sum, n = m["rows"], m["hit_at_k"] * m["n"], m["p_at_1"] * m["n"], m["mrr"] * m["n"], m["n"]
     console.print(Panel(
         f"RAG ({mode}) avaliado em [bold]{n}[/bold] queries reais de cliente, top-{TOP_K}.\n"
         f"Hit@{TOP_K} = {hits/n*100:.1f}%   ·   Precision@1 = {p1/n*100:.1f}%   ·   MRR = {rr_sum/n:.3f}",

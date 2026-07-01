@@ -1,0 +1,17 @@
+{
+  "amostra_deteccao": 2000,
+  "metrics": {
+    "deteccao_natureza": 0.998,
+    "deteccao_tema": 0.876,
+    "deteccao_pediu_humano_f1": 0.69,
+    "rag_modo": "hibrido",
+    "rag_hit_at_k": 1.0,
+    "rag_p_at_1": 0.8571,
+    "rag_mrr": 0.9167,
+    "rag_queries": 14,
+    "decisao_acuracia": 1.0,
+    "decisao_cenarios": 15,
+    "decisao_divergencias": 0
+  },
+  "divergencias": []
+}
