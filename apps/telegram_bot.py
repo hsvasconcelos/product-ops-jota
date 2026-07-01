@@ -522,8 +522,15 @@ def _deliver_proactive(chat_id, sess, text):
     sess["history"].append({"role": "user", "content": text})
     typing(chat_id)
     det, docs, dec, inp = analisar(sess)
+    # no proativo o EVENTO conta o contexto: enriquece a busca com os FACTS pra pegar o doc CERTO
+    # (ex.: duplicidade → KB-ESTORNO-001, não KB-BOLETO-001), aí o opener fica grounded e passa.
+    facts = FACTS.get(sid, "")
+    if facts:
+        enriched = retriever.retrieve(f"{facts} {det.predicted_theme.value.replace('_', ' ')}", top_k=TOP_K)
+        if enriched:
+            docs = enriched
     doc = docs[0] if docs else None
-    opener = gerar([], det.predicted_theme, sess["segment"], doc, opener=True, fatos=FACTS.get(sid, ""))
+    opener = gerar([], det.predicted_theme, sess["segment"], doc, opener=True, fatos=facts)
     ok, _why = guardrail_check(opener, doc)
     guardrail = "pass" if ok else "blocked"
     if not ok:
