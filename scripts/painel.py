@@ -37,6 +37,17 @@ from rich.text import Text
 DB = Path(__file__).resolve().parents[1] / "data" / "jota_support.db"
 HEADER = "Product Ops · Jota — Atendimento como Laboratório"
 
+# ── Mundo ativo (tecla 'm' alterna) — toda query filtra por canal ────────────
+# Mundo 1 = suporte (reativo); Mundo 2 = produto (proativo). O painel é
+# consciente de mundo: as métricas de cada um vivem no seu canal, sem misturar.
+MUNDO = "support"
+MUNDO_LABEL = {"support": "MUNDO 1 · Suporte (reativo)", "jota": "MUNDO 2 · Produto (proativo)"}
+
+
+def _ch() -> str:
+    """Fragmento SQL do filtro de canal do mundo ativo (channel é valor controlado)."""
+    return f"channel = '{MUNDO}'"
+
 # ── Policy: pesos e limiares do score de antecipação (aba 3) ─────────────────
 # Mecanismo (a fórmula) vive em prioritizacao_dados(); estes são os botões.
 SCORE_SCALE = 100.0          # só escala o número pra leitura (não muda ordem)
@@ -65,6 +76,7 @@ TEMA_LABEL = {
 NATUREZA_LABEL = {
     "behavior_inferred": "behavior_inferred (jornada)",
     "system_signaled": "system_signaled (bug/produto)",
+    "absence_detected": "absence_detected (silencioso)",
 }
 
 console = Console()
@@ -91,16 +103,16 @@ def connect() -> sqlite3.Connection:
 
 
 def overview_dados(conn: sqlite3.Connection) -> dict:
-    total = conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+    total = conn.execute(f"SELECT COUNT(*) FROM conversations WHERE {_ch()}").fetchone()[0]
     outcomes = dict(
-        conn.execute("SELECT outcome, COUNT(*) FROM conversations GROUP BY outcome").fetchall()
+        conn.execute(f"SELECT outcome, COUNT(*) FROM conversations WHERE {_ch()} GROUP BY outcome").fetchall()
     )
     resolvidos = outcomes.get("resolved", 0)
     volumetria = conn.execute(
-        "SELECT gold_theme, COUNT(*) n FROM conversations GROUP BY gold_theme ORDER BY n DESC"
+        f"SELECT gold_theme, COUNT(*) n FROM conversations WHERE {_ch()} GROUP BY gold_theme ORDER BY n DESC"
     ).fetchall()
     naturezas = conn.execute(
-        "SELECT gold_nature, COUNT(*) n FROM conversations GROUP BY gold_nature ORDER BY n DESC"
+        f"SELECT gold_nature, COUNT(*) n FROM conversations WHERE {_ch()} GROUP BY gold_nature ORDER BY n DESC"
     ).fetchall()
     return {
         "total": total,
@@ -115,8 +127,8 @@ def overview_dados(conn: sqlite3.Connection) -> dict:
 def _semanas_por_tema(conn: sqlite3.Connection):
     """Devolve (semanas_ordenadas, {tema: {semana: n}}, {tema: total})."""
     rows = conn.execute(
-        """SELECT strftime('%Y-W%W', started_at) wk, gold_theme, COUNT(*) n
-           FROM conversations GROUP BY wk, gold_theme"""
+        f"""SELECT strftime('%Y-W%W', started_at) wk, gold_theme, COUNT(*) n
+           FROM conversations WHERE {_ch()} GROUP BY wk, gold_theme"""
     ).fetchall()
     semanas = sorted({wk for wk, _, _ in rows})
     por_tema: dict[str, dict[str, int]] = {}
@@ -186,7 +198,7 @@ def trend_dados(conn: sqlite3.Connection) -> dict:
 def natureza_dominante(conn: sqlite3.Connection) -> dict[str, tuple[str, float]]:
     """Por tema: (natureza predominante, % que ela representa). À prova de zero."""
     rows = conn.execute(
-        "SELECT gold_theme, gold_nature, COUNT(*) n FROM conversations GROUP BY gold_theme, gold_nature"
+        f"SELECT gold_theme, gold_nature, COUNT(*) n FROM conversations WHERE {_ch()} GROUP BY gold_theme, gold_nature"
     ).fetchall()
     agg: dict[str, dict[str, int]] = {}
     for theme, nat, n in rows:
@@ -212,9 +224,9 @@ def prioritizacao_dados(conn: sqlite3.Connection) -> list[dict]:
                 * crit_norm   ** PESO_CRITICIDADE
                 * trend       ** PESO_TENDENCIA
     """
-    vols = dict(conn.execute("SELECT gold_theme, COUNT(*) FROM conversations GROUP BY gold_theme").fetchall())
+    vols = dict(conn.execute(f"SELECT gold_theme, COUNT(*) FROM conversations WHERE {_ch()} GROUP BY gold_theme").fetchall())
     crits = dict(
-        conn.execute("SELECT gold_theme, AVG(gold_criticality) FROM conversations GROUP BY gold_theme").fetchall()
+        conn.execute(f"SELECT gold_theme, AVG(gold_criticality) FROM conversations WHERE {_ch()} GROUP BY gold_theme").fetchall()
     )
     nat_dom = natureza_dominante(conn)
     trend = trend_dados(conn)
@@ -253,31 +265,32 @@ def prioritizacao_dados(conn: sqlite3.Connection) -> list[dict]:
 def sla_dados(conn: sqlite3.Connection) -> dict:
     # 1ª resposta humana após mensagem do cliente — window function LAG.
     # (mesma query do scripts/painel_queries.py, fonte de verdade do SLA)
+    inscope = f"conversation_id IN (SELECT conversation_id FROM conversations WHERE {_ch()})"
     row = conn.execute(
-        """WITH g AS (
+        f"""WITH g AS (
                SELECT conversation_id, sender, sent_at,
                       LAG(sent_at) OVER (PARTITION BY conversation_id ORDER BY turn_index) prev,
                       LAG(sender)  OVER (PARTITION BY conversation_id ORDER BY turn_index) ps
-               FROM messages)
-           SELECT ROUND(AVG((julianday(sent_at)-julianday(prev))*24),1),
-                  ROUND(MAX((julianday(sent_at)-julianday(prev))*24),1)
+               FROM messages WHERE {inscope})
+           SELECT ROUND(AVG((strftime('%s',sent_at)-strftime('%s',prev))/3600.0),1),
+                  ROUND(MAX((strftime('%s',sent_at)-strftime('%s',prev))/3600.0),1)
            FROM g WHERE ps='customer' AND sender='human_agent'"""
     ).fetchone()
     sla_medio, sla_pior = (row[0], row[1]) if row else (None, None)
 
     pediu, atendido = conn.execute(
-        "SELECT COALESCE(SUM(asked_for_human),0), COALESCE(SUM(human_handoff_done),0) FROM conversations"
+        f"SELECT COALESCE(SUM(asked_for_human),0), COALESCE(SUM(human_handoff_done),0) FROM conversations WHERE {_ch()}"
     ).fetchone()
     ignorados = (pediu or 0) - (atendido or 0)
 
     contexto_perdido = conn.execute(
-        "SELECT COALESCE(SUM(context_lost),0) FROM conversations"
+        f"SELECT COALESCE(SUM(context_lost),0) FROM conversations WHERE {_ch()}"
     ).fetchone()[0]
 
     trocas = conn.execute(
-        """SELECT COUNT(*) FROM (
+        f"""SELECT COUNT(*) FROM (
                SELECT conversation_id FROM messages
-               WHERE agent_name IS NOT NULL
+               WHERE agent_name IS NOT NULL AND {inscope}
                GROUP BY conversation_id HAVING COUNT(DISTINCT agent_name) > 1)"""
     ).fetchone()[0]
 
@@ -294,7 +307,7 @@ def sla_dados(conn: sqlite3.Connection) -> dict:
 
 def temas_ordenados(conn: sqlite3.Connection) -> list[tuple[str, int]]:
     return conn.execute(
-        "SELECT gold_theme, COUNT(*) n FROM conversations GROUP BY gold_theme ORDER BY n DESC"
+        f"SELECT gold_theme, COUNT(*) n FROM conversations WHERE {_ch()} GROUP BY gold_theme ORDER BY n DESC"
     ).fetchall()
 
 
@@ -340,13 +353,13 @@ def conversas_do_tema(conn: sqlite3.Connection, theme: str, limite: int = 10) ->
     ids = [
         r[0]
         for r in conn.execute(
-            """SELECT conversation_id FROM conversations
-               WHERE gold_theme=? ORDER BY gold_criticality DESC, conversation_id LIMIT ?""",
+            f"""SELECT conversation_id FROM conversations
+               WHERE gold_theme=? AND {_ch()} ORDER BY gold_criticality DESC, conversation_id LIMIT ?""",
             (theme, limite),
         ).fetchall()
     ]
-    # Garante a âncora como 1ª (sem duplicar nem estourar o limite).
-    if theme == ANCHOR_THEME:
+    # Garante a âncora como 1ª (só no Mundo 1, onde ela vive).
+    if theme == ANCHOR_THEME and MUNDO == "support":
         ids = [ANCHOR_ID] + [i for i in ids if i != ANCHOR_ID]
         ids = ids[:limite]
 
@@ -375,7 +388,9 @@ def render_overview(conn) -> Panel:
     for theme, n in d["volumetria"]:
         vol.add_row(TEMA_LABEL.get(theme, theme), str(n), Text(bar(n, maxn), style="cyan"))
 
-    nat = Table(box=SIMPLE_HEAVY, expand=True, title="Natureza do atrito (quem está aqui FALOU)")
+    nat_titulo = ("Natureza do atrito (quem está aqui FALOU)" if MUNDO == "support"
+                  else "Natureza do atrito (inclui o silencioso — ausência)")
+    nat = Table(box=SIMPLE_HEAVY, expand=True, title=nat_titulo)
     nat.add_column("Natureza")
     nat.add_column("N", justify="right", style="bold")
     nat.add_column("%", justify="right")
@@ -623,12 +638,14 @@ def render_header(ativa: int) -> Panel:
         estilo = "bold black on cyan" if i == ativa else "cyan"
         barra.append(f" {i + 1} {label} ", style=estilo)
         barra.append("  ")
-    return Panel(Text(HEADER, style="bold white", justify="center"),
-                 subtitle=barra, border_style="bright_blue", box=ROUNDED)
+    titulo = Text(justify="center")
+    titulo.append(HEADER + "   ", style="bold white")
+    titulo.append(f"[ {MUNDO_LABEL[MUNDO]} ]", style="bold black on green")
+    return Panel(titulo, subtitle=barra, border_style="bright_blue", box=ROUNDED)
 
 
 def render_footer() -> Text:
-    return Text("  1-5 abas   ·   ←/→ navega   ·   t escolhe tema (aba 5)   ·   q sai",
+    return Text("  1-5 abas   ·   ←/→ navega   ·   m alterna Mundo 1/2   ·   t escolhe tema (aba 5)   ·   q sai",
                 style="dim", justify="center")
 
 
@@ -668,6 +685,7 @@ def pedir_tema(conn) -> str | None:
 
 
 def loop_interativo(conn) -> None:
+    global MUNDO
     ativa = 0
     theme_sel: str | None = None
     # Estado do modo leitor (modal, só vive dentro da aba 5).
@@ -710,6 +728,9 @@ def loop_interativo(conn) -> None:
             ativa = (ativa - 1) % len(ABAS)
         elif tecla in "12345":
             ativa = int(tecla) - 1
+        elif tecla in ("m", "M"):                       # alterna Mundo 1 ↔ Mundo 2
+            MUNDO = "jota" if MUNDO == "support" else "support"
+            theme_sel, reader, convs = None, False, []
         elif tecla in ("t", "T") and ABAS[ativa][1] is render_drilldown:
             sel = pedir_tema(conn)
             if sel:
@@ -723,9 +744,13 @@ def loop_interativo(conn) -> None:
 
 
 def modo_nao_interativo(conn) -> None:
-    """Fallback p/ stdin sem TTY (pipe/CI): imprime as 5 abas em sequência."""
-    console.print(render_header(0))
-    console.print(render_overview(conn))
+    """Fallback p/ stdin sem TTY (pipe/CI): visão geral dos DOIS mundos + abas do Mundo 1."""
+    global MUNDO
+    for mundo in ("support", "jota"):                    # visão geral de cada mundo
+        MUNDO = mundo
+        console.print(render_header(0))
+        console.print(render_overview(conn))
+    MUNDO = "support"                                    # o restante (lab) no Mundo 1
     console.print(render_trend(conn))
     console.print(render_prioritizacao(conn))
     console.print(render_sla(conn))

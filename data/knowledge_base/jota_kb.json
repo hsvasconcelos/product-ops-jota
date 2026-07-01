@@ -9,7 +9,8 @@
       "Peça ao destinatário para conferir se a chave usada está correta e ativa.",
       "Se o status for 'Devolvido', o valor retorna automaticamente, sem custo.",
       "Após 30 minutos sem crédito, acione o suporte com o ID E2E para abertura de MED (Mecanismo Especial de Devolução)."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-PIX-002",
@@ -21,7 +22,8 @@
       "Peça para ele verificar as chaves cadastradas no banco onde quer receber.",
       "Como alternativa, ele pode te enviar um QR Code de cobrança — aí não precisa de chave.",
       "Para receber você mesmo, veja suas chaves cadastradas no Jota e cadastre uma nova se precisar."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-PIX-003",
@@ -33,7 +35,8 @@
       "Toque na transação de Pix desejada.",
       "Toque em 'Compartilhar comprovante' para baixar em PDF.",
       "O ID E2E fica no rodapé e é o que o suporte usa para rastrear."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-KYC-001",
@@ -45,7 +48,8 @@
       "Tire óculos, boné ou máscara e mantenha o rosto centralizado.",
       "Toque em 'Tentar novamente' para refazer a verificação.",
       "Se falhar 3 vezes, um atendente do time de onboarding pode validar manualmente."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-CONECTA-001",
@@ -57,7 +61,8 @@
       "Você será levado ao app do banco para autorizar novamente.",
       "Defina a duração da conexão para evitar nova expiração.",
       "Os saldos voltam a atualizar em seguida."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-BOLETO-001",
@@ -69,7 +74,8 @@
       "Confira o status do boleto no Radar de Boletos.",
       "Se ainda estiver no prazo, reagende ou pague agora com saldo do Jota ou de outro banco.",
       "Se já venceu, o suporte ajuda a obter a segunda via atualizada com o valor corrigido."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-RENDE-001",
@@ -81,7 +87,8 @@
       "O saldo precisa permanecer na conta para render — saídas reduzem a base.",
       "Os impostos já saem retidos; o valor mostrado é aproximado.",
       "Posso fazer uma projeção para um período específico, se quiser."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-TAREFA-001",
@@ -93,7 +100,8 @@
       "Informe o valor a pagar.",
       "Escolha o horário do dia em que devo executar.",
       "Confirmo e a rotina passa a rodar automaticamente todo mês."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-CONTA-001",
@@ -105,7 +113,8 @@
       "Não compartilhe senha nem códigos com ninguém.",
       "Um atendente de segurança assume o caso com prioridade.",
       "Casos de conta invadida têm canal prioritário."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-SUP-001",
@@ -117,7 +126,8 @@
       "Em horário comercial, você entra na fila da especialidade certa.",
       "Fora do horário, seu caso é registrado e priorizado.",
       "Casos de segurança têm canal prioritário."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-FALATAP-001",
@@ -129,7 +139,8 @@
       "Verifique o plano de recebimento do lojista: D0 (na hora) ou D1 (próximo dia útil).",
       "Se for D1 e a venda foi hoje (ou fim de semana), tranquilize: o valor está garantido desde a aprovação e cai no próximo dia útil — não é erro.",
       "Se já passou o prazo do plano sem crédito, aí sim acione o suporte com o ID da venda para investigar a liquidação."
-    ]
+    ],
+    "requires_human": false
   },
   {
     "id": "KB-DADOS-001",
@@ -141,7 +152,8 @@
       "Se o sistema pedir, confirme sua identidade (código ou biometria) — é proteção contra fraude.",
       "Para alterar CPF ou nome, é preciso validação com documento; um atendente conduz.",
       "Para excluir a conta: zere o saldo e quite pendências; depois solicite a exclusão, que é registrada conforme a LGPD."
-    ]
+    ],
+    "requires_human": true
   },
   {
     "id": "KB-ACESSO-001",
@@ -153,6 +165,34 @@
       "Atualize o app para a ultima versao na Play Store / App Store.",
       "Se persistir, limpe o cache do app (Configuracoes do app > Armazenamento > Limpar cache) ou reinstale — seus dados e saldo nao se perdem.",
       "Reinicie o aparelho e abra o app de novo. Se ainda fechar, um atendente verifica logs do dispositivo com voce."
-    ]
+    ],
+    "requires_human": false
+  },
+  {
+    "id": "KB-ESTORNO-001",
+    "title": "Cobrança em duplicidade e estorno automático",
+    "category": "estorno_duplicidade",
+    "content": "Quando o sistema identifica duas cobranças idênticas — mesmo valor, mesmo destino, em um intervalo curto — trata como cobrança em duplicidade. O estorno da cobrança duplicada é automático: o cliente não precisa pedir, e o valor volta para a conta de origem em até 1 dia útil. A cobrança legítima é mantida.",
+    "steps": [
+      "Confirmar as duas cobranças idênticas (mesmo valor, destino e dia).",
+      "Estornar automaticamente a cobrança duplicada — a original permanece.",
+      "Avisar o cliente de forma proativa do estorno e do prazo de até 1 dia útil.",
+      "Acompanhar o crédito de volta na conta de origem e confirmar quando cair."
+    ],
+    "requires_human": false
+  },
+  {
+    "id": "KB-PIX-004",
+    "title": "Pix enviado para a pessoa errada (devolução)",
+    "category": "erro_pix",
+    "content": "Um Pix concluído NÃO tem estorno automático — nem o Jota nem outro banco desfazem sozinhos, porque o valor já caiu na conta do destinatário. O caminho depende do que aconteceu: se foi ERRO ao digitar a chave/CPF, a devolução é voluntária (o recebedor precisa devolver); se foi GOLPE/Pix não autorizado, dá pra abrir uma contestação pelo MED (Mecanismo Especial de Devolução), que exige boletim de ocorrência. O Jota é a conta do cliente e conduz esse processo aqui mesmo — puxa o comprovante (nome e banco do destinatário) e orienta o próximo passo.",
+    "steps": [
+      "Confirme se foi ERRO de digitação ou GOLPE — o caminho muda.",
+      "Puxe o comprovante do Pix aqui no Jota pra ver o nome e o banco do destinatário.",
+      "Se foi ERRO: peça a devolução voluntária ao recebedor (o Jota ajuda a acionar pelo banco de destino).",
+      "Se foi GOLPE: registre um boletim de ocorrência e abra a contestação pelo MED — o Jota conduz.",
+      "O prazo do MED é de até 7 dias corridos para análise pelo banco do recebedor."
+    ],
+    "requires_human": false
   }
 ]

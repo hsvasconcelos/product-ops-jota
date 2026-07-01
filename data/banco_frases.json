@@ -1,0 +1,662 @@
+{
+  "pix_chave_invalida": {
+    "openers": {
+      "low": [
+        "nao consigo fazer pix",
+        "deu erro na chave do pix",
+        "pq meu pix nao vai",
+        "chave pix ta dando erro",
+        "ta dizendo q chave nao existe",
+        "pix deu errado e agora",
+        "fui fazer pix n foi",
+        "to tentando pix n vai",
+        "pq nao da certo esse pix",
+        "chave errada diz aqui",
+        "pix falhou e n sei pq",
+        "nao to entendendo o erro"
+      ],
+      "medium": [
+        "tentei fazer um pix mas a chave deu errado",
+        "a chave que usei pra pix não tá funcionando",
+        "não consigo enviar pix, chave tá inválida",
+        "minha transação pix não foi por causa da chave",
+        "a chave de pix não é aceita, não sei o motivo",
+        "erro de chave pix, o que faço?",
+        "chave do pix não ativa, pode verificar?",
+        "não vai o pix, diz chave inativa"
+      ],
+      "high": [
+        "Estou tentando enviar um Pix, mas a chave está inválida.",
+        "A operação Pix não está concluindo por causa de uma chave inativa.",
+        "Recebi uma mensagem dizendo que a chave Pix não existe, mas está correta.",
+        "Tentei novamente enviar um Pix e a chave foi rejeitada.",
+        "Por alguma razão, a chave Pix utilizada não é reconhecida.",
+        "Preciso de ajuda, a chave Pix que usei não está ativa."
+      ]
+    },
+    "followups": [
+      "tentei de novo e nada",
+      "acho que a chave tá certa, mas nao vai",
+      "ja fiz varias vezes e sempre erro",
+      "poxa, pix nao tá indo mesmo",
+      "queria saber pq essa chave n funciona",
+      "alguem ai pra me ajudar com pix?",
+      "me ajuda a resolver isso por favor",
+      "to precisando fazer esse pix urgente",
+      "ta complicado essa situação do pix",
+      "desencana, vou pedir ajuda aqui na loja"
+    ],
+    "bot_bad": [
+      "Verifique se a chave está correta e tente novamente.",
+      "Por favor, use uma chave Pix válida.",
+      "Confira a chave e faça outra tentativa.",
+      "Não conseguimos processar a transação no momento.",
+      "Aguarde alguns instantes e tente novamente."
+    ]
+  },
+  "pix_pessoa_errada": {
+    "openers": {
+      "low": [
+        "pix foi pra outra pessoa help",
+        "tx fiz errado cmo fz pra voltar",
+        "pix num era p ele, e agora?",
+        "mande pix errado e agor?",
+        "fiz cagada no pix, me ajuda",
+        "pix errado socorro",
+        "errei chave pix cmo cancelo",
+        "pix foi outra pessoa por dini",
+        "ajuda pix foi p errdo",
+        "mndei pix p chave errada",
+        "pix pra erado ndj ajuda",
+        "coloquei cpf errado no pix"
+      ],
+      "medium": [
+        "enviei um pix pra pessoa errada sem querer",
+        "o pix que eu mandei foi pro destino errado",
+        "acabei de cometer um erro enviando um pix",
+        "gente acho que fiz um pix pra pessoa errada",
+        "e aí como eu faço quando o pix vai pro lugar errado",
+        "tem como cancelar um pix enviado errado?",
+        "acho que enviei um pix pra uma chave errada",
+        "pix depositado errado, me ajudem"
+      ],
+      "high": [
+        "Infelizmente, enviei um Pix para a conta incorreta, há possibilidade de reverter?",
+        "Boa tarde, acabei de notar que cometi um engano no envio do Pix. O que posso fazer?",
+        "Preciso de ajuda, por favor, enviei um Pix para o destinatário errado. Como proceder?",
+        "Fiz um Pix para a chave errada, e gostaria de entender as opções disponíveis para resolver isso.",
+        "Enviei um Pix e só depois percebi que a chave estava errada. Há alguma forma de recuperar o valor?",
+        "Errei a chave do Pix e o pagamento foi efetuado de forma equivocada. Existe como remediar?"
+      ]
+    },
+    "followups": [
+      "mas não tem como chamar alguém pra ajudar?",
+      "por favor preciso muito resolver isso logo",
+      "já faz um tempo e ninguém me ajuda",
+      "tentei cancelar e não consegui",
+      "pelo amor de deus o que faço agora",
+      "quero falar com uma pessoa de verdade",
+      "me mandem pra um atendente, tô desesperado",
+      "não acredito que ninguém vai resolver isso",
+      "parece que não tem solução, e agora?",
+      "gente, por favor, tem que ter um jeito"
+    ],
+    "bot_bad": [
+      "Lamentamos o inconveniente. Para mais informações, entre em contato conosco.",
+      "Estamos aqui para ajudar! Volte mais tarde ou acesse nosso site para mais opções.",
+      "Todos os atendentes estão ocupados. Aguarde e tente novamente mais tarde.",
+      "Sua questão é importante. Contate o suporte através de outros canais.",
+      "Desculpe pelo ocorrido. Essa situação não pode ser resolvida por aqui."
+    ]
+  },
+  "kyc_biometria": {
+    "openers": {
+      "low": [
+        "no consigo faze a selfie",
+        "selfie naum passa",
+        "erro biometria o que faço",
+        "travo na foto ja tentei 3x",
+        "a conta n qre abrir",
+        "como fasso funcinar",
+        "so da erro aqui gente",
+        "to preso no cadastro",
+        "selfie da erro td hora",
+        "n da cadastra",
+        "o q fiz errado com selfie",
+        "selfi num vai"
+      ],
+      "medium": [
+        "tentei abrir a conta mas deu erro na selfie",
+        "a biometria não tá passando o que eu faço",
+        "tô travado na validação da selfie, ajuda",
+        "tentando faz um tempo mas selfie não valida",
+        "tô achando que o sistema não gosta da minha foto",
+        "já fiz a selfie várias vezes e ainda assim não vai",
+        "a biometria tá dando erro direto",
+        "não consigo passar da parte da selfie"
+      ],
+      "high": [
+        "Olá, estou enfrentando problemas para validar minha selfie ao abrir a conta.",
+        "Estou tentando completar o cadastro, mas a validação da selfie falha.",
+        "A biometria não está funcionando, e estou travado no cadastro.",
+        "A validação da selfie continua falhando, por favor, preciso de assistência.",
+        "A selfie não valida, já tentei múltiplas vezes. Alguma dica?",
+        "Esbarrei em um problema na validação biométrica, procuro ajuda."
+      ]
+    },
+    "followups": [
+      "ainda não deu certo",
+      "já tentei tudo que vocês mandaram e nada",
+      "será que tá com problema no sistema?",
+      "realmente preciso resolver isso rápido",
+      "não consigo fazer nada com minha conta sem terminar isso",
+      "isso tá demorado demais, ajuda urgente",
+      "to começando a perder a paciência",
+      "acho que vou desistir",
+      "é frustrante não poder nem começar a usar",
+      "tem outro jeito pra validar essa selfie?"
+    ],
+    "bot_bad": [
+      "Desculpe, tente novamente.",
+      "Confira sua conexão de internet.",
+      "Verifique as condições de luz no ambiente.",
+      "Reinicie o aplicativo e tente de novo.",
+      "Aguarde e tente mais tarde."
+    ]
+  },
+  "onboarding_limbo": {
+    "openers": {
+      "low": [
+        "nao consigo fazer conta",
+        "app travou aq",
+        "tentei abrir mas sumiu",
+        "bugo aki n da",
+        "paro na metade o processo",
+        "nao abre",
+        "a conta sumiu no meio",
+        "tentei cad e n vai",
+        "cade o resto do cadastro",
+        "kd a confirmacao",
+        "n ta deixando abrir",
+        "nao finaliza"
+      ],
+      "medium": [
+        "comecei a abrir a conta, travou no meio",
+        "o aplicativo deu erro na hora de criar a conta",
+        "tentei abrir a conta, mas não completa",
+        "não consigo concluir o cadastro",
+        "por que não está terminando de abrir a conta?",
+        "cadastrei e não apareceu mais nada",
+        "vim abrir a conta mas deu problema",
+        "alguma coisa parou durante o cadastro"
+      ],
+      "high": [
+        "Durante o processo de abertura da conta, simplesmente travou e não houve mensagem de erro.",
+        "Após iniciar a abertura da conta, o processo sumiu e não consegui continuar.",
+        "O aplicativo interrompeu o cadastro da conta sem fornecer detalhes.",
+        "Tentei abrir uma conta, mas fui impedido por uma mensagem genérica dizendo 'erro interno'.",
+        "Por algum motivo, minha solicitação de abertura de conta não foi concluída e não recebi feedback.",
+        "O processo de abertura de conta não chegou ao fim e não sei o que aconteceu."
+      ]
+    },
+    "followups": [
+      "ainda não funcionou gente oq eu faço",
+      "alô tem alguem ai?",
+      "preciso de ajuda, n deu certo de novo",
+      "to tentando dnv mas continua parado",
+      "pode verificar pq n to conseguindo?",
+      "to preso nessa parte há horas",
+      "qual o problema q tá acontecendo?",
+      "toda hora isso trava e nao vai",
+      "alguem pode me ajudar pq nao resolve",
+      "esperando resposta e nada ainda"
+    ],
+    "bot_bad": [
+      "Verifique sua conexão e tente novamente.",
+      "Reinicie seu dispositivo e veja se resolve.",
+      "Infelizmente, não podemos ajudar com isso no momento.",
+      "Tente novamente mais tarde, por favor.",
+      "Nossa equipe está ciente e está trabalhando nisso."
+    ]
+  },
+  "fala_tap_travado": {
+    "openers": {
+      "low": [
+        "dinheiro n cai na maquininha",
+        "vendi e n veio pix",
+        "cade meu pagamento da fala tap",
+        "pq n ta caindo grana dq",
+        "quanto tempo pro dinheiro cair",
+        "eai kd meu dinheiro",
+        "fazendo certim mas dinheiro n aparece",
+        "pix n caiu dnv",
+        "dinheiro sumiu ajuda ai",
+        "pq ta demorando sair dinheiro maquininha",
+        "recebi e não entrou nda",
+        "quanto que demora p cair"
+      ],
+      "medium": [
+        "realizei venda e o dinheiro não caiu ainda",
+        "fiz uma venda e parece que o pagamento está travado",
+        "o dinheiro da maquininha deveria ter caído instantaneamente, o que houve?",
+        "vende um item mas não recebi o pagamento ainda",
+        "quanto tempo demora para liberar o pagamento do fala tap",
+        "vendi com a maquininha e n recebi ainda, ajuda por favor?",
+        "a maquininha fala tap tá com problema no meu pagamento",
+        "não estou vendo o pagamento que fiz pelo fala tap"
+      ],
+      "high": [
+        "Realizei uma transação pela maquininha Fala Tap, mas o valor ainda não foi creditado, podem verificar?",
+        "O pagamento efetuado via Fala Tap não processou ainda, gostaria de entender o porquê.",
+        "Estou com uma pendência na maquininha Fala Tap, minha venda não foi efetivada no saldo.",
+        "Fiz uma venda pelo Fala Tap e o pagamento não caiu conforme esperado, gostaria de assistência.",
+        "Preciso de esclarecimentos sobre um valor que está pendente no meu Fala Tap.",
+        "Houve uma falha ao creditar a quantia da maquininha no meu saldo, podem resolver?"
+      ]
+    },
+    "followups": [
+      "pessoal eu dependo dissoe",
+      "to precisando do dinheiro hj ainda",
+      "tem alguem q pode ver isso pra mim agr",
+      "será q é culpa do sistema mesmo?",
+      "moço vcs n sabem qnto é ruim recibir dpois",
+      "preciso desse dinheiro urgente, n volto mais pra essa maquininha",
+      "ngm responde, será q existe um número direto p ajuda?",
+      "já passaram mais de 24h e nada do pagamento",
+      "fizeram algo e n resolveram",
+      "algm pode ver pq n recebi ainda"
+    ],
+    "bot_bad": [
+      "Verifique os detalhes da transação e tente novamente.",
+      "Aguarde o processamento, é normal demorar um pouco.",
+      "Reinicie seu dispositivo e tente realizar novamente.",
+      "Confirme que seguiu todos os passos corretamente.",
+      "O serviço está funcionando normalmente, tente outra vez."
+    ]
+  },
+  "estorno_duplicado": {
+    "openers": {
+      "low": [
+        "pq descontou 2x?",
+        "ei foi debitado duas vezes",
+        "tirei dois pagamentos iguais",
+        "desconto dobrado do boleto ajuda pfvr",
+        "duplo debito bosta!",
+        "jeito arrumar 2x retirada",
+        "tá errado paguei duas vez",
+        "cobraram igual duas vez",
+        "retiraram dinheiro em duplicidade",
+        "ajuda voltou a debitar",
+        "descontou duas sem eu saber",
+        "cobrança em dobro resolve pq isso"
+      ],
+      "medium": [
+        "Oi, parece que a cobrança saiu duas vezes, é possível estornar?",
+        "Fui cobrado em duplicidade, como faço para resolver?",
+        "Tem um débito duplicado na minha conta, podem conferir?",
+        "Detectei um pagamento feito duas vezes, preciso de ajuda",
+        "Duas parcelas foram retiradas, quero meu dinheiro de volta",
+        "Cobrança duplicada, preciso que reembolsem",
+        "Fiz um pagamento e saiu duplo, quero estorno",
+        "Minha cobrança saiu em dobro, como resolver isso?"
+      ],
+      "high": [
+        "Prezados, houve uma cobrança duplicada em minha conta, solicito estorno.",
+        "Gentileza verificar uma duplicidade no débito da minha conta, foi cobrado em dobro.",
+        "Identifiquei um débito em duplicidade que precisa ser estornado.",
+        "Solicito a reversão de um pagamento duplicado na minha conta.",
+        "Há uma cobrança feita duas vezes, peço a correção urgente.",
+        "Qual o procedimento para corrigir um débito duplicado que ocorreu?"
+      ]
+    },
+    "followups": [
+      "Ainda não recebi resposta sobre o débito duplicado",
+      "Preciso do estorno urgentemente, já faz dias",
+      "Alguém pode verificar meu caso pessoalmente?",
+      "Vocês não resolveram meu problema ainda",
+      "Já enviei mensagem antes e nada foi feito",
+      "Estou sem paciência, por favor resolvam logo",
+      "Continuo aguardando pela solução do estorno",
+      "Esse erro está me causando problemas, preciso que resolvam",
+      "Por favor, entra em contato humano, estou farto disso",
+      "Minha conta não pode ficar assim, resolvam já"
+    ],
+    "bot_bad": [
+      "Por favor, ligue para a central de atendimento.",
+      "Verifique se digitou os dados corretamente.",
+      "Esse é um procedimento normal, aguarde.",
+      "Isso não é um problema, tente reiniciar o app.",
+      "Isso é impossível de acontecer, reveja suas transações."
+    ]
+  },
+  "boleto": {
+    "openers": {
+      "low": [
+        "oque tá pegando q meu boleto nao pagou",
+        "preciso do boleto dnovo n sei onde ta",
+        "ji agendei o boleto e n pagô",
+        "gostaria de ver um boleto em aberto",
+        "pq meu boleto num foi pago",
+        "fiz agendado e não passou",
+        "eu preciso duma 2 via do boleto",
+        "pode mandar daquele documento vencido",
+        "como que vejo se pagou o boleto",
+        "boleto agendado deu erro",
+        "perdi info do boleto preciso ajuda",
+        "vcs pagaram o boleto q eu deixei"
+      ],
+      "medium": [
+        "agendei o pagamento mas o boleto não foi pago",
+        "tem como ver se existe cobrança em aberto pra mim",
+        "gostaria de uma segunda via do boleto, por favor",
+        "tem um boleto que eu agendei e não foi pago",
+        "não encontrei o boleto que tinha que pagar",
+        "quero saber se meu boleto foi pago",
+        "vi que o boleto não debitou na conta",
+        "pode verificar um boleto em aberto no meu nome"
+      ],
+      "high": [
+        "Agendei um boleto para pagamento, mas não consta como pago. O que houve?",
+        "Poderia enviar uma segunda via do boleto? Não localizei a original.",
+        "Existe alguma cobrança em aberto em meu nome? Gostariam de confirmar.",
+        "Notei que o boleto que agendei para pagamento não foi descontado. Alguma orientação?",
+        "Preciso confirmar se há boletos pendentes no meu CPF. Podem me ajudar com isso?",
+        "Estou verificando uma transação de boleto que deveria ter sido paga, mas não foi. Alguma ideia do erro?"
+      ]
+    },
+    "followups": [
+      "acabei de ver q não debitou mesmo",
+      "to confuso com esse boleto pq nao pagou",
+      "alguém pode verificar isso pra mim urgente?",
+      "ainda na espera daquela segunda via",
+      "gente cadê o suporte com esse problema?",
+      "mandei msg e nao tive resposta ainda",
+      "será q foi algum problema técnico?",
+      "qdo pode resolver isso?",
+      "ainda n achei onde ver se foi pago",
+      "preciso disso resolvido logo, por favor"
+    ],
+    "bot_bad": [
+      "O boleto deve ter sido cancelado, verifique o suporte.",
+      "Tente pagar o boleto novamente mais tarde.",
+      "Seu boleto foi processado corretamente. Dúvidas, contate o banco.",
+      "Não podemos ajudar no momento, tente outrora.",
+      "Boleto agendado pode não ter sido confirmado, procure o banco."
+    ]
+  },
+  "open_finance": {
+    "openers": {
+      "low": [
+        "saldo do banco sumiu aki",
+        "n consigo ver meu dinheiro qdo conecto a conta",
+        "eai pq meu saldo n aparece mais",
+        "cade o dinheiro q transferi pela open finance",
+        "o saldo n ta atualizando na outra conta",
+        "tentei trazer dinheiro de outro banco e nao vai",
+        "kd minha grana connectei outro banco",
+        "da erro qdo conecto banco nao aparece saldo",
+        "nao atualiza saldo do outro banco",
+        "meu saldo sumiu depois que conectei um banco novo",
+        "n aparece nada da minha conta conectada",
+        "pq n mostra meu saldo do outro banco"
+      ],
+      "medium": [
+        "conectei outra conta, mas o saldo não atualiza",
+        "saldo sumiu depois que conectei com outro banco",
+        "não estou conseguindo ver o saldo ao trazer dinheiro de outro banco",
+        "minhas contas conectadas não mostram o saldo certo",
+        "nada aparece do saldo no open finance",
+        "conectei um banco e não aparece o saldo",
+        "não tô conseguindo trazer dinheiro de outra conta",
+        "tentei unir minhas contas mas sumiu tudo"
+      ],
+      "high": [
+        "Conectei meu banco via Open Finance e o saldo não atualiza, pode ajudar?",
+        "Parece que houve um problema com a atualização de saldo ao vincular outra conta.",
+        "Meu saldo desapareceu após conectar meu banco pelo Open Finance, como resolver?",
+        "Estou com dificuldade para transferir dinheiro de outra conta, saldo não aparece.",
+        "Vinculei minha conta de outro banco, mas o saldo não está atualizado.",
+        "Ao conectar outro banco, a exibição do saldo não está funcionando corretamente."
+      ]
+    },
+    "followups": [
+      "ainda n resolveu meu saldo sumido",
+      "preciso de ajuda pra ver meu saldo conectado",
+      "mais de uma semana e saldo nao aparece",
+      "kd o suporte humano p resolver isso logo",
+      "continua nao atualizando desde q conectei",
+      "tentei varias vezes e saldo nada de atualizar",
+      "to frustado com essa atualização de saldo",
+      "ja enviei mensagem e nada de resolver",
+      "quero falar com um humano ja tentei de tudo",
+      "esse problema de saldo tá me tirando do sério"
+    ],
+    "bot_bad": [
+      "Tem certeza que você conectou corretamente?",
+      "Pode tentar desconectar e conectar novamente.",
+      "Verifique se você está logado na conta correta.",
+      "Verifique suas configurações de conexão.",
+      "Tente reiniciar o aplicativo para ver se resolve."
+    ]
+  },
+  "rende": {
+    "openers": {
+      "low": [
+        "quanto q rende esse rende+",
+        "n to vendo aumento na conta",
+        "é todo mês q cai?",
+        "qd rende mais?",
+        "to confuso coe com esse cdi",
+        "tem taxinha escondida ai?",
+        "eu ganho qnto em um mês?",
+        "isso é seguro mesmo?",
+        "não vi nada rendendo hj",
+        "pq o saldo ta igual?",
+        "coé cdi na vdd",
+        "nao entendi oque e esse rende+"
+      ],
+      "medium": [
+        "oi, queria saber sobre o rendimento do meu Rende+",
+        "meu saldo não aumentou como esperava, está tudo certo?",
+        "poderia explicar como funciona o 100% CDI?",
+        "quando os rendimentos caem na conta?",
+        "qual o rendimento médio que posso esperar?",
+        "gostaria de saber se o Rende+ é seguro",
+        "não vi diferença no meu saldo, poderiam conferir?",
+        "tem como vocês detalharem meu rendimento?"
+      ],
+      "high": [
+        "Olá, estou com dúvidas sobre o rendimento em CDI, podem esclarecer?",
+        "Gostaria de entender como os rendimentos são aplicados na minha conta",
+        "Notei que não houve alteração no saldo, é normal?",
+        "Podem me informar quando exatamente os rendimentos caem na conta?",
+        "Estou avaliando se o Rende+ é a melhor opção para o meu investimento atual",
+        "Há alguma taxa que possa estar impactando meus rendimentos totais?"
+      ]
+    },
+    "followups": [
+      "ainda não clarificou",
+      "expliquei na primeira msg",
+      "tem alguém ai?",
+      "me ajuda entender melhor",
+      "eu já mandei essa dúvida antes",
+      "não tá claro pra mim ainda",
+      "falam sempre a mesma coisa",
+      "preciso falar com alguém que entende de cdi",
+      "não compreendo, preciso de ajuda",
+      "isso tá me confundindo mais"
+    ],
+    "bot_bad": [
+      "Seu saldo pode ser conferido no app, mantenha atualizado!",
+      "Os rendimentos variam conforme o CDI, verifique a tabela completa.",
+      "Os ganhos dependem da condição do mercado, sem garantias.",
+      "Aguarde, seu rendimento será atualizado conforme normas.",
+      "Para mais informações, acesse o site ou nosso FAQ completo."
+    ]
+  },
+  "account_access": {
+    "openers": {
+      "low": [
+        "num consigo entra app",
+        "app n pega mais pq",
+        "num abre o app!",
+        "me ajuda login",
+        "app ta bugando aq",
+        "eu cliquei no app e n funfa",
+        "seu app fechando solo",
+        "pq nao acesso app agora?",
+        "tela do app fica preta",
+        "problema no app, o q faço?",
+        "ajuda to fora do app",
+        "pq meu app n loga?"
+      ],
+      "medium": [
+        "tô tentando acessar mas o app fecha toda hora",
+        "meu app tá travando e não abre",
+        "não consigo logar de jeito nenhum",
+        "o aplicativo para de funcionar quando tento abrir",
+        "algum bug no app, não entra",
+        "toda vez que abro o app ele fecha sozinho",
+        "to com problema pra acessar a conta pelo app",
+        "aplicativo não tá funcionando, o que faço?"
+      ],
+      "high": [
+        "Estou enfrentando problemas para acessar o aplicativo, ele fecha sozinho.",
+        "Não consigo acessar minha conta, o app continua falhando.",
+        "Meu aplicativo está travando e não consigo entrar na conta.",
+        "Ao tentar acessar o app, ele se fecha inesperadamente.",
+        "O aplicativo não está funcionando adequadamente, preciso de ajuda.",
+        "Infelizmente, não estou conseguindo acessar minha conta pelo aplicativo."
+      ]
+    },
+    "followups": [
+      "Ainda não consegui acessar, precisa de ajuda urgente",
+      "o app continua fechando, mto frustrante",
+      "já tentei de tudo e nada funciona",
+      "to horas nisso e nada resolve",
+      "será q ngm ai pra resolver?",
+      "isso já ta fora do normal, preciso usar minha conta",
+      "precisava de um suporte humano aqui",
+      "alguém pode me ajudar com esse app?",
+      "por que nao ta funcionando ainda gente",
+      "alguém pode resolver isso pelo amor de Deus"
+    ],
+    "bot_bad": [
+      "Tente reinstalar o aplicativo.",
+      "Por favor, verifique sua conexão com a internet.",
+      "Desculpe pelo inconveniente, mas deve ser um problema temporário.",
+      "Já tentou reiniciar o dispositivo?",
+      "Estamos cientes do problema e trabalhando para corrigir."
+    ]
+  },
+  "account_dados_exclusao": {
+    "openers": {
+      "low": [
+        "oi qro apagar minha conta",
+        "muda meu telefone pf",
+        "como faz pra exluir conta",
+        "preciso trocar email",
+        "meu tel mudou como muda aki",
+        "apagar tem como",
+        "nao consigo mudar email",
+        "como tira conta do app",
+        "quero mudar dados",
+        "me ajuda excluir",
+        "conta voltou pq?",
+        "cade opção pra excluir"
+      ],
+      "medium": [
+        "Olá, preciso alterar meu telefone cadastrado",
+        "Solicitei para excluir a conta mas ainda tá ativa",
+        "Tem como excluir a conta de forma definitiva?",
+        "Gostaria de mudar meu endereço de e-mail, por favor",
+        "Como faço para atualizar meu telefone na conta?",
+        "minha conta reativou sozinha, preciso de ajuda",
+        "quero apagar a conta de vez, como proceder?",
+        "Olá, quero alterar meus dados de contato"
+      ],
+      "high": [
+        "Prezados, gostaria de solicitar a exclusão definitiva da minha conta.",
+        "Peço a gentileza de alterar meu telefone no cadastro, como faço?",
+        "Enviei um pedido de exclusão, mas minha conta ainda está ativa.",
+        "Gostaria de compreender o processo para modificar meu endereço de e-mail.",
+        "Meu telefone mudou e preciso atualizar essa informação na conta.",
+        "Existe a possibilidade de desativação total e definitiva da minha conta?"
+      ]
+    },
+    "followups": [
+      "ainda não mudou nada",
+      "pq minha conta ainda existe",
+      "cade a confirmação da exclusão",
+      "já pedi pra mudar meu email",
+      "essa conta tá errada preciso mudar",
+      "mandei excluir e nada aconteceu",
+      "preciso falar com alguém urgente",
+      "ninguém tá resolvendo meu problema",
+      "não era pra reativar a conta",
+      "não sei mais o que fazer"
+    ],
+    "bot_bad": [
+      "Verifique a central de ajuda para mais informações.",
+      "Você pode tentar novamente daqui a alguns dias.",
+      "Estamos analisando sua solicitação, aguarde.",
+      "Tente realizar o processo mais uma vez.",
+      "Veja se a opção de exclusão aparece nas configurações."
+    ]
+  },
+  "confusao_canal": {
+    "openers": {
+      "low": [
+        "ndcah fala tap aqui no zap?",
+        "como faz esse fala tap? não acho",
+        "pq não aparece fala tap aqui",
+        "é nesse app no zap o fala tap?",
+        "ki eh isso de fala tap",
+        "cade o fala tap? xx",
+        "fala tap tá no app ou whats?",
+        "não cosigo liga o fala tap",
+        "usa fala tap por onde",
+        "cade a função do fala tap?",
+        "onde tá o fala tap",
+        "não tem fala tap aqui no zap?"
+      ],
+      "medium": [
+        "procurei o fala tap no whatsapp mas não achei",
+        "não tô achando a opção de fala tap, por onde acesso?",
+        "alguém pode dizer como usar o fala tap?",
+        "tô perdido, tem fala tap no zap?",
+        "tem como explicar onde o fala tap funciona?",
+        "fala tap não aparece no meu app, onde está?",
+        "onde ativa o fala tap? tá complicado",
+        "será que sou eu que não vejo o fala tap?"
+      ],
+      "high": [
+        "Estou tentando localizar a função Fala Tap, mas parece que não está no WhatsApp. Poderia esclarecer?",
+        "Gostaria de saber a respeito do acesso ao Fala Tap, é pelo aplicativo ou WhatsApp?",
+        "Encontro dificuldades em achar o recurso Fala Tap. Alguém poderia ajudar?",
+        "Não encontrei o Fala Tap no WhatsApp. Devo procurar em outro lugar?",
+        "Poderiam indicar se a ativação do Fala Tap ocorre via aplicativo ou é suportado no WhatsApp?",
+        "Tenho procurado pelo Fala Tap, mas não consigo encontrá-lo. Onde devo acessá-lo?"
+      ]
+    },
+    "followups": [
+      "tá complicado esse negócio, ajuda aí",
+      "não consigo usar e preciso resolver urgente",
+      "já tentei de tudo, não sei mais o que fazer",
+      "poxa vida, você pode me explicar de novo?",
+      "ainda nada do fala tap funcionar aqui",
+      "qual é a lógica desse sistema?",
+      "por favor, tem que ser mais claro",
+      "não tá dando pra resolver sozinho isso",
+      "ninguém explica direito, frustante isso",
+      "quero atendimento humano, não dá assim"
+    ],
+    "bot_bad": [
+      "Para usar o Fala Tap, siga os passos no aplicativo.",
+      "Tem certeza que não está no WhatsApp? Verifique novamente.",
+      "Reinicie seu dispositivo e tente acessar novamente.",
+      "Por favor, consulte o manual de instruções.",
+      "Certifique-se de que está buscando pelo nome correto."
+    ]
+  }
+}

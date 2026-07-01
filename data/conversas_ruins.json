@@ -264,5 +264,28 @@
         "text": "Ok."
       }
     ]
+  },
+  {
+    "id": "ex_estorno_duplicado",
+    "segment": "pf",
+    "started_at": "2026-06-29T08:14:00",
+    "descricao": "Parcela cobrada em duplicidade — o sistema detecta e o Jota estorna proativamente, antes de o cliente reclamar (ReclameAqui: estorno de parcela duplicada).",
+    "mensagens": [
+      {
+        "sender": "customer",
+        "text": "fui cobrado duas vezes na mesma parcela, preciso do estorno da cobrança duplicada",
+        "sent_at": "2026-06-29T08:14:30"
+      }
+    ],
+    "eventos": [
+      {
+        "event_type": "payment.charged",
+        "occurred_at": "2026-06-29T08:14:02"
+      },
+      {
+        "event_type": "payment.charged",
+        "occurred_at": "2026-06-29T08:14:05"
+      }
+    ]
   }
 ]

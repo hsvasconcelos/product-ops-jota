@@ -15,7 +15,8 @@ from product_ops_jota.generate_support_data import generate
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n", type=int, default=1000, help="número de conversas sintéticas")
+    ap.add_argument("--n-support", type=int, default=1000, help="conversas de SUPORTE (Mundo 1, reativo)")
+    ap.add_argument("--n-product", type=int, default=0, help="conversas de PRODUTO (Mundo 2, proativo)")
     ap.add_argument("--out", default="data/jota_support.db", help="caminho do banco")
     args = ap.parse_args()
 
@@ -24,7 +25,9 @@ if __name__ == "__main__":
 
     conn = init_db(out)
     seed_real_conversation(conn)          # a conversa real (Hugo) como caso-âncora
-    generate(conn, n_conversations=args.n)
+    generate(conn, n_support=args.n_support, n_product=args.n_product)
     n = conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
-    print(f"✓ banco gerado em {out} com {n} conversas")
+    sup = conn.execute("SELECT COUNT(*) FROM conversations WHERE channel='support'").fetchone()[0]
+    prod = conn.execute("SELECT COUNT(*) FROM conversations WHERE channel='jota'").fetchone()[0]
+    print(f"✓ banco em {out}: {n} conversas ({sup} suporte · {prod} produto)")
     conn.close()

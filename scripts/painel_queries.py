@@ -35,8 +35,8 @@ def main() -> None:
                 LAG(sent_at) OVER (PARTITION BY conversation_id ORDER BY turn_index) prev,
                 LAG(sender)  OVER (PARTITION BY conversation_id ORDER BY turn_index) ps
               FROM messages)
-            SELECT ROUND(AVG((julianday(sent_at)-julianday(prev))*24),1),
-                   ROUND(MAX((julianday(sent_at)-julianday(prev))*24),1)
+            SELECT ROUND(AVG((strftime('%s',sent_at)-strftime('%s',prev))/3600.0),1),
+                   ROUND(MAX((strftime('%s',sent_at)-strftime('%s',prev))/3600.0),1)
             FROM g WHERE ps='customer' AND sender='human_agent'""")[0]
     print(f"  média {row[0]}h | pior {row[1]}h   (baseline real Jota ~33h, ReclameAqui)")
 
