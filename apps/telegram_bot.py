@@ -164,8 +164,10 @@ def _system_prompt(theme, seg, doc, disappointed=False, opener=False, fatos="") 
               "(status, valor, motivo da falha). AFIRME com os dados e diga o próximo passo.")
     if opener:
         s += ("\nVocê é PROATIVO: o sistema detectou o atrito pelo EVENTO, antes de o cliente pedir. "
-              "ABRA a conversa afirmando o que aconteceu (com os dados) e o caminho — direção e ação, "
-              "não pergunta. Curto (1-2 frases + 1 oferta). Antecipe as dúvidas que sua mensagem gera.")
+              "NÃO se apresente nem cumprimente (a saudação já foi enviada numa mensagem separada) — "
+              "comece DIRETO pela novidade do evento, afirmando o que aconteceu (com os dados) e o "
+              "caminho — direção e ação, não pergunta. Curto (1-2 frases + 1 oferta). Antecipe as "
+              "dúvidas que sua mensagem gera.")
     if doc:
         passos = "\n".join(f"- {p}" for p in doc.steps)
         s += f"\n\n## PROCEDIMENTO ANCORADO ({doc.id})\n{doc.content}\nPassos:\n{passos}"
