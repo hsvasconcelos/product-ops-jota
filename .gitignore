@@ -7,3 +7,6 @@ qr_jota.png
 
 # prep pessoal da apresentacao (nao vai pro repo)
 prep/
+
+# trace de observabilidade (runtime, cresce)
+data/traces.jsonl

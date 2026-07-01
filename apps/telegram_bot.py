@@ -49,6 +49,7 @@ from product_ops_jota.decision import (                                    # noq
 )
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme as _T  # noqa: E402
 from product_ops_jota.handoff import build_context_pack                    # noqa: E402
+from product_ops_jota.trace import trace                                   # noqa: E402
 from product_ops_jota.rag import Retriever                                 # noqa: E402
 from copiloto import montar_sugestao                                       # noqa: E402  (fallback)
 
@@ -184,6 +185,31 @@ def stuck_judge(prior_bot: str, customer_msg: str) -> bool:
         return False
 
 
+def guardrail_check(reply: str, doc) -> tuple[bool, str]:
+    """Guardrail de SAÍDA (anti-alucinação) — o mais crítico num produto financeiro: a resposta
+    está ANCORADA no procedimento e não inventa procedimento/valor/prazo sobre dinheiro? Retorna
+    (ok, motivo). Fail-OPEN (ok=True se o LLM cair) — não travar o cliente por falha do guardrail."""
+    if LLM is None:
+        return True, "sem llm"
+    proc = (doc.content + " | passos: " + " ".join(doc.steps)) if doc else "(nenhum procedimento recuperado)"
+    try:
+        r = LLM.chat.completions.create(
+            model=OPENAI_MODEL, temperature=0, max_tokens=40,
+            messages=[{"role": "system", "content":
+                       "Você é um guardrail anti-ALUCINAÇÃO de um assistente financeiro. A RESPOSTA do "
+                       "atendente INVENTA algum procedimento, valor, prazo ou fato sobre dinheiro/conta que "
+                       "NÃO está no procedimento e que pode estar ERRADO / enganar o cliente? "
+                       "Empatia, tom, reformular, pedir dado e conhecimento geral seguro são OK — NÃO são "
+                       "violação. Responda ok=false SÓ se houver risco REAL de informação errada. "
+                       "Responda SÓ JSON: {\"ok\": true|false, \"motivo\": \"curto\"}."},
+                      {"role": "user", "content": f"PROCEDIMENTO: {proc[:800]}\n\nRESPOSTA: {reply[:800]}"}])
+        out = r.choices[0].message.content or ""
+        j = json.loads(out[out.find("{"):out.rfind("}") + 1])
+        return bool(j.get("ok", True)), str(j.get("motivo", ""))[:80]
+    except Exception:
+        return True, "guardrail falhou (fail-open)"
+
+
 def gerar(history, theme, seg, doc, disappointed=False, opener=False) -> str:
     # quando a IA resolve, tira passos de escalação/jargão do procedimento (a decisão
     # de chamar humano é do gate, não do texto — e jargão assusta o leigo).
@@ -261,9 +287,10 @@ _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comport
            "absence_detected": "ausência (silenciosa)"}
 
 
-def _brain_text(det, docs, dec, inp) -> str:
+def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
     """Formato 'bulletado por área' em HTML (negrito confiável) — pra plateia de engenheiros."""
     doc = docs[0] if docs else None
+    gr = {"pass": "✅ passou", "blocked": "🛑 bloqueou (trocou por procedimento ancorado)"}.get(guardrail, "—")
     sinais = [n for n, v in (("pediu humano", det.asked_for_human), ("frustrado", det.frustrated),
                              ("desanimado", det.disappointed), ("em loop", det.in_loop),
                              ("confuso", det.confused), ("⚠️ vulnerável", det.safety_concern)) if v]
@@ -281,8 +308,9 @@ def _brain_text(det, docs, dec, inp) -> str:
         f"• capacidade {dec.ai_capability} · pressão→humano {dec.handoff_pressure}\n"
         f"• {emoji} <b>{_esc(ACTION_LABEL.get(dec.action, dec.action.value))}</b> · prio {dec.priority}\n"
         f"  ↳ {_esc(dec.reason)}\n\n"
-        "<b>RAG</b>\n"
-        f"• {fonte}"
+        "<b>RAG + guardrail</b>\n"
+        f"• fonte: {fonte}\n"
+        f"• guardrail de saída: {gr}"
     )
 
 
@@ -407,6 +435,8 @@ def run_turn(sess, text):
     o esgotamento. Reusado pelo bot (handle_message) E pelo simulador de conversas (eval)."""
     sess["history"].append({"role": "user", "content": text})
     det, docs, dec, inp = analisar(sess)
+    doc = docs[0] if docs else None
+    guardrail = None
     if dec.action == InterceptionAction.HUMAN_HANDOFF:
         em_horario = 9 <= datetime.now().hour < 20
         sla = ("Como é horário comercial (9h–20h), te retornam em seguida."
@@ -421,10 +451,26 @@ def run_turn(sess, text):
         kind = "handoff"
     else:
         reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
-                      doc=docs[0] if docs else None, disappointed=det.disappointed)
+                      doc=doc, disappointed=det.disappointed)
+        # GUARDRAIL de saída: se a resposta do LLM não estiver ancorada, NÃO envia — troca pelo
+        # procedimento determinístico da KB (grounded por construção). Confiança é o produto.
+        ok, _why = guardrail_check(reply, doc)
+        guardrail = "pass" if ok else "blocked"
+        if not ok:
+            sug = montar_sugestao(det.predicted_theme, docs)
+            reply = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
+                     if sug else "Deixa eu confirmar isso certinho pra não te passar nada errado sobre a sua conta. 🙏")
         sess["history"].append({"role": "assistant", "content": reply})
         kind = "resolve"
-    return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply, "kind": kind}
+    trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
+           "confianca": inp.detection_confidence, "criticidade": inp.criticality,
+           "trust": inp.trust_risk, "resolubilidade": inp.resolvability,
+           "capacidade": dec.ai_capability, "pressao": dec.handoff_pressure,
+           "acao": dec.action.value, "prioridade": dec.priority, "motivo": dec.reason,
+           "fonte": doc.id if doc else None, "kind": kind, "guardrail": guardrail,
+           "cliente_msg": text[:200]})
+    return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply,
+            "kind": kind, "guardrail": guardrail}
 
 
 def handle_message(chat_id, text, name=""):
@@ -442,7 +488,7 @@ def handle_message(chat_id, text, name=""):
     if r["kind"] == "handoff" and chat_id in DEBUG:
         send(chat_id, _handoff_card(r["det"], r["dec"], r["inp"], sess), html=True)
     if chat_id in DEBUG:
-        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"]), html=True)
+        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"], r.get("guardrail")), html=True)
 
 
 def main():

@@ -1,0 +1,23 @@
+name: evals
+
+# Guarda de regressão: a cada push/PR roda o gate rápido de qualidade.
+# O gate leve (test_core: schema + policy de decisão + handoff + DB) roda em segundos,
+# SEM baixar modelos de ML (torch/sentence-transformers são opcionais). Os evals pesados
+# (classificador semântico, RAG) rodam local/nightly via `evals/run_all.py`.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: instalar (deps leves — sem torch)
+        run: pip install -e .
+      - name: guarda de regressão (schema + policy de decisão + handoff)
+        run: python tests/test_core.py
