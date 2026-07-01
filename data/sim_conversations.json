@@ -1,0 +1,167 @@
+[
+  {
+    "id": "acesso_esgota",
+    "expect": "human",
+    "final": "human_handoff",
+    "action_ok": true,
+    "escalate_turn": 5,
+    "turns_usados": 5,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏\n\nE enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo, sem precisar esperar. 😉"
+  },
+  {
+    "id": "acesso_baixa_literacia",
+    "expect": "human",
+    "final": "human_handoff",
+    "action_ok": true,
+    "escalate_turn": 5,
+    "turns_usados": 5,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏\n\nE enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo, sem precisar esperar. 😉"
+  },
+  {
+    "id": "acesso_resolve_1a",
+    "expect": "ai",
+    "final": "no_intercept",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 2,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Ok! Para resolver o problema do app travando, vamos tentar alguns passos simples:\n\n1. **Atualize o app** para a última versão na Play Store (ou App Store se for iPhone).\n2. Se for Android e isso não resolver, veja se o **Modo Desenvolvedor** está ativado com a opção 'Não manter atividades' marcada. Desative essa opção em Configurações > Sistema.\n3. **Limpe o cache do app**: Configurações do app > Armazenamento > Limpar cache.\n4. Se ainda assim travar, **reinstale o app**. Seus dados e saldo estão seguros.\n\nSe precisar de algo mais, avisa! 🙌"
+  },
+  {
+    "id": "pix_errado",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 3,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Beleza! Você pode verificar o comprovante diretamente aqui no Jota pra confirmar o **nome e o banco** do destinatário. Dessa forma, você poderá entrar em contato e solicitar a devolução. Se precisar, podemos ajudar a acionar o banco de destino. 👍 Tem mais alguma dúvida?"
+  },
+  {
+    "id": "pix_chave_invalida",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Só pra confirmar, você tá tentando fazer o Pix usando uma *chave específica* (como CPF, e-mail, celular ou chave aleatória)? Pode ser que essa chave não esteja ativa. Se puder, **verifica com o destinatário** se a chave Pix que está usando é a mesma que tá registrada no banco dele. 🙂 Se preferir, ele também pode te enviar um QR Code."
+  },
+  {
+    "id": "ludopatia_seguranca",
+    "expect": "human",
+    "final": "human_handoff",
+    "action_ok": true,
+    "escalate_turn": 1,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏\n\nE enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo, sem precisar esperar. 😉"
+  },
+  {
+    "id": "excluir_conta_lgpd",
+    "expect": "human",
+    "final": "human_handoff",
+    "action_ok": true,
+    "escalate_turn": 1,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏"
+  },
+  {
+    "id": "boleto_duplicado",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Entendi, vou te ajudar com isso! Primeiro, vamos conferir algumas informações. Você se lembra de ter feito mais de um agendamento ou pagamento desse boleto? Isso pode ajudar a entender o que aconteceu."
+  },
+  {
+    "id": "falatap_nao_caiu",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Confira direitinho: a venda aparece como **APROVADA** no seu histórico? E você sabe qual é o plano de recebimento que está usando, se é **D0** ou **D1**? Vamos dar uma olhada nisso! 😊"
+  },
+  {
+    "id": "open_finance_saldo",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Pode ser que o consentimento de **Open Finance** tenha expirado ou a conexão com o banco foi interrompida. Vou te ajudar a reconectar:\n\n1. Peça 'reconectar meu banco' no Jota e escolha a instituição.\n2. Você será levado ao app do banco para autorizar novamente.\n3. Defina a duração da conexão.\n\nIsso deve resolver e os **saldos** voltarão a atualizar. Se precisar de mais alguma coisa, me avisa! 😊"
+  },
+  {
+    "id": "rendimento_duvida",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "O saldo na sua conta Jota rende automaticamente *100% do CDI* desde o primeiro real! 😄 O rendimento é calculado por dia útil sobre o saldo mantido. Lembre que os impostos já são retidos na fonte. Se você quiser, posso fazer uma projeção para um período específico!"
+  },
+  {
+    "id": "confusao_canal_falatap",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Oi! O **Fala Tap** é um serviço pro recebimento de pagamentos por aproximação, mas ele não fica dentro do WhatsApp. Dá uma olhada direto no app do Jota no seu celular. 😄 Se precisar de ajuda com outra coisa, estou aqui!"
+  },
+  {
+    "id": "kyc_selfie",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Vamos resolver isso! 😊 A validação pode falhar por alguns motivos. Tente seguir esses passos:\n\n1. Procure um ambiente bem iluminado, sem luz forte atrás de você.\n2. Tire óculos, boné ou máscara e mantenha o rosto centralizado.\n3. Toque em *'Tentar novamente'* para refazer a verificação.\n\nMe avise se precisar de mais ajuda! 📸"
+  },
+  {
+    "id": "frustracao_fria_resolve",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Poxa, sinto muito por essa experiência frustrante! 😕 Vamos resolver isso juntos. Me conta mais: o erro aparece quando você tenta enviar ou ao receber o Pix?"
+  },
+  {
+    "id": "nubank_externo",
+    "expect": "ai",
+    "final": "ai_resolve",
+    "action_ok": true,
+    "escalate_turn": null,
+    "turns_usados": 1,
+    "grounding_ok": true,
+    "grounding_viol": [],
+    "ultima": "Vamos resolver isso! Você já verificou se tem saldo suficiente na sua conta do Nubank? Se sim, poderia me dizer se aparece alguma mensagem de erro?"
+  }
+]
