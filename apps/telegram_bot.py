@@ -64,9 +64,41 @@ TOP_K = 2
 DATA = json.loads((ROOT / "data" / "conversas_ruins.json").read_text("utf-8"))
 SCENARIOS = {c["id"]: c for c in DATA}
 COMMANDS = {
-    "/pix": "ex_pix_loop", "/kyc": "ex_kyc_falhou", "/falatap": "ex_fala_tap_inseguranca",
+    # proativos event-driven (o EVENTO na tabela conta a história → a IA age com direção)
+    "/demo-kyc": "ex_kyc_falhou", "/demo-estorno": "ex_estorno_duplicado",
+    "/demo-falatap": "ex_fala_tap_inseguranca", "/demo-boleto": "ex_boleto_duplicado",
+    "/demo-openfinance": "ex_open_finance", "/demo-limbo": "ex_kyc_limbo",
+    "/demo-pix": "ex_pix_loop",
+    # aliases curtos + reativos (sem evento — o Jota abre com o contexto que tem)
+    "/kyc": "ex_kyc_falhou", "/pix": "ex_pix_loop", "/falatap": "ex_fala_tap_inseguranca",
+    "/boleto": "ex_boleto_duplicado", "/estorno": "ex_estorno_duplicado",
     "/pixerrado": "ex_pix_pessoa_errada", "/excluir": "ex_excluir_conta",
-    "/boleto": "ex_boleto_duplicado", "/conta": "c_real_001",
+}
+
+# O QUE O SISTEMA JÁ SABE por cenário — é o que faz o proativo AFIRMAR e AGIR (com base no
+# evento), em vez de perguntar. Direção e ação > perguntas interpretativas.
+FACTS = {
+    "ex_kyc_falhou": ("Onboarding em andamento. A biometria (selfie) FALHOU 1 vez (evento kyc.failed). "
+                      "Causas comuns: iluminação ruim, foto tremida, rosto coberto (óculos/boné/máscara). "
+                      "A conta ainda NÃO foi ativada — momento mais frágil da jornada (antes do 1º valor)."),
+    "ex_estorno_duplicado": ("A parcela do empréstimo (R$318,40) foi cobrada 2x às 08:14 por uma "
+                             "instabilidade momentânea (2 eventos payment.charged idênticos). O estorno "
+                             "automático JÁ foi disparado; o valor volta em até 1 dia útil. O saldo final não "
+                             "muda. Caso isolado, já sinalizado ao time."),
+    "ex_fala_tap_inseguranca": ("Venda no Fala Tap APROVADA hoje de manhã, R$480,00. Plano de recebimento D1 "
+                                "(cai no próximo dia útil). Liquidação GARANTIDA pelo Jota — o dinheiro não corre "
+                                "risco. Vendedora MEI, 1ª semana."),
+    "ex_boleto_duplicado": ("Um boleto foi cobrado em duplicidade (evento charge.duplicated). O estorno da "
+                            "cobrança extra é automático e segue pelo Radar de Boletos."),
+    "ex_open_finance": ("O consentimento do Open Finance (Jota Conecta) EXPIROU (evento "
+                        "open_finance.consent_expired) — por isso o saldo do banco conectado parou de "
+                        "atualizar. Basta renovar/reconectar o consentimento."),
+    "ex_kyc_limbo": ("O cliente iniciou o onboarding mas NÃO concluiu — nenhum evento de conclusão nem de "
+                     "falha há 1h+ (ausência detectada, o atrito silencioso). Ele parou numa etapa sem erro. "
+                     "Falta pouco pra ativar a conta."),
+    "ex_pix_loop": ("O cliente tentou o MESMO Pix várias vezes (~10 min). A chave usada NÃO está cadastrada "
+                    "como chave Pix do destinatário em nenhum banco — por isso trava. Saldo suficiente. Sem "
+                    "falha de sistema: é a chave do destino."),
 }
 SEG_NOME = {"pf": "pessoa física", "pj": "pessoa jurídica", "mei": "MEI"}
 ACTION_LABEL = {
@@ -121,14 +153,19 @@ JOTA_VOICE = (
 )
 
 
-def _system_prompt(theme, seg, doc, disappointed=False, opener=False) -> str:
+def _system_prompt(theme, seg, doc, disappointed=False, opener=False, fatos="") -> str:
     s = JOTA_VOICE + f"\n\nCliente: {SEG_NOME.get(seg, seg)}."
     if disappointed:
         s += ("\nO cliente está DESANIMADO/decepcionado (frustração fria). Acolha primeiro, "
               "de forma genuína e breve, antes de resolver — sem dramatizar.")
+    if fatos:
+        s += (f"\n\n## O QUE VOCÊ JÁ SABE (evento do sistema + base de dados)\n{fatos}\n"
+              "Use estes fatos com CONFIANÇA. NUNCA pergunte ao cliente algo que você já sabe aqui "
+              "(status, valor, motivo da falha). AFIRME com os dados e diga o próximo passo.")
     if opener:
-        s += ("\nVocê é PROATIVO: percebeu o atrito e ABRE a conversa reconhecendo, com os dados "
-              "que já tem. Curto (1-2 frases + 1 oferta). Antecipe as dúvidas que sua mensagem gera.")
+        s += ("\nVocê é PROATIVO: o sistema detectou o atrito pelo EVENTO, antes de o cliente pedir. "
+              "ABRA a conversa afirmando o que aconteceu (com os dados) e o caminho — direção e ação, "
+              "não pergunta. Curto (1-2 frases + 1 oferta). Antecipe as dúvidas que sua mensagem gera.")
     if doc:
         passos = "\n".join(f"- {p}" for p in doc.steps)
         s += f"\n\n## PROCEDIMENTO ANCORADO ({doc.id})\n{doc.content}\nPassos:\n{passos}"
@@ -210,7 +247,7 @@ def guardrail_check(reply: str, doc) -> tuple[bool, str]:
         return True, "guardrail falhou (fail-open)"
 
 
-def gerar(history, theme, seg, doc, disappointed=False, opener=False) -> str:
+def gerar(history, theme, seg, doc, disappointed=False, opener=False, fatos="") -> str:
     # quando a IA resolve, tira passos de escalação/jargão do procedimento (a decisão
     # de chamar humano é do gate, não do texto — e jargão assusta o leigo).
     if doc is not None:
@@ -218,7 +255,7 @@ def gerar(history, theme, seg, doc, disappointed=False, opener=False) -> str:
                                                if not any(w in s.lower() for w in _ESC)]})
     if LLM is not None and doc is not None:
         try:
-            msgs = [{"role": "system", "content": _system_prompt(theme, seg, doc, disappointed, opener)}]
+            msgs = [{"role": "system", "content": _system_prompt(theme, seg, doc, disappointed, opener, fatos)}]
             if opener:
                 msgs.append({"role": "user", "content": "(abra a conversa proativamente agora)"})
             else:
@@ -390,8 +427,10 @@ def handle_command(chat_id, cmd, name=""):
         SESSIONS[chat_id] = _new_session(name=name)
         SESSIONS[chat_id]["greeted"] = True
         send(chat_id, _saudacao(name))
-        send(chat_id, "_(demo do case · /debug mostra o cérebro · /reset zera · "
-                      "/pix /kyc /falatap /pixerrado /excluir = cenários proativos)_")
+        send(chat_id, "_(demo do case · /debug mostra a engenharia · /reset zera)_\n\n"
+                      "*Cenários proativos* (o Jota fala primeiro, a partir do evento):\n"
+                      "/demo-kyc · /demo-estorno · /demo-falatap · /demo-boleto · "
+                      "/demo-openfinance · /demo-limbo · /demo-pix")
         return
     if cmd == "/reset":
         SESSIONS[chat_id] = _new_session(name=name)
@@ -405,17 +444,26 @@ def handle_command(chat_id, cmd, name=""):
             send(chat_id, "🕵🏻‍♀️ Debug ativo. Vou mostrar a engenharia por trás de cada interação.")
         return
     if cmd in COMMANDS:
-        c = SCENARIOS[COMMANDS[cmd]]
+        sid = COMMANDS[cmd]
+        c = SCENARIOS[sid]
         seg = c.get("segment", "pf")
         ctx = " ".join(m["text"] for m in c["mensagens"] if m["sender"] == "customer")
-        sess = _new_session(seg, [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])],
-                            ctx, c["started_at"], name=name)
+        events = [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])]
+        sess = _new_session(seg, events, ctx, c["started_at"], name=name)
         SESSIONS[chat_id] = sess
         det, docs, dec, inp = analisar(sess)
-        send(chat_id, "🔔 _atrito detectado — agindo antes do chamado existir_")
+        evs = sorted({et for et, _ in events})
+        if evs:
+            banner = ("🔔 <b>Evento no sistema:</b> <code>" + ", ".join(_esc(e) for e in evs)
+                      + "</code> — agindo antes de você pedir.")
+        elif sid == "ex_kyc_limbo":
+            banner = "🔔 <b>Ausência detectada</b> — onboarding parou sem erro; agindo antes de você pedir."
+        else:
+            banner = "🔔 <b>Atrito detectado</b> — agindo antes do chamado existir."
+        send(chat_id, banner, html=True)
         typing(chat_id)
         opener = gerar([], det.predicted_theme, seg, docs[0] if docs else None,
-                       det.disappointed, opener=True)
+                       det.disappointed, opener=True, fatos=FACTS.get(sid, ""))
         sess["history"].append({"role": "assistant", "content": opener})
         send(chat_id, opener)
         if chat_id in DEBUG:
