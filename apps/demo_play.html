@@ -164,6 +164,53 @@
   .brow{display:grid;grid-template-columns:158px 1fr;gap:14px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:10px;border:0;border-bottom:1px solid var(--line);background:none;cursor:pointer;text-align:left;width:100%}
   .brow:hover{background:var(--jota-wash)}
   .brow .bn{color:var(--ink);font-weight:700} .brow .bd{color:var(--grey)}
+
+  /* jornada — bloco 1: escada dos 4 níveis (com o exemplo embutido) */
+  .ladder{display:flex;flex-direction:column;margin-bottom:2px}
+  .lvl{display:grid;grid-template-columns:128px 1fr 176px;gap:16px;align-items:baseline;padding:11px 10px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px}
+  .lvl.head{color:var(--faint);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:8px 10px}
+  .lvl.head .lname,.lvl.head .ld,.lvl.head .lt{font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .ladder-wrap{display:grid;grid-template-columns:62px 1fr;column-gap:10px}
+  .ch-band{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;border-right:1px solid var(--line)}
+  .ladder-wrap .lvl{grid-column:2}
+  .lvl .lname{color:var(--ink);font-weight:700}
+  .lvl .ld{color:var(--ink);font-family:var(--sans);font-size:13px}
+  .lvl .ex{display:block;color:var(--faint);font-family:var(--mono);font-size:11px;margin-top:5px;line-height:1.4}
+  .lvl .lt{color:var(--grey);justify-self:start;font-size:11.5px}
+  .lvl .lt .np{color:var(--ink);background:var(--jota);border:1px solid var(--jota-edge);border-radius:3px;padding:0 5px}
+  .contrast{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:14px 0 6px;line-height:1.55;padding:10px 13px;border:1px solid var(--line2);border-radius:7px} .contrast b{font-weight:700}
+  .ladder-insight{font-family:var(--mono);font-size:12.5px;color:var(--ink);line-height:1.65;margin:10px 0 6px}
+  .ladder-insight b{font-weight:600}
+  /* bloco 2: matriz 2x2 */
+  .matrix{display:grid;grid-template-columns:104px 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:540px;font-family:var(--mono);font-size:11.5px;margin:6px auto}
+  .matrix>div{background:var(--panel);padding:9px 11px}
+  .matrix .mh{color:var(--faint);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em}
+  .matrix .cell{color:var(--ink)} .matrix .cell.deep{background:var(--jota-wash);font-weight:700}
+  .jnote{font-family:var(--mono);font-size:11.5px;color:var(--grey);margin:0 0 12px;line-height:1.5}
+  .jrule{font-family:var(--mono);font-size:12px;color:var(--grey);line-height:1.6;margin-top:6px} .jrule b{color:var(--ink);font-weight:600}
+  /* bloco 3: funil de frequência por etapa */
+  .funnel-wrap{overflow-x:auto;padding-bottom:6px}
+  .funnel{display:flex;min-width:1060px;align-items:flex-end}
+  .fcol{flex:1 1 0;display:flex;flex-direction:column;padding:0 6px}
+  .fbarwrap{height:118px;display:flex;align-items:flex-end;margin-bottom:7px}
+  .fbar{width:100%;background:var(--ink);border-radius:3px 3px 0 0;min-height:3px}
+  .fbar.nd{background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--line2) 4px,var(--line2) 5px);border:1px solid var(--line2);min-height:24px}
+  .fpct{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;border-top:1px solid var(--line);padding-top:7px}
+  .fpct.nd{color:var(--faint);font-weight:400}
+  .fstage{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-top:4px}
+  .fpen{font-family:var(--mono);font-size:10px;color:var(--grey);margin-top:5px;line-height:1.35}
+  .fgat{font-family:var(--mono);font-size:9.5px;color:var(--faint);margin-top:4px}
+  .flvl{font-family:var(--mono);font-size:9px;margin-top:6px;padding:1px 5px;border-radius:3px;align-self:flex-start}
+  .flvl.j{color:var(--ink);background:var(--jota);border:1px solid var(--jota-edge)}
+  .flvl.s{color:var(--grey);border:1px solid var(--line2)}
+  .flvl.none{color:var(--faint);border:1px solid var(--line)}
+  /* ritmo entre seções (só na jornada): 40px entre seções, ~20px dentro */
+  #tab-jornada .ptitle{margin-top:40px}
+  #tab-jornada .contrast{margin-top:20px;margin-bottom:0}
+  #tab-jornada .ladder-insight{margin-top:20px;margin-bottom:0}
+  #tab-jornada .jnote{margin-bottom:12px}
+  #tab-jornada .jrule{margin-top:16px}
+  #tab-jornada .funnel-wrap{margin-top:20px}
 </style></head>
 <body>
 <div class="wrap">
@@ -178,6 +225,7 @@
 
   <nav class="tabs" id="tabs">
     <button data-tab="visao" class="on">visão</button>
+    <button data-tab="jornada">jornada</button>
     <button data-tab="intercept">interceptação</button>
     <button data-tab="lab">laboratório</button>
     <button data-tab="logica">lógica &amp; modelos</button>
@@ -217,6 +265,53 @@
       <button class="brow" data-goto="lab"><span class="bn">laboratório</span><span class="bd">os 5k atendimentos viram dado: os gargalos e os tipos de atrito</span></button>
       <button class="brow" data-goto="logica"><span class="bn">lógica &amp; modelos</span><span class="bd">a mecânica auditável e como os números recalibram</span></button>
       <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida — e o que ainda é hipótese</span></button>
+    </div>
+  </section>
+
+  <!-- JORNADA -->
+  <section class="tab" id="tab-jornada">
+    <div class="ptitle" style="margin-top:0">os 4 níveis de proatividade · o mesmo atrito (kyc/biometria) em cada um</div>
+    <div class="ladder-wrap">
+      <div class="ch-band" style="grid-column:1;grid-row:2">suporte</div>
+      <div class="ch-band" style="grid-column:1;grid-row:3 / span 3">produto</div>
+      <div class="lvl head"><span class="lname">nível</span><span class="ld">o que faz · exemplo no kyc</span><span class="lt">alcance</span></div>
+      <div class="lvl"><span class="lname">0 · reativo</span><span class="ld">cliente pede, o motor responde<span class="ex">› "não passo na biometria" → o motor responde</span></span><span class="lt">linha de base</span></div>
+      <div class="lvl"><span class="lname">1 · por sinal</span><span class="ld">detecta evento/ausência DESTE cliente e age<span class="ex">› KYC deste cliente parado 10 min → a Aline oferece ajuda</span></span><span class="lt">individual</span></div>
+      <div class="lvl"><span class="lname">2 · por jornada</span><span class="ld">o lab achou o atrito → apoio ANTES, pra TODOS<span class="ex">› o lab viu 30% travarem → 3 dicas antes da etapa, pra todos</span></span><span class="lt">coletivo</span></div>
+      <div class="lvl"><span class="lname">3 · por produto</span><span class="ld">conserta a fonte → o atrito não nasce<span class="ex">› engenharia melhora a captura de biometria → a trava some</span></span><span class="lt">estrutural</span></div>
+    </div>
+    <div class="contrast"><b>Escala não é atender mais rápido, é precisar atender menos.</b> Nível 1 apaga um incêndio; nível 3 tira o combustível. Cada degrau pra baixo cobre mais gente com menos esforço, e é assim que 300k viram 1M.</div>
+
+    <div class="ptitle">onde agir · a régua que decide o nível (e evita spam)</div>
+    <div class="jnote">eixo 1: frequência do gargalo (vem do laboratório) · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
+    <div class="matrix">
+      <div class="mh"></div><div class="mh">freq baixa</div><div class="mh">freq alta</div>
+      <div class="mh">risco baixo</div><div class="cell">reativo</div><div class="cell">por sinal</div>
+      <div class="mh">risco alto</div><div class="cell">por sinal</div><div class="cell deep">jornada / produto</div>
+    </div>
+    <div class="jrule">Antecipar todo mundo o tempo todo é spam. Por isso a régua é a mesma da interceptação: frequência (do laboratório) × criticidade. E o que dói muito e dói sempre não vira só antecipação: vira jornada agora e melhoria de produto depois — a cura na fonte.</div>
+
+    <div class="ptitle">onde a jornada quebra · todos os atritos que o lab mediu (100% do suporte)</div>
+    <div class="jnote">altura = frequência do atrito por tema no lab (5k · % dos chamados de suporte) · soma 100%.</div>
+    <div class="funnel-wrap">
+      <div class="funnel">
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
+          <div class="fpct">22.6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:91px"></div></div>
+          <div class="fpct">18.3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:73px"></div></div>
+          <div class="fpct">14.8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:72px"></div></div>
+          <div class="fpct">14.5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:48px"></div></div>
+          <div class="fpct">9.7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:42px"></div></div>
+          <div class="fpct">8.5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:34px"></div></div>
+          <div class="fpct">6.9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:23px"></div></div>
+          <div class="fpct">4.7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
+      </div>
     </div>
   </section>
 
