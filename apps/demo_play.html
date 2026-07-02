@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jota · Atendimento</title>
+<style>
+  /* Marca: FFMarkPro (display) + Aeonik (body). Comerciais, sem CDN — embutir .woff2 via @font-face p/ renderizar exatas; senão fallback grotesk. */
+  :root{
+    --paper:#FFFFFF; --panel:#FFFFFF; --panel2:#FAFAF9; --line:#E7E7E4; --line2:#DBDBD7;
+    --ink:#000000; --grey:#9C9C9F; --faint:#C6C6C6;
+    --jota:#FFE84C; --jota-wash:#FFFBE6; --jota-edge:#F0D63A;
+    --disp:"FF Mark Pro","FFMarkPro","Mark Pro",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --sans:"Aeonik","Aeonik Regular",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px clamp(16px,3vw,36px) 60px}
+
+  header{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding-bottom:14px}
+  .logo{width:40px;height:40px;flex:0 0 auto;display:flex}
+  .logo svg{width:40px;height:40px;border-radius:11px}
+  h1{font-family:var(--disp);font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:13px;color:var(--grey)}
+  .htext{display:flex;flex-direction:column;gap:0}
+  .live{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink);border:1px solid var(--line2);
+    padding:5px 11px;border-radius:6px;background:var(--panel2)}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink);margin-right:6px;vertical-align:middle}
+
+  nav.tabs{display:flex;gap:2px;margin-bottom:22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;font-family:var(--mono);font-size:12.5px;
+    color:var(--grey);padding:10px 13px;cursor:pointer;margin-bottom:-1px}
+  nav.tabs button:hover{color:var(--ink)}
+  nav.tabs button.on{color:var(--ink);border-bottom-color:var(--jota);font-weight:600}
+  .tab{display:none} .tab.on{display:block}
+
+  .composer{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+  textarea{width:100%;min-height:96px;resize:vertical;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line2);border-radius:8px;padding:12px 14px;padding-bottom:48px;font-family:var(--sans);font-size:15px;line-height:1.45}
+  textarea::placeholder{color:var(--faint)}
+  textarea:focus{outline:none;border-color:var(--ink)}
+  .cbox{position:relative}
+  .cbox .actions{position:absolute;right:10px;bottom:10px;display:flex;align-items:center;gap:11px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  button.go{background:var(--ink);color:#fff;border:0;border-radius:7px;padding:10px 20px;font-family:var(--disp);font-weight:600;font-size:14px;cursor:pointer}
+  button.go:disabled{opacity:.45;cursor:default}
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:12px;padding:5px 11px;border-radius:6px;border:1px solid var(--line2);color:var(--grey);background:var(--panel);cursor:pointer}
+  .chip:hover{border-color:var(--ink);color:var(--ink)}
+  .chiplabel{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase}
+  .hint{font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+  #out{display:none;margin-top:20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:840px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px 17px;display:flex;flex-direction:column;gap:11px}
+  .card.full{grid-column:1/-1}
+  .card h3{margin:0 0 2px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);padding-bottom:9px;border-bottom:1px solid var(--line)}
+
+  .kv{font-family:var(--mono);font-size:13px;color:var(--ink);display:flex;gap:20px;flex-wrap:wrap}
+  .kv .l{color:var(--grey)} .kv b{font-weight:600}
+  .line{font-family:var(--mono);font-size:12.5px;color:var(--grey)}
+  .line .k{color:var(--faint)} .line .v{color:var(--ink)}
+
+  .sig{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line);color:var(--ink)}
+  .sig:last-child{border-bottom:0}
+  .sig .m{color:var(--grey)} .sig .t{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)} .sig .t.det{color:var(--grey)}
+
+  .grow{display:grid;grid-template-columns:34px 128px 1fr auto;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:6px 10px;color:var(--grey);border-bottom:1px solid var(--line)}
+  .grow:last-child{border-bottom:0}
+  .grow.head{color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid var(--line2)}
+  .grow .num{color:var(--faint)} .grow .nm{color:var(--grey)} .grow .cd{color:var(--grey)} .grow .vd{color:var(--grey);text-align:right}
+  .grow.skip,.grow.skip .num,.grow.skip .nm,.grow.skip .cd,.grow.skip .vd{color:var(--faint)}
+  .grow.fire{background:var(--jota-wash);color:var(--ink)}
+  .grow.fire .num,.grow.fire .nm{color:var(--ink);font-weight:700} .grow.fire .cd{color:var(--ink)}
+  .grow.fire .vd .act{background:var(--jota);color:var(--ink);padding:3px 9px;border-radius:5px;font-weight:700;font-size:11px;white-space:nowrap}
+
+  .resol{font-family:var(--mono);font-size:14px;color:var(--grey)}
+  .resol .f{color:var(--grey)} .resol .f b{color:var(--grey);font-weight:400}
+  .resol .f.block{color:var(--ink)} .resol .f.block b{color:var(--ink);font-weight:700;background:var(--jota);padding:0 5px;border-radius:4px}
+  .resol .eq{color:var(--ink);font-weight:700}
+  .gargalo{font-family:var(--mono);font-size:12px;color:var(--ink);margin-top:8px} .gargalo .lbl{color:var(--grey)}
+
+  .doc{display:grid;grid-template-columns:26px 130px 1fr auto;gap:10px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line);color:var(--grey)}
+  .doc:last-child{border-bottom:0}
+  .doc.top{color:var(--ink)} .doc.top .rk{font-weight:700}
+  .doc .ti{color:var(--grey)} .doc.top .ti{color:var(--ink)} .doc .src{color:var(--grey);font-size:11px}
+
+  .outmeta{font-family:var(--mono);font-size:12px;color:var(--grey);margin-bottom:9px} .outmeta .act{color:var(--ink);font-weight:700}
+  .reply{font-size:14.5px;line-height:1.55;white-space:pre-wrap;color:var(--ink);border-left:2px solid var(--line2);padding:2px 0 2px 14px}
+  .loading{font-family:var(--mono);font-size:12.5px;color:var(--grey);margin-top:18px}
+
+  /* Lógica & placeholders */
+  .frame{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:15px 17px;font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:16px}
+  .frame b{font-weight:600} .frame .lead{color:var(--grey);font-size:13px;margin-top:4px}
+  .frame a{color:var(--ink)}
+  .hl{font-family:var(--disp);font-size:clamp(21px,2.8vw,30px);font-weight:700;letter-spacing:-.01em;line-height:1.16;margin:6px 0 12px;max-width:26ch;text-wrap:balance}
+  .hl-sub{font-size:13.5px;color:var(--grey);line-height:1.6;max-width:66ch;margin:0 0 24px}
+  .toggle{background:none;border:0;font-family:var(--mono);font-size:12.5px;color:var(--grey);cursor:pointer;padding:16px 0 6px;margin-top:6px}
+  .toggle:hover{color:var(--ink)}
+  #logica-more{border-top:1px solid var(--line);margin-top:2px}
+  .ptitle{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:20px 0 6px}
+  .prow{display:grid;grid-template-columns:160px 62px 1fr;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:7px 4px;border-bottom:1px solid var(--line)}
+  .prow.head{color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .prow .nme{color:var(--ink)} .prow .val{color:var(--ink);font-weight:700;background:var(--jota-wash);border:1px solid var(--jota-edge);border-radius:4px;padding:0 6px;justify-self:start} .prow .desc{color:var(--grey)}
+  .trow{display:grid;grid-template-columns:150px 1fr 1.1fr;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:7px 4px;border-bottom:1px solid var(--line)}
+  .trow.head{color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .trow .nme{color:var(--ink)} .trow .rg{color:var(--ink)} .trow .rg .op{color:var(--grey);padding:0 5px}
+  .trow .rg .vv{background:var(--jota-wash);border:1px solid var(--jota-edge);border-radius:4px;padding:0 6px;font-weight:700}
+  .trow .ef{color:var(--grey)}
+  .frow{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:7px 4px;border-bottom:1px solid var(--line)}
+  .frow .fn{color:var(--grey)} .frow .fx{color:var(--ink)} .frow .fo{color:var(--grey);display:block;margin-top:2px;font-size:11.5px}
+
+  /* laboratório */
+  .lab-stats{display:flex;gap:28px;flex-wrap:wrap;padding:2px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .lstat{display:flex;flex-direction:column;gap:2px}
+  .lstat .v{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .lstat .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  #lab-sql{min-height:104px;font-family:var(--mono);font-size:12.5px}
+  .tblwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px}
+  table.res{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px}
+  table.res th{text-align:left;color:var(--grey);font-weight:600;padding:8px 13px;border-bottom:1px solid var(--line2);background:var(--panel2);white-space:nowrap;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  table.res td{padding:7px 13px;border-bottom:1px solid var(--line);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+  table.res tr:last-child td{border-bottom:0}
+  .resmeta{font-family:var(--mono);font-size:11px;color:var(--grey);margin-top:7px}
+
+  /* evals scorecard */
+  .scrow{display:grid;grid-template-columns:1fr 82px 82px 90px;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:8px 4px;border-bottom:1px solid var(--line)}
+  .scrow.head{color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .scrow .mt{color:var(--ink)} .scrow .mo{color:var(--grey);display:block;font-size:11px;margin-top:2px}
+  .scrow .vl{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums} .scrow .lm{color:var(--grey);font-variant-numeric:tabular-nums}
+  .scrow .st{color:var(--grey);justify-self:start} .scrow .st.fail{color:var(--ink);background:var(--jota-wash);border:1px solid var(--jota-edge);border-radius:4px;padding:0 6px}
+
+  /* visão */
+  .loopflow{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+  .lnode{flex:1 1 200px;border:1px solid var(--line);border-radius:10px;padding:13px 15px;background:var(--panel2)}
+  .lnode .lt{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:6px}
+  .lnode p{margin:0;font-size:12.5px;color:var(--grey);line-height:1.45}
+  .larrow{display:flex;align-items:center;color:var(--grey);font-family:var(--mono);font-size:18px}
+  .loopback{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:10px;padding:10px 13px;border-left:2px solid var(--jota);background:var(--jota-wash);border-radius:0 6px 6px 0;line-height:1.5}
+  .plist{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin-top:4px}
+  @media(max-width:840px){.plist{grid-template-columns:1fr}}
+  .pline{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:baseline;padding:9px 10px;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.4}
+  .pline .pn{font-family:var(--mono);color:var(--grey);font-size:12px}
+  .pline b{font-weight:600}
+  .pline.key{background:var(--jota-wash);border-radius:6px;border-bottom-color:transparent}
+  .pline.key .pn{color:var(--ink);font-weight:700}
+</style></head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="logo" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M46.5306 59.2247C53.2365 58.5488 58.5269 53.2543 59.2022 46.543C59.6271 42.317 59.9666 36.8897 60 29.9993C59.9657 23.1089 59.6271 17.6816 59.2013 13.4556C58.526 6.7444 53.2356 1.44986 46.5297 0.774005C36.0733 -0.279703 23.4926 -0.23607 13.4685 0.774005C6.76438 1.44986 1.4731 6.7444 0.797774 13.4556C0.372913 17.6816 0.0343228 23.1089 0 29.9993C0.0343228 36.8897 0.372913 42.317 0.797774 46.543C1.4731 53.2543 6.76345 58.5488 13.4694 59.2247C23.9249 60.2793 36.5074 60.2347 46.5306 59.2247Z" fill="#FFE84C"></path><path d="M47.4803 26.8134C47.3198 27.0845 47.2493 27.5311 47.163 27.805C46.8597 28.7686 46.5879 29.7416 46.2855 30.7061C45.6278 32.8043 44.6686 34.8161 43.4385 36.6385C40.4274 41.0984 35.7576 44.0497 30.3281 44.3282C30.0118 44.344 29.6955 44.3524 29.3791 44.3524C27.0044 44.3524 24.638 43.8594 22.4979 42.8196C16.5749 39.9416 13.1713 33.5349 14.0192 31.6113C14.2437 31.1016 14.8142 30.7711 15.3699 30.8036C16.907 30.8946 17.5545 32.8284 18.2641 33.909C19.1222 35.2153 20.1166 36.4259 21.3893 37.3487C23.3996 38.8062 25.83 39.4951 28.3003 39.4951C32.1964 39.4951 35.6769 37.7497 38.0099 34.635C39.6769 32.4088 40.7335 29.7351 41.3253 27.0298C41.4311 26.5452 41.7975 25.7254 41.265 25.38C40.5378 24.9075 39.547 25.4515 38.7363 25.2742C38.0758 25.1294 37.4459 24.6151 37.394 23.941C37.3597 23.4899 37.5897 23.0489 37.9153 22.7351C38.6816 21.9998 39.8504 21.8114 40.8624 21.6897C42.6027 21.4799 44.3996 21.4372 46.1166 21.8411C47.7159 22.2171 49.3903 23.0721 50.4218 24.3867C50.7419 24.7942 51.009 25.2714 51.0294 25.7894C51.0498 26.3075 50.7641 26.8627 50.2715 27.0223C49.8133 27.1709 49.3253 26.9573 48.881 26.7717C48.5192 26.6203 47.8513 26.3502 47.5433 26.7234C47.5211 26.7503 47.5007 26.781 47.4812 26.8134H47.4803Z" fill="#000000"></path><path d="M10.2184 25.5051C10.16 26.828 11.686 27.0091 13.0218 26.5894C14.672 26.0705 16.4327 25.9034 18.1498 26.1095C18.8483 26.194 19.5904 26.3323 20.2314 26.0426C22.0774 25.208 20.8381 23.5861 19.7991 22.7784C18.5292 21.7916 16.8724 21.2865 15.2685 21.4537C13.4633 21.6421 11.0969 22.8964 10.404 24.7002C10.2871 25.0056 10.2277 25.2721 10.2175 25.5042L10.2184 25.5051Z" fill="#000000"></path></svg></span>
+    <div class="htext">
+      <h1>Jota · Atendimento</h1>
+      <span class="sub">um só cérebro — reativo e proativo</span>
+    </div>
+    <span class="live"><span class="dot"></span>mesmo cérebro do @ajudajota_bot em prod</span>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="visao" class="on">visão</button>
+    <button data-tab="intercept">interceptação</button>
+    <button data-tab="lab">laboratório</button>
+    <button data-tab="logica">lógica &amp; modelos</button>
+    <button data-tab="evals">evals</button>
+  </nav>
+
+  <!-- VISÃO -->
+  <section class="tab on" id="tab-visao">
+    <h2 class="hl">Atendimento que antecipa, não só responde.</h2>
+    <p class="hl-sub">A visão pra escalar de 300 mil a 1 milhão de clientes sem a operação crescer junto — um só modelo, dois mundos, e o loop entre eles.</p>
+
+    <div class="ptitle" style="margin-top:2px">a tese · dois mundos, um modelo</div>
+    <div class="loopflow">
+      <div class="lnode"><div class="lt">Mundo 1 · atendimento</div><p>Reativo. Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede, descobre o atrito.</p></div>
+      <div class="larrow">→</div>
+      <div class="lnode"><div class="lt">Mundo 2 · Jota proativo</div><p>Age antes do chamado existir: detecta o atrito na origem e resolve, assiste ou chama humano.</p></div>
+      <div class="larrow">→</div>
+      <div class="lnode"><div class="lt">aprende</div><p>Cada atrito vira melhoria de produto e de KB — a cura na fonte.</p></div>
+    </div>
+    <div class="loopback">↺ o loop: o Mundo 1 alimenta o Mundo 2, pra cada vez menos atrito nascer. Containment é consequência de antecipar melhor — nunca a meta.</div>
+
+    <div class="ptitle">os princípios · uma frase cada</div>
+    <div class="plist">
+      <div class="pline"><span class="pn">1</span><span><b>Containment é consequência</b>, não meta — escalar é sinal de que a jornada falhou.</span></div>
+      <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório</b>; o produto é a cura.</span></div>
+      <div class="pline"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão</b> — a maioria trava em silêncio e abandona.</span></div>
+      <div class="pline key"><span class="pn">4</span><span><b>Confiança é o produto</b> — protegê-la vem antes de resolver. <span style="color:var(--grey)">(a chave)</span></span></div>
+      <div class="pline"><span class="pn">5</span><span><b>A natureza do erro define como detectá-lo</b> — evento, comportamento, ausência.</span></div>
+      <div class="pline"><span class="pn">6</span><span><b>Mesmo problema, cuidado sob medida</b> — PF/PJ/MEI, momento, letramento.</span></div>
+      <div class="pline"><span class="pn">7</span><span><b>Criticidade = erro × momento × o que está em jogo.</b></span></div>
+      <div class="pline key"><span class="pn">8</span><span><b>Cuidar não pode custar mais que o cuidado entrega.</b> <span style="color:var(--grey)">(sustenta a escala)</span></span></div>
+    </div>
+  </section>
+
+  <!-- INTERCEPTAÇÃO -->
+  <section class="tab" id="tab-intercept">
+    <div class="composer">
+      <div class="cbox">
+        <textarea id="txt" placeholder="mensagem do cliente…  (ex.: 'fui cobrado duas vezes no boleto')"></textarea>
+        <div class="actions"><span class="hint">⌘⏎</span><button class="go" id="go">interceptar ►</button></div>
+      </div>
+      <div class="row"><span class="chiplabel">ou testa um caso:</span><div class="chips" id="chips"></div></div>
+    </div>
+    <div class="loading" id="load" style="display:none">rodando o motor…</div>
+    <div id="out">
+      <div class="grid">
+        <div class="card" id="c-det"><h3>detecção</h3><div id="det"></div></div>
+        <div class="card" id="c-res"><h3>resolubilidade</h3><div id="res"></div></div>
+        <div class="card full"><h3>cascata de decisão · gate a gate</h3><div id="gates"></div></div>
+        <div class="card"><h3>rag · ranking</h3><div id="rag"></div></div>
+        <div class="card" id="c-hand"><h3>handoff</h3><div id="hand"></div></div>
+        <div class="card full"><h3>resposta recomendada</h3><div id="reply"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LABORATÓRIO -->
+  <section class="tab" id="tab-lab">
+    <div class="lab-stats" id="lab-overview"></div>
+    <div class="ptitle" style="margin-top:0">explorar os dados · o método à mostra</div>
+    <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: a mesma base de 10k (suporte + produto) que treina o olhar do modelo. As queries abaixo são as reais — clica uma, ou escreve a sua (read-only).</p>
+    <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
+    <div class="cbox">
+      <textarea id="lab-sql" spellcheck="false"></textarea>
+      <div class="actions"><span class="hint">read-only · select/with</span><button class="go" id="lab-run">rodar ►</button></div>
+    </div>
+    <div id="lab-result"></div>
+  </section>
+
+  <!-- LÓGICA & MODELOS -->
+  <section class="tab" id="tab-logica">
+    <h2 class="hl">Não são números mágicos — são priors que recalibram contra o desfecho real.</h2>
+    <p class="hl-sub">Vivem numa política separada do mecanismo de decisão. Cada handoff e cada correção do atendente vira um label. O número certo é o que o A/B mostra, não o que foi chutado hoje.</p>
+    <div id="logica-body"></div>
+    <button class="toggle" id="logica-toggle" aria-expanded="false">ver a matemática do motor ▸</button>
+    <div id="logica-more" style="display:none"></div>
+  </section>
+
+  <!-- EVALS -->
+  <section class="tab" id="tab-evals">
+    <h2 class="hl">97–100% — mas contra um gabarito curado. A arquitetura não se apoia nesse número.</h2>
+    <p class="hl-sub">Precisão em tráfego real do Jota é hipótese até rodar em produção. Por isso o motor é determinístico onde dá — pra não depender de um 99% que não sobrevive à produção. Honesto acima de inflado.</p>
+    <div class="ptitle" style="margin-top:4px">scorecard · contratos com limiar de regressão (roda no CI a cada push)</div>
+    <div id="evals-scorecard"></div>
+    <div class="ptitle">soak overnight · volume real (persona × atrito × estilo)</div>
+    <div class="lab-stats" id="evals-soak" style="border-bottom:0;padding-bottom:2px"></div>
+    <div class="ptitle">as 4 camadas de eval</div>
+    <div id="evals-camadas"></div>
+  </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function pct(x){return (x*100).toFixed(0)+'%';}
+
+/* navegação de abas */
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+b.dataset.tab));
+    if(b.dataset.tab==='logica') loadPolicy();
+    if(b.dataset.tab==='lab') loadLab();
+    if(b.dataset.tab==='evals') loadEvals();
+  };
+});
+
+/* evals — scorecard real (CI) + soak + camadas */
+let evalsLoaded=false;
+async function loadEvals(){
+  if(evalsLoaded) return; evalsLoaded=true;
+  const e=await (await fetch('/api/evals')).json();
+  const fmt=(v,f)=> v==null?'—':(f==='pct'?(v*100).toFixed(1)+'%':String(v));
+  let h='<div class="scrow head"><span>métrica</span><span class="vl">valor</span><span class="lm">limiar</span><span class="st">status</span></div>';
+  e.scorecard.forEach(s=>{
+    const lim=(s.fmt==='pct'?(s.limiar*100).toFixed(0)+'%':s.limiar);
+    h+=`<div class="scrow"><span class="mt">${esc(s.metrica)}<span class="mo">${esc(s.o_que)}</span></span>
+      <span class="vl">${fmt(s.valor,s.fmt)}</span><span class="lm">${s.invert?'≤ ':'≥ '}${lim}</span>
+      <span class="st ${s.ok?'':'fail'}">${s.ok?'ok':'▸ abaixo'}</span></div>`;
+  });
+  $('#evals-scorecard').innerHTML=h;
+  if(e.soak){ $('#evals-soak').innerHTML=[['conversas',e.soak.conversas],['desfecho',(e.soak.desfecho||'—')+'%'],['grounding',(e.soak.grounding||'—')+'%'],['tom',(e.soak.tom||'—')+'/5']]
+     .map(([l,v])=>`<div class="lstat"><span class="v">${v}</span><span class="l">${l}</span></div>`).join(''); }
+  $('#evals-camadas').innerHTML=e.camadas.map(c=>`<div class="frow"><span class="fn">${esc(c.nome)}</span><span class="fx" style="color:var(--grey)">${esc(c.o_que)}</span></div>`).join('');
+}
+
+/* laboratório — explorador de dados (lê a base real de 10k) */
+let labLoaded=false;
+async function loadLab(){
+  if(labLoaded) return; labLoaded=true;
+  const o=await (await fetch('/api/lab/overview')).json();
+  $('#lab-overview').innerHTML=[['total',o.total],['suporte',o.suporte],['produto',o.produto],
+    ['usuários',o.users],['eventos',o.eventos],['ausências',o.ausencias]]
+    .map(([l,v])=>`<div class="lstat"><span class="v">${(v||0).toLocaleString('pt-BR')}</span><span class="l">${l}</span></div>`).join('');
+  const pr=await (await fetch('/api/lab/presets')).json();
+  const box=$('#lab-presets'); box.innerHTML='';
+  pr.forEach(q=>{ const b=document.createElement('button');b.className='chip';b.textContent=q.nome;
+    b.onclick=()=>{$('#lab-sql').value=q.sql; runSQL();}; box.appendChild(b); });
+  const joia=pr.find(q=>/ausência|ausencia|invis/i.test(q.nome))||pr[0];
+  $('#lab-sql').value=joia.sql; runSQL();
+}
+async function runSQL(){
+  const sql=$('#lab-sql').value.trim(); if(!sql) return;
+  $('#lab-result').innerHTML='<div class="resmeta">rodando…</div>';
+  const r=await (await fetch('/api/lab/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql})})).json();
+  if(r.error){ $('#lab-result').innerHTML=`<div class="resmeta">erro: ${esc(r.error)}</div>`; return; }
+  let t='<div class="tblwrap"><table class="res"><thead><tr>'+r.columns.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr></thead><tbody>';
+  t+=r.rows.map(row=>'<tr>'+row.map(c=>`<td>${esc(String(c))}</td>`).join('')+'</tr>').join('');
+  $('#lab-result').innerHTML=t+`</tbody></table></div><div class="resmeta">${r.n} linha(s) · read-only · máx 1000</div>`;
+}
+document.getElementById('lab-run').onclick=runSQL;
+
+/* toggle da matemática do motor — colapsado por padrão */
+$('#logica-toggle').onclick=()=>{
+  const more=$('#logica-more'), t=$('#logica-toggle');
+  const open=more.style.display==='none';
+  more.style.display=open?'block':'none';
+  t.setAttribute('aria-expanded',open?'true':'false');
+  t.textContent=open?'ocultar a matemática do motor ▾':'ver a matemática do motor ▸';
+};
+
+/* casos plantados */
+const CASES=[
+  ["não acesso meu whatsapp","nao estou conseguindo acessar meu wpp"],
+  ["acesso ambíguo","nao consigo acessar minha conta"],
+  ["app fecha sozinho","o app abre e fecha sozinho, nao consigo entrar"],
+  ["cobrado 2x","fui cobrado duas vezes no mesmo boleto, quero o estorno"],
+  ["excluir conta (lgpd)","quero excluir minha conta e apagar meus dados"],
+  ["vulnerável","to viciado em aposta, preciso parar, me tira disso"],
+];
+const chips=$('#chips');
+CASES.forEach(([label,text])=>{
+  const b=document.createElement('button');b.className='chip';b.textContent=label;
+  b.onclick=()=>{$('#txt').value=text; run();}; chips.appendChild(b);
+});
+
+async function run(){
+  const text=$('#txt').value.trim(); if(!text) return;
+  $('#go').disabled=true; $('#load').style.display='block'; $('#out').style.display='none';
+  try{ render(await (await fetch('/api/intercept',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})})).json()); }
+  catch(e){ $('#load').textContent='erro: '+e; }
+  $('#go').disabled=false; $('#load').style.display='none';
+}
+$('#go').onclick=run;
+$('#txt').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter')run();});
+
+function render(p){
+  const d=p.deteccao;
+  let det=`<div class="kv"><span><span class="l">natureza</span> <b>${d.natureza}</b> ${pct(d.natureza_conf)}</span>
+     <span><span class="l">tema</span> <b>${d.tema}</b> ${pct(d.tema_conf)} · ${d.tema_fonte}</span></div>`;
+  if(d.evento) det+=`<div class="line" style="margin-top:6px"><span class="k">evento</span> <span class="v">${esc(d.evento)}</span></div>`;
+  const sig=(d.sinais||[]);
+  if(sig.length){ det+='<div style="margin-top:8px">'+sig.map(s=>`
+     <div class="sig"><span>${esc(s.rotulo||s.tipo)}</span>
+       <span class="m">${s.valor!=null?('val '+s.valor):''}${s.limiar!=null?(' · lim '+s.limiar):''}</span>
+       <span class="t ${s.deterministico?'':'det'}">${s.deterministico?'determinístico':'calibrado'}</span></div>`).join('')+'</div>'; }
+  const fl=d.flags, on=Object.keys(fl).filter(k=>fl[k]);
+  if(on.length) det+=`<div class="line" style="margin-top:8px"><span class="k">sinais</span> <span class="v">${on.join(' · ')}</span></div>`;
+  $('#det').innerHTML=det;
+
+  const R=p.resolubilidade;
+  const f=(k,v)=>`<span class="f ${v?'':'block'}">${k} <b>${v?1:0}</b></span>`;
+  $('#res').innerHTML=`<div class="resol">${f('kb',R.kb_existe)} · ${f('exec',R.executavel)} · ${f('rev',R.reversivel)}
+     &nbsp;→&nbsp; <span class="eq">${R.valor}</span></div>
+     ${R.gargalo?`<div class="gargalo"><span class="lbl">gargalo</span> ${esc(R.gargalo)}</div>`:`<div class="gargalo"><span class="lbl">sem gargalo — a IA resolve</span></div>`}`;
+
+  const short={'confiança mínima':'confiança mín.','confiança em jogo':'confiança jogo','política da KB':'política KB'};
+  let html=`<div class="grow head"><span class="num">#</span><span class="nm">gate</span><span class="cd">condição</span><span class="vd">veredito</span></div>`;
+  p.gates.forEach(g=>{
+    const parts=g.gate.split(' · '); const num=parts[0]; let nm=parts.slice(1).join(' · '); nm=short[nm]||nm;
+    const fire=g.status==='disparou', skip=g.status==='nao_avaliado';
+    const vd=fire?`<span class="act">► ${(g.acao||'').toUpperCase()}</span>`:(skip?'—':'passa');
+    html+=`<div class="grow ${fire?'fire':(skip?'skip':'')}"><span class="num">${fire?'▸':''}${num}</span><span class="nm">${nm}</span><span class="cd">${esc(g.detalhe||'')}</span><span class="vd">${vd}</span></div>`;
+  });
+  $('#gates').innerHTML=html;
+
+  $('#rag').innerHTML=(p.rag||[]).map((x,i)=>`<div class="doc ${i===0?'top':''}"><span class="rk">${i+1}º</span><span class="id">${x.id}</span><span class="ti">${esc(x.titulo)}</span><span class="src">${i===0?'fonte':''}${x.requires_human?' · requires_human':''}</span></div>`).join('')||'<span class="line">—</span>';
+
+  const dec=p.decisao;
+  const kindTxt={handoff:'humano',deflect:'deflete (fora do escopo)',clarify:'pergunta antes'}[p.kind]||'IA resolve';
+  const gr=p.guardrail==='pass'?'guardrail ok':(p.guardrail==='blocked'?'guardrail bloqueou':(p.guardrail==='skip'?'resposta canônica':''));
+  $('#reply').innerHTML=`<div class="outmeta"><span class="act">${kindTxt}</span> · ${dec.acao} · crit ${dec.criticidade}/5 · cap ${dec.capacidade} · pressão ${dec.pressao_humano} · prio ${dec.prioridade}${gr?(' · '+gr):''}</div><div class="reply">${esc(p.resposta)}</div>`;
+
+  const h=p.handoff;
+  if(h){ $('#c-hand').style.display='flex';
+    $('#hand').innerHTML=`<div class="kv"><span><span class="l">fila</span> <b>${esc(h.especialidade)}</b></span><span><span class="l">${h.in_hours?'em horário':'fora do horário'}</span> · prio ${h.prioridade}</span></div>
+      <div class="line" style="margin-top:6px"><span class="k">evidência</span> <span class="v">${esc(h.evidencia)}</span></div>
+      ${h.sinais&&h.sinais.length?`<div class="line" style="margin-top:4px"><span class="k">sinais</span> <span class="v">${h.sinais.map(esc).join(' · ')}</span></div>`:''}
+      <div class="line" style="margin-top:4px">${esc(h.nota)}</div>`;
+  } else { $('#c-hand').style.display='none'; }
+  $('#out').style.display='block';
+}
+
+/* Lógica & Modelos — lê os thresholds reais do código */
+let policyLoaded=false;
+async function loadPolicy(){
+  if(policyLoaded) return; policyLoaded=true;
+  const p=await (await fetch('/api/policy')).json();
+  // camada 2 — visível: só os thresholds (a prova concreta)
+  let h='<div class="ptitle">thresholds de decisão (policy · recalibrável)</div>';
+  h+='<div class="trow head"><span class="nme">parâmetro</span><span class="rg">regra (dispara quando)</span><span class="ef">então</span></div>';
+  p.thresholds.forEach(t=>{ h+=`<div class="trow"><span class="nme">${t.nome}</span><span class="rg">${esc(t.grandeza)}<span class="op">${t.op}</span><span class="vv">${t.valor}</span></span><span class="ef">${esc(t.efeito)}</span></div>`; });
+  $('#logica-body').innerHTML=h;
+
+  // camada 3 — colapsada: a matemática do motor
+  let m='<div class="ptitle">grandezas do motor · como cada número nasce</div>';
+  p.formulas.forEach(t=>{ m+=`<div class="frow"><span class="fn">${t.nome}</span><span class="fx">${esc(t.expr)}<span class="fo">${esc(t.o_que)}</span></span></div>`; });
+  m+='<div class="ptitle">confiança-base por natureza do atrito</div>';
+  m+='<div class="prow head"><span class="nme">natureza</span><span class="val" style="background:none;border:0;padding:0">valor</span><span class="desc">por quê</span></div>';
+  p.confianca_base.forEach(t=>{ m+=`<div class="prow"><span class="nme">${t.natureza}</span><span class="val">${t.valor}</span><span class="desc">${esc(t.o_que)}</span></div>`; });
+  m+='<div class="ptitle">o que cada ação significa</div>';
+  (p.acoes||[]).forEach(t=>{ m+=`<div class="frow"><span class="fn">${t.nome}</span><span class="fx" style="color:var(--grey)">${esc(t.o_que)}</span></div>`; });
+  $('#logica-more').innerHTML=m;
+}
+</script>
+</body></html>

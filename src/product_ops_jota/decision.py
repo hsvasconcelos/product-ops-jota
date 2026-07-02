@@ -142,6 +142,48 @@ def decide(inp: DecisionInput, t: PolicyThresholds = DEFAULT_THRESHOLDS) -> Deci
                f"baixa capacidade da IA ({ai_capability:.2f}); humano com contexto", warm=True)
 
 
+def explain_gates(inp: DecisionInput, t: PolicyThresholds = DEFAULT_THRESHOLDS) -> dict:
+    """A cascata de decisão, gate a gate e EM ORDEM — pra demonstrar/auditar o 'porquê'.
+    Espelha decide(): o 1º gate que dispara define a ação; os seguintes nem são avaliados.
+    O detalhe é SEMPRE verdadeiro pro ramo tomado (desigualdade certa p/ passou vs disparou)."""
+    c, crit, tr = inp.detection_confidence, inp.criticality, inp.trust_risk
+    hp = round(tr * (1.0 - inp.resolvability), 2)
+    cap = round(inp.resolvability * c, 2)
+    cap_acao = "IA resolve" if cap >= t.resolve_floor else "IA assiste"
+    cap_det = (f"capacidade {cap:.2f} ≥ {t.resolve_floor}" if cap >= t.resolve_floor
+               else f"capacidade {cap:.2f} ≥ {t.assist_floor} (< {t.resolve_floor})")
+    # (nome, disparou?, ação, detalhe-se-disparou, detalhe-se-passou)
+    gates = [
+        ("0 · segurança", inp.safety_flag, "humano",
+         "cliente vulnerável — a IA se recusa de propósito", "sem sinal de vulnerabilidade"),
+        ("0.5 · esgotamento", inp.stuck, "humano",
+         "a IA tentou e o cliente segue travado (multi-toque)", "sem esgotamento (a IA ainda não tentou e falhou)"),
+        ("0.7 · política da KB", inp.requires_human, "humano",
+         "procedimento privilegiado/irreversível — a KB exige humano", "procedimento não exige humano"),
+        ("1 · confiança mínima", c < t.conf_floor, "não intercepta",
+         f"certeza {c:.2f} < {t.conf_floor} → não age sobre palpite fraco", f"certeza {c:.2f} ≥ {t.conf_floor}"),
+        ("2 · ROI", crit < t.roi_crit_floor and tr < t.roi_trust_floor, "resolve silencioso / observa",
+         f"trivial: crit {crit:.1f} < {t.roi_crit_floor} e trust {tr:.2f} < {t.roi_trust_floor}",
+         f"não trivial: crit {crit:.1f} ≥ {t.roi_crit_floor} ou trust {tr:.2f} ≥ {t.roi_trust_floor}"),
+        ("3 · confiança em jogo", hp >= t.handoff_ceiling, "humano quente",
+         f"pressão {hp:.2f} ≥ {t.handoff_ceiling} — trust que a IA não prova", f"pressão {hp:.2f} < {t.handoff_ceiling}"),
+        ("4 · capacidade", cap >= t.assist_floor, cap_acao,
+         cap_det, f"capacidade {cap:.2f} < {t.assist_floor}"),
+    ]
+    out_gates, decided = [], False
+    for nome, cond, acao, det_fire, det_pass in gates:
+        if decided:
+            out_gates.append({"gate": nome, "status": "nao_avaliado", "acao": None, "detalhe": "—"})
+        elif cond:
+            out_gates.append({"gate": nome, "status": "disparou", "acao": acao, "detalhe": det_fire}); decided = True
+        else:
+            out_gates.append({"gate": nome, "status": "passou", "acao": None, "detalhe": det_pass})
+    if not decided:
+        out_gates.append({"gate": "5 · baixa capacidade", "status": "disparou", "acao": "humano quente",
+                          "detalhe": f"capacidade {cap:.2f} < {t.assist_floor}"})
+    return {"gates": out_gates, "pressao_humano": hp, "capacidade": cap}
+
+
 # ─────────── Resolubilidade: os 3 fatos que dizem se a IA RESOLVE sozinha ───
 # A resolubilidade não é um chute por tema — é o PRODUTO de três perguntas
 # objetivas sobre o atrito. Cada fator é POLICY (inventário de KB/tool/risco),

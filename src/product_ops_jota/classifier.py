@@ -266,6 +266,7 @@ THEME_ANCHORS: dict[SupportTheme, list[str]] = {
     SupportTheme.BOLETO: ["fui cobrado duas vezes, quero estorno", "cobrança em duplicidade no meu cartão",
                           "preciso estornar um pagamento", "boleto agendado não foi pago", "paguei e continua em aberto"],
     SupportTheme.ACCOUNT_ACCESS: ["não consigo acessar o aplicativo", "o app fecha sozinho ao abrir",
+                                  "não consigo acessar a minha conta", "não consigo acessar minha conta",
                                   "não entro na minha conta de jeito nenhum", "esqueci a senha e não acesso",
                                   "não consigo entrar na conta que já tenho pra ver meu saldo",
                                   "preciso acessar minha conta pra resgatar meu dinheiro e não consigo"],

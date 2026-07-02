@@ -48,6 +48,10 @@ from product_ops_jota.friction_model import (                            # noqa:
     LOOP_CHAVE_PIX, KYC_FALHOU, FALA_TAP_INSEGURANCA,
 )
 from product_ops_jota.rag import Retriever                              # noqa: E402
+from product_ops_jota.decision import explain_gates, derive_resolubilidade, DEFAULT_THRESHOLDS  # noqa: E402
+from product_ops_jota.friction_model import DEFAULT_CONFIDENCE                # noqa: E402
+from product_ops_jota.handoff import build_context_pack                 # noqa: E402
+import telegram_bot as brain     # noqa: E402  — o MESMO cérebro do bot em prod (import não dispara polling)
 from copiloto import ACK_BY_THEME, derivar_decisao, montar_sugestao     # noqa: E402
 
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
@@ -368,6 +372,93 @@ class MsgIn(BaseModel):
     text: str
 
 
+class InterceptIn(BaseModel):
+    text: str
+    segment: str = "pf"
+
+
+@app.post("/api/intercept")
+def intercept(inp: InterceptIn):
+    """O HERÓI: cola texto → o motor REAL (mesmo run_turn do bot em prod) devolve o
+    raio-x completo — detecção auditável, cascata de gates, resolubilidade, RAG e handoff."""
+    sess = brain._new_session(seg=inp.segment, name="Cliente")
+    r = brain.run_turn(sess, inp.text)
+    det, docs, dec, di = r["det"], r["docs"], r["dec"], r["inp"]
+    doc = docs[0] if docs else None
+    resol = derive_resolubilidade(det, doc)
+    gx = explain_gates(di)
+    payload = {
+        "deteccao": {
+            "natureza": det.predicted_nature.value, "natureza_conf": round(det.nature_confidence, 2),
+            "tema": det.predicted_theme.value, "tema_conf": round(det.theme_confidence, 2),
+            "tema_fonte": det.theme_source, "evento": det.correlated_event,
+            "sinais": [s.model_dump() for s in det.signals if s.disparou],
+            "flags": {"frustrado": det.frustrated, "em_loop": det.in_loop, "confuso": det.confused,
+                      "decepcionado": det.disappointed, "pediu_humano": det.asked_for_human,
+                      "seguranca": det.safety_concern},
+        },
+        "gates": gx["gates"],
+        "resolubilidade": {**resol.fatores.model_dump(), "valor": resol.valor, "gargalo": resol.gargalo},
+        "rag": [{"id": d.id, "titulo": d.title, "score": d.score, "requires_human": d.requires_human} for d in docs],
+        "decisao": {"acao": dec.action.value, "motivo": dec.reason, "prioridade": dec.priority,
+                    "capacidade": gx["capacidade"], "pressao_humano": gx["pressao_humano"],
+                    "resolubilidade": di.resolvability, "criticidade": di.criticality},
+        "resposta": r["reply"], "kind": r["kind"], "guardrail": r["guardrail"],
+    }
+    if dec.action == InterceptionAction.HUMAN_HANDOFF:
+        pack = build_context_pack(det, dec, di.criticality, inp.segment, datetime.now().hour)
+        payload["handoff"] = {"especialidade": pack.routing.specialty, "in_hours": pack.routing.in_hours,
+                              "nota": pack.routing.note, "prioridade": round(pack.routing.priority, 2),
+                              "evidencia": pack.evidence, "sinais": pack.signals, "motivo": pack.reason}
+    return payload
+
+
+@app.get("/api/policy")
+def policy():
+    """Os 'números mágicos' à mostra — mas como POLICY nomeada, separada do mecanismo:
+    priors iniciais recalibráveis, lidos do próprio código (fonte única de verdade)."""
+    t = DEFAULT_THRESHOLDS
+    return {
+        "thresholds": [
+            {"nome": "conf_floor", "grandeza": "certeza da detecção", "op": "<", "valor": t.conf_floor,
+             "efeito": "não intercepta — palpite fraco"},
+            {"nome": "roi_crit_floor", "grandeza": "criticidade (1–5)", "op": "<", "valor": t.roi_crit_floor,
+             "efeito": "trivial (junto de trust baixo) → não incomoda"},
+            {"nome": "roi_trust_floor", "grandeza": "trust em jogo", "op": "<", "valor": t.roi_trust_floor,
+             "efeito": "trivial (junto de crit baixa) → não incomoda"},
+            {"nome": "handoff_ceiling", "grandeza": "pressão por humano", "op": "≥", "valor": t.handoff_ceiling,
+             "efeito": "handoff quente"},
+            {"nome": "resolve_floor", "grandeza": "capacidade da IA", "op": "≥", "valor": t.resolve_floor,
+             "efeito": "a IA resolve sozinha"},
+            {"nome": "assist_floor", "grandeza": "capacidade da IA", "op": "≥", "valor": t.assist_floor,
+             "efeito": "a IA assiste — humano no loop"},
+        ],
+        "confianca_base": [
+            {"natureza": n.value, "valor": v,
+             "o_que": ("fato: um evento de sistema" if v >= 1.0 else "probabilístico — calibrável contra o real")}
+            for n, v in DEFAULT_CONFIDENCE.items()
+        ],
+        "formulas": [
+            {"nome": "certeza da detecção", "expr": "mín(certeza do tema, certeza da natureza)", "o_que": "quão seguro o modelo está do tema E da natureza — o elo mais fraco (0–1)"},
+            {"nome": "resolubilidade", "expr": "kb_existe × executável × reversível", "o_que": "os 3 fatos que dizem se a IA resolve sozinha (0–1)"},
+            {"nome": "capacidade da IA", "expr": "resolubilidade × certeza da detecção", "o_que": "só age bem se sabe resolver E tem certeza do atrito (0–1)"},
+            {"nome": "pressão por humano", "expr": "trust em jogo × (1 − resolubilidade)", "o_que": "confiança em risco que a IA não prova → empurra pro humano (0–1)"},
+            {"nome": "prioridade na fila", "expr": "0.6 · criticidade_norm + 0.4 · pressão", "o_que": "ordena a fila: criticidade domina, trust não-resolvido empurra (0–1)"},
+        ],
+        "acoes": [
+            {"nome": "não intercepta", "o_que": "a IA não age — fica quieta e observa, esperando mais sinal (certeza fraca ou atrito trivial)"},
+            {"nome": "resolve", "o_que": "a IA resolve sozinha, ancorada no procedimento da KB"},
+            {"nome": "assiste", "o_que": "a IA sugere a resposta, mas um humano decide (humano no loop)"},
+            {"nome": "handoff", "o_que": "passa pro humano com o pacote de contexto (fila da especialidade)"},
+        ],
+    }
+
+
+@app.get("/play")
+def play():
+    return FileResponse(str(ROOT / "apps" / "demo_play.html"))
+
+
 @app.get("/")
 def index():
     return FileResponse(str(ROOT / "apps" / "demo_ui.html"))
@@ -553,6 +644,40 @@ def lab_atendimento():
     if not _ATEND.exists():
         return {"error": "rode scripts/lab_atendimento.py primeiro"}
     return json.loads(_ATEND.read_text("utf-8"))
+
+
+@app.get("/api/evals")
+def evals():
+    """Scorecard real (data/eval_scorecard.json, rodado no CI) + soak + as 4 camadas.
+    A honestidade do dataset é o herói: números contra um seed set curado, não produção."""
+    import re
+    sc = json.loads((ROOT / "data" / "eval_scorecard.json").read_text("utf-8")) if (ROOT / "data" / "eval_scorecard.json").exists() else {"metrics": {}}
+    m = sc.get("metrics", {})
+    rows = [
+        {"metrica": "detecção · natureza", "valor": m.get("deteccao_natureza"), "limiar": 0.95, "fmt": "pct", "o_que": f"acurácia vs gabarito · amostra {sc.get('amostra_deteccao','')}"},
+        {"metrica": "detecção · tema", "valor": m.get("deteccao_tema"), "limiar": 0.80, "fmt": "pct", "o_que": "semântico"},
+        {"metrica": "retrieval · Hit@3", "valor": m.get("rag_hit_at_k"), "limiar": 0.80, "fmt": "pct", "o_que": f"{m.get('rag_modo','')} · {m.get('rag_queries','')} queries"},
+        {"metrica": "retrieval · MRR", "valor": m.get("rag_mrr"), "limiar": 0.70, "fmt": "pct", "o_que": "ranking do doc certo"},
+        {"metrica": "decisão · acurácia", "valor": m.get("decisao_acuracia"), "limiar": 0.95, "fmt": "pct", "o_que": f"{m.get('decisao_cenarios','')} cenários"},
+        {"metrica": "decisão · divergências", "valor": m.get("decisao_divergencias"), "limiar": 0, "fmt": "int", "invert": True, "o_que": "vs julgamento de produto"},
+    ]
+    for row in rows:
+        v = row["valor"]
+        row["ok"] = (v is not None) and (v <= row["limiar"] if row.get("invert") else v >= row["limiar"])
+    soak = None
+    sp = ROOT / "data" / "soak_report.md"
+    if sp.exists():
+        txt = sp.read_text("utf-8")
+        grab = lambda pat: (re.search(pat, txt).group(1) if re.search(pat, txt) else None)
+        soak = {"conversas": grab(r"conversas:\s*\*\*([\d.]+)\*\*"), "desfecho": grab(r"desfecho certo:\s*\*\*([\d.]+)%"),
+                "grounding": grab(r"grounding limpo:\s*\*\*([\d.]+)%"), "tom": grab(r"tom médio:\s*\*\*([\d.,]+)")}
+    camadas = [
+        {"nome": "unit (run_all)", "o_que": "contratos do motor com limiares de regressão — vermelho se cair"},
+        {"nome": "scripted · 15 cenários", "o_que": "conversas multi-turno determinísticas ponta a ponta"},
+        {"nome": "cliente-LLM + juiz", "o_que": "um LLM finge de cliente; outro julga grounding / adequação / tom"},
+        {"nome": "proativo · /demo-*", "o_que": "os 7 cenários proativos pelo fluxo real"},
+    ]
+    return {"scorecard": rows, "soak": soak, "camadas": camadas}
 
 
 class SQLIn(BaseModel):
