@@ -93,6 +93,18 @@
   .frame{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:15px 17px;font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:16px}
   .frame b{font-weight:600} .frame .lead{color:var(--grey);font-size:13px;margin-top:4px}
   .frame a{color:var(--ink)}
+  /* diagrama de arquitetura (aba lógica) */
+  .arch-wrap{overflow-x:auto;margin:2px 0 30px;padding-bottom:6px}
+  .arch{position:relative;width:1100px;height:284px;font-family:var(--mono)}
+  .arch svg{position:absolute;inset:0}
+  .abox{position:absolute;top:38px;min-height:108px;border:1px solid var(--line2);border-radius:6px;background:var(--panel);padding:9px 11px}
+  .abox .at{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:6px;border-bottom:1px solid var(--line);padding-bottom:5px}
+  .abox .ai{font-size:10.5px;color:var(--grey);line-height:1.7}
+  .abox.hot{border-color:var(--jota-edge);background:var(--jota-wash)}
+  .abox .tag{position:absolute;top:-9px;right:9px;font-size:9px;letter-spacing:.04em;color:var(--ink);background:var(--jota);border-radius:3px;padding:1px 6px}
+  .albl{position:absolute;font-family:var(--mono);font-size:10.5px;color:var(--ink);background:var(--paper);padding:0 5px;white-space:nowrap}
+  .albl.sub{color:var(--grey);font-size:9.5px}
+  .acap{position:absolute;font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;background:var(--paper);padding:0 6px}
   .hl{font-family:var(--disp);font-size:clamp(21px,2.8vw,30px);font-weight:700;letter-spacing:-.01em;line-height:1.16;margin:6px 0 12px;max-width:26ch;text-wrap:balance}
   .hl-sub{font-size:13.5px;color:var(--grey);line-height:1.6;max-width:66ch;margin:0 0 24px}
   .toggle{background:none;border:0;font-family:var(--mono);font-size:12.5px;color:var(--grey);cursor:pointer;padding:16px 0 6px;margin-top:6px}
@@ -136,7 +148,8 @@
   .lnode .lt{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:6px}
   .lnode p{margin:0;font-size:12.5px;color:var(--grey);line-height:1.45}
   .larrow{display:flex;align-items:center;color:var(--grey);font-family:var(--mono);font-size:18px}
-  .loopback{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:10px;padding:10px 13px;border-left:2px solid var(--jota);background:var(--jota-wash);border-radius:0 6px 6px 0;line-height:1.5}
+  .loopback{font-family:var(--mono);font-size:13.5px;color:var(--ink);margin:26px 0 12px;padding:16px 18px;border-left:3px solid var(--jota);background:var(--jota-wash);border-radius:0 8px 8px 0;line-height:1.55}
+  .mk{background:var(--jota-wash);padding:0 5px;border-radius:3px;color:var(--ink);font-weight:600}
   .plist{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin-top:4px}
   @media(max-width:840px){.plist{grid-template-columns:1fr}}
   .pline{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:baseline;padding:9px 10px;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.4}
@@ -144,6 +157,13 @@
   .pline b{font-weight:600}
   .pline.key{background:var(--jota-wash);border-radius:6px;border-bottom-color:transparent}
   .pline.key .pn{color:var(--ink);font-weight:700}
+  .hl-sharp{font-size:14px;line-height:1.55;color:var(--ink);margin:-8px 0 22px;max-width:66ch;font-weight:400}
+  .tese-bridge{font-family:var(--mono);font-size:12px;color:var(--grey);margin:0 0 14px;line-height:1.5}
+  .lab-note{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:8px 0 0;border-top:1px solid var(--line);padding-top:7px;line-height:1.4}
+  .built{display:flex;flex-direction:column;margin-top:2px}
+  .brow{display:grid;grid-template-columns:158px 1fr;gap:14px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:10px;border:0;border-bottom:1px solid var(--line);background:none;cursor:pointer;text-align:left;width:100%}
+  .brow:hover{background:var(--jota-wash)}
+  .brow .bn{color:var(--ink);font-weight:700} .brow .bd{color:var(--grey)}
 </style></head>
 <body>
 <div class="wrap">
@@ -167,18 +187,18 @@
   <!-- VISÃO -->
   <section class="tab on" id="tab-visao">
     <h2 class="hl">Atendimento que antecipa, não só responde.</h2>
-    <p class="hl-sub">A visão pra escalar de 300 mil a 1 milhão de clientes sem a operação crescer junto — um só modelo, dois mundos, e o loop entre eles.</p>
+    <p class="hl-sub">Interceptação inteligente e escala exponencial parecem brigar — cuidar custa, escalar exige baratear. Uma alavanca dissolve o trade-off: <span class="mk">o loop</span> — cada interceptação boa faz menos atrito nascer. É assim que 300k viram 1M sem o time crescer junto.</p>
+    <p class="hl-sharp">Atendimento é custo — todos pagam essa conta. O laboratório é o que fatura o subproduto que os outros jogam fora: <b>chamado vira dado, dado vira produto.</b></p>
 
-    <div class="ptitle" style="margin-top:2px">a tese · dois mundos, um modelo</div>
+    <div class="ptitle" style="margin-top:2px">a tese · um cérebro, dois modos</div>
+    <p class="tese-bridge">Como equilibro as duas: um só cérebro reativo+proativo, e o loop entre eles.</p>
     <div class="loopflow">
-      <div class="lnode"><div class="lt">Mundo 1 · atendimento</div><p>Reativo. Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede, descobre o atrito.</p></div>
+      <div class="lnode"><div class="lt">reativo · atende</div><p>Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede, descobre o atrito.</p><p class="lab-note">laboratório pro atrito que ainda não conheço · fábrica pro que já conheço</p></div>
       <div class="larrow">→</div>
-      <div class="lnode"><div class="lt">Mundo 2 · Jota proativo</div><p>Age antes do chamado existir: detecta o atrito na origem e resolve, assiste ou chama humano.</p></div>
+      <div class="lnode"><div class="lt">proativo · antecipa</div><p>Age antes do chamado existir: detecta o atrito na origem e resolve, assiste ou chama humano.</p></div>
       <div class="larrow">→</div>
       <div class="lnode"><div class="lt">aprende</div><p>Cada atrito vira melhoria de produto e de KB — a cura na fonte.</p></div>
     </div>
-    <div class="loopback">↺ o loop: o Mundo 1 alimenta o Mundo 2, pra cada vez menos atrito nascer. Containment é consequência de antecipar melhor — nunca a meta.</div>
-
     <div class="ptitle">os princípios · uma frase cada</div>
     <div class="plist">
       <div class="pline"><span class="pn">1</span><span><b>Containment é consequência</b>, não meta — escalar é sinal de que a jornada falhou.</span></div>
@@ -189,6 +209,14 @@
       <div class="pline"><span class="pn">6</span><span><b>Mesmo problema, cuidado sob medida</b> — PF/PJ/MEI, momento, letramento.</span></div>
       <div class="pline"><span class="pn">7</span><span><b>Criticidade = erro × momento × o que está em jogo.</b></span></div>
       <div class="pline key"><span class="pn">8</span><span><b>Cuidar não pode custar mais que o cuidado entrega.</b> <span style="color:var(--grey)">(sustenta a escala)</span></span></div>
+    </div>
+
+    <div class="ptitle">o que construí</div>
+    <div class="built">
+      <button class="brow" data-goto="intercept"><span class="bn">interceptação</span><span class="bd">o motor decidindo ao vivo — mesmo cérebro do bot em prod</span></button>
+      <button class="brow" data-goto="lab"><span class="bn">laboratório</span><span class="bd">os 5k atendimentos viram dado: os gargalos e os tipos de atrito</span></button>
+      <button class="brow" data-goto="logica"><span class="bn">lógica &amp; modelos</span><span class="bd">a mecânica auditável e como os números recalibram</span></button>
+      <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida — e o que ainda é hipótese</span></button>
     </div>
   </section>
 
@@ -229,6 +257,44 @@
 
   <!-- LÓGICA & MODELOS -->
   <section class="tab" id="tab-logica">
+    <div class="ptitle" style="margin-top:0">o motor · do sinal ao desfecho, e o loop que fecha o ciclo</div>
+    <div class="arch-wrap">
+      <div class="arch">
+        <svg viewBox="0 0 1100 284" width="1100" height="284" fill="none" aria-hidden="true">
+          <defs>
+            <marker id="ag" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#9C9C9F"/></marker>
+            <marker id="aj" markerWidth="9" markerHeight="9" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#E8C93A"/></marker>
+          </defs>
+          <!-- conectores do fluxo principal (cinza) -->
+          <line x1="154" y1="92" x2="188" y2="92" stroke="#9C9C9F" stroke-width="1.2" marker-end="url(#ag)"/>
+          <line x1="390" y1="92" x2="424" y2="92" stroke="#9C9C9F" stroke-width="1.2" marker-end="url(#ag)"/>
+          <line x1="646" y1="92" x2="680" y2="92" stroke="#9C9C9F" stroke-width="1.2" marker-end="url(#ag)"/>
+          <line x1="832" y1="92" x2="866" y2="92" stroke="#9C9C9F" stroke-width="1.2" marker-end="url(#ag)"/>
+          <!-- loop 1: desfecho -> cascata/thresholds (amarelo) -->
+          <path d="M962,146 L962,186 L536,186 L536,150" stroke="#E8C93A" stroke-width="1.6" marker-end="url(#aj)"/>
+          <!-- loop 2: desfecho -> sinal (amarelo) -->
+          <path d="M992,146 L992,246 L79,246 L79,150" stroke="#E8C93A" stroke-width="1.6" marker-end="url(#aj)"/>
+        </svg>
+
+        <div class="abox" style="left:4px;width:150px"><div class="at">sinal</div>
+          <div class="ai">mensagem<br>evento<br>ausência</div></div>
+        <div class="abox" style="left:190px;width:200px"><div class="at">detecção</div>
+          <div class="ai">3 naturezas<br>system · behavior · absence<br>+ tema</div></div>
+        <div class="abox" style="left:426px;width:220px"><div class="at">cascata de gates</div>
+          <div class="ai">seg · esgot · política<br>confiança · ROI<br>conf.jogo · capacidade</div></div>
+        <div class="abox" style="left:682px;width:150px"><div class="at">ação</div>
+          <div class="ai">observa<br>resolve<br>assiste<br>handoff</div></div>
+        <div class="abox hot" style="left:868px;width:224px"><div class="at">desfecho</div>
+          <span class="tag">próximo passo</span>
+          <div class="ai">system_confirmed<br>no_recontact<br>explicit</div></div>
+
+        <div class="albl" style="left:602px;top:178px">recalibra · o modelo aprende</div>
+        <div class="albl" style="left:300px;top:238px">backlog produto &amp; KB · menos atrito nasce</div>
+        <div class="albl sub" style="left:300px;top:256px">todo chamado é um sintoma</div>
+        <div class="acap" style="left:604px;top:206px">↺ loop de aprendizado</div>
+      </div>
+    </div>
+
     <h2 class="hl">Não são números mágicos — são priors que recalibram contra o desfecho real.</h2>
     <p class="hl-sub">Vivem numa política separada do mecanismo de decisão. Cada handoff e cada correção do atendente vira um label. O número certo é o que o A/B mostra, não o que foi chutado hoje.</p>
     <div id="logica-body"></div>
@@ -309,6 +375,11 @@ async function runSQL(){
   $('#lab-result').innerHTML=t+`</tbody></table></div><div class="resmeta">${r.n} linha(s) · read-only · máx 1000</div>`;
 }
 document.getElementById('lab-run').onclick=runSQL;
+
+/* "o que construí" — cada linha navega pra aba (o rodapé é o índice) */
+document.querySelectorAll('.brow').forEach(b=>{
+  b.onclick=()=>{ const t=document.querySelector('nav.tabs button[data-tab="'+b.dataset.goto+'"]'); if(t) t.click(); window.scrollTo(0,0); };
+});
 
 /* toggle da matemática do motor — colapsado por padrão */
 $('#logica-toggle').onclick=()=>{
