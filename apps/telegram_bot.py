@@ -340,7 +340,8 @@ def analisar(sess):
     # (has_kb=False → escala pro humano) e registra a lacuna pro backlog (o loop cura o KB).
     kb_relevant = relevance_judge(txt, doc) if (doc is not None and det.predicted_theme is not _T.OTHER) else True
     # lacuna de KB = tema não reconhecido (OTHER) OU doc recuperado não responde à pergunta
-    if det.predicted_theme is _T.OTHER or not kb_relevant:
+    kb_gap = (det.predicted_theme is _T.OTHER) or (not kb_relevant)
+    if kb_gap:
         _log_kb_gap(txt, det.predicted_theme.value, doc.id if doc else None)
     # ESGOTAMENTO: o sinal PRIMÁRIO é o do CLIENTE (determinístico, independe do reply do LLM):
     # quantas vezes ele disse "não funcionou / continua / já tentei" (in_loop). 2 sinais de
@@ -366,14 +367,14 @@ def analisar(sess):
     inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck, kb_relevant=kb_relevant)
     # streak é incrementado em handle_message SÓ quando entrega um fix real (pergunta de
     # esclarecimento não conta) — senão o esgotamento dispara cedo demais.
-    return det, docs, decide(inp), inp
+    return det, docs, decide(inp), inp, kb_gap
 
 
 _NAT_PT = {"system_signaled": "evento de sistema", "behavior_inferred": "comportamento",
            "absence_detected": "ausência (silenciosa)"}
 
 
-def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
+def _brain_text(det, docs, dec, inp, guardrail=None, kb_gap=False) -> str:
     """Formato 'bulletado por área' em HTML (negrito confiável) — pra plateia de engenheiros."""
     doc = docs[0] if docs else None
     gr = {"pass": "passou", "blocked": "bloqueou (trocou por procedimento ancorado)",
@@ -397,6 +398,8 @@ def _brain_text(det, docs, dec, inp, guardrail=None) -> str:
         "<b>RAG + guardrail</b>\n"
         f"• fonte: {fonte}\n"
         f"• guardrail de saída: {gr}"
+        + ("\n• ⚠️ <b>LACUNA DE KB</b> — sem procedimento relevante → escalado + registrado no backlog"
+           if kb_gap else "")
     )
 
 
@@ -572,7 +575,7 @@ def run_turn(sess, text):
     """O CÉREBRO de um turno, sem Telegram: detecta → decide → redige/handoff → atualiza
     o esgotamento. Reusado pelo bot (handle_message) E pelo simulador de conversas (eval)."""
     sess["history"].append({"role": "user", "content": text})
-    det, docs, dec, inp = analisar(sess)
+    det, docs, dec, inp, kb_gap = analisar(sess)
     doc = docs[0] if docs else None
     guardrail = None
     if dec.action == InterceptionAction.HUMAN_HANDOFF:
@@ -615,7 +618,7 @@ def run_turn(sess, text):
            "fonte": doc.id if doc else None, "kind": kind, "guardrail": guardrail,
            "cliente_msg": text[:200]})
     return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply,
-            "kind": kind, "guardrail": guardrail}
+            "kind": kind, "guardrail": guardrail, "kb_gap": kb_gap}
 
 
 def _deliver_proactive(chat_id, sess, text):
@@ -624,7 +627,7 @@ def _deliver_proactive(chat_id, sess, text):
     sid = sess.pop("proactive_pending")
     sess["history"].append({"role": "user", "content": text})
     typing(chat_id)
-    det, docs, dec, inp = analisar(sess)
+    det, docs, dec, inp, kb_gap = analisar(sess)
     # no proativo o EVENTO conta o contexto: enriquece a busca com os FACTS pra pegar o doc CERTO
     # (ex.: duplicidade → KB-ESTORNO-001, não KB-BOLETO-001), aí o opener fica grounded e passa.
     facts = FACTS.get(sid, "")
@@ -650,7 +653,7 @@ def _deliver_proactive(chat_id, sess, text):
            "confianca": inp.detection_confidence, "acao": "proativo", "kind": "proativo",
            "fonte": doc.id if doc else None, "guardrail": guardrail, "cliente_msg": text[:200]})
     if chat_id in DEBUG:
-        send(chat_id, _brain_text(det, docs, dec, inp, guardrail), html=True)
+        send(chat_id, _brain_text(det, docs, dec, inp, guardrail, kb_gap), html=True)
 
 
 def handle_message(chat_id, text, name=""):
@@ -671,7 +674,7 @@ def handle_message(chat_id, text, name=""):
     if r["kind"] == "handoff" and chat_id in DEBUG:
         send(chat_id, _handoff_card(r["det"], r["dec"], r["inp"], sess), html=True)
     if chat_id in DEBUG:
-        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"], r.get("guardrail")), html=True)
+        send(chat_id, _brain_text(r["det"], r["docs"], r["dec"], r["inp"], r.get("guardrail"), r.get("kb_gap")), html=True)
 
 
 def main():

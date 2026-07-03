@@ -404,6 +404,7 @@ def intercept(inp: InterceptIn):
                     "capacidade": gx["capacidade"], "pressao_humano": gx["pressao_humano"],
                     "resolubilidade": di.resolvability, "criticidade": di.criticality},
         "resposta": r["reply"], "kind": r["kind"], "guardrail": r["guardrail"],
+        "kb_gap": r.get("kb_gap", False),
     }
     if dec.action == InterceptionAction.HUMAN_HANDOFF:
         pack = build_context_pack(det, dec, di.criticality, inp.segment, datetime.now().hour)
@@ -678,6 +679,24 @@ def evals():
         {"nome": "proativo · /demo-*", "o_que": "os 7 cenários proativos pelo fluxo real"},
     ]
     return {"scorecard": rows, "soak": soak, "camadas": camadas}
+
+
+@app.get("/api/lab/gaps")
+def lab_gaps():
+    """O backlog de lacunas de KB (data/kb_gaps.jsonl) — perguntas sem procedimento relevante
+    que o motor escalou e registrou. É o Mundo 1 alimentando o Mundo 2, com evidência."""
+    p = ROOT / "data" / "kb_gaps.jsonl"
+    rows = []
+    if p.exists():
+        for line in p.read_text("utf-8").splitlines()[-60:]:
+            line = line.strip()
+            if line:
+                try:
+                    rows.append(json.loads(line))
+                except Exception:
+                    pass
+    rows.reverse()   # mais recente primeiro
+    return {"gaps": rows}
 
 
 class SQLIn(BaseModel):

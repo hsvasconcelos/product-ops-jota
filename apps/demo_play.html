@@ -134,6 +134,9 @@
   table.res td{padding:7px 13px;border-bottom:1px solid var(--line);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
   table.res tr:last-child td{border-bottom:0}
   .resmeta{font-family:var(--mono);font-size:11px;color:var(--grey);margin-top:7px}
+  .gaprow{display:grid;grid-template-columns:1fr 120px 132px;gap:14px;align-items:baseline;font-family:var(--mono);font-size:12px;padding:7px 4px;border-bottom:1px solid var(--line)}
+  .gaprow.head{color:var(--faint);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .gaprow .gq{color:var(--ink)} .gaprow .gt{color:var(--grey)} .gaprow .gd{color:var(--faint)}
 
   /* evals scorecard */
   .scrow{display:grid;grid-template-columns:1fr 82px 82px 90px;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:8px 4px;border-bottom:1px solid var(--line)}
@@ -348,6 +351,9 @@
       <div class="actions"><span class="hint">read-only · select/with</span><button class="go" id="lab-run">rodar ►</button></div>
     </div>
     <div id="lab-result"></div>
+    <div class="ptitle" style="margin-top:30px">lacunas de KB · o backlog do loop (perguntas sem procedimento)</div>
+    <div class="jnote">quando o motor não acha procedimento relevante, ele escala pro humano E registra a lacuna aqui — o Product Ops cura o KB e o atrito para de escalar. Mundo 1 → Mundo 2.</div>
+    <div id="lab-gaps"></div>
   </section>
 
   <!-- LÓGICA & MODELOS -->
@@ -384,7 +390,7 @@
           <div class="ai">system_confirmed<br>no_recontact<br>explicit</div></div>
 
         <div class="albl" style="left:602px;top:178px">recalibra · o modelo aprende</div>
-        <div class="albl" style="left:300px;top:238px">backlog produto &amp; KB · menos atrito nasce</div>
+        <div class="albl" style="left:286px;top:238px">lacuna de KB &amp; backlog de produto · menos atrito nasce</div>
         <div class="albl sub" style="left:300px;top:256px">todo chamado é um sintoma</div>
         <div class="acap" style="left:604px;top:206px">↺ loop de aprendizado</div>
       </div>
@@ -421,7 +427,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+b.dataset.tab));
     if(b.dataset.tab==='logica') loadPolicy();
-    if(b.dataset.tab==='lab') loadLab();
+    if(b.dataset.tab==='lab'){ loadLab(); loadGaps(); }
     if(b.dataset.tab==='evals') loadEvals();
   };
 });
@@ -470,6 +476,17 @@ async function runSQL(){
   $('#lab-result').innerHTML=t+`</tbody></table></div><div class="resmeta">${r.n} linha(s) · read-only · máx 1000</div>`;
 }
 document.getElementById('lab-run').onclick=runSQL;
+
+async function loadGaps(){
+  const gp=await (await fetch('/api/lab/gaps')).json();
+  if(!gp.gaps || !gp.gaps.length){
+    $('#lab-gaps').innerHTML='<div class="resmeta">nenhuma lacuna registrada ainda — teste uma pergunta sem procedimento (ex.: "qual o limite do meu pix?") na aba interceptação e volte aqui.</div>';
+    return;
+  }
+  let h='<div class="gaprow head"><span>pergunta</span><span class="gt">tema</span><span class="gd">quando</span></div>';
+  gp.gaps.forEach(g=>{ h+=`<div class="gaprow"><span class="gq">${esc(g.pergunta||'')}</span><span class="gt">${esc(g.tema||'')}</span><span class="gd">${esc((g.ts||'').replace('T',' '))}</span></div>`; });
+  $('#lab-gaps').innerHTML=h;
+}
 
 /* "o que construí" — cada linha navega pra aba (o rodapé é o índice) */
 document.querySelectorAll('.brow').forEach(b=>{
@@ -545,7 +562,8 @@ function render(p){
   const dec=p.decisao;
   const kindTxt={handoff:'humano',deflect:'deflete (fora do escopo)',clarify:'pergunta antes'}[p.kind]||'IA resolve';
   const gr=p.guardrail==='pass'?'guardrail ok':(p.guardrail==='blocked'?'guardrail bloqueou':(p.guardrail==='skip'?'resposta canônica':''));
-  $('#reply').innerHTML=`<div class="outmeta"><span class="act">${kindTxt}</span> · ${dec.acao} · crit ${dec.criticidade}/5 · cap ${dec.capacidade} · pressão ${dec.pressao_humano} · prio ${dec.prioridade}${gr?(' · '+gr):''}</div><div class="reply">${esc(p.resposta)}</div>`;
+  const gap=p.kb_gap?' · <b style="color:var(--ink);background:var(--jota);padding:0 5px;border-radius:3px">⚠ lacuna de KB → humano + backlog</b>':'';
+  $('#reply').innerHTML=`<div class="outmeta"><span class="act">${kindTxt}</span> · ${dec.acao} · crit ${dec.criticidade}/5 · cap ${dec.capacidade} · pressão ${dec.pressao_humano} · prio ${dec.prioridade}${gr?(' · '+gr):''}${gap}</div><div class="reply">${esc(p.resposta)}</div>`;
 
   const h=p.handoff;
   if(h){ $('#c-hand').style.display='flex';
