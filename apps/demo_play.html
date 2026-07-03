@@ -109,7 +109,6 @@
   .hl-sub{font-size:14px;color:var(--grey);line-height:1.6;margin:0 0 24px}
   .toggle{background:none;border:0;font-family:var(--mono);font-size:12.5px;color:var(--grey);cursor:pointer;padding:16px 0 6px;margin-top:6px}
   .toggle:hover{color:var(--ink)}
-  #logica-more{border-top:1px solid var(--line);margin-top:2px}
   .ptitle{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:20px 0 6px}
   .prow{display:grid;grid-template-columns:160px 62px 1fr;gap:16px;align-items:baseline;font-family:var(--mono);font-size:12.5px;padding:7px 4px;border-bottom:1px solid var(--line)}
   .prow.head{color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
@@ -127,6 +126,7 @@
   .lstat{display:flex;flex-direction:column;gap:2px}
   .lstat .v{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
   .lstat .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+  .lstat .d{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:2px;line-height:1.4}
   #lab-sql{min-height:104px;font-family:var(--mono);font-size:12.5px}
   .tblwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px}
   table.res{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px}
@@ -193,7 +193,7 @@
   .jrule{font-family:var(--mono);font-size:12px;color:var(--grey);line-height:1.6;margin-top:6px} .jrule b{color:var(--ink);font-weight:600}
   /* bloco 3: funil de frequência por etapa */
   .funnel-wrap{overflow-x:auto;padding-bottom:6px}
-  .funnel{display:flex;min-width:1060px;align-items:flex-end}
+  .funnel{display:flex;min-width:1060px;align-items:flex-start}
   .fcol{flex:1 1 0;display:flex;flex-direction:column;padding:0 6px}
   .fbarwrap{height:118px;display:flex;align-items:flex-end;margin-bottom:7px}
   .fbar{width:100%;background:var(--ink);border-radius:3px 3px 0 0;min-height:3px}
@@ -212,7 +212,16 @@
   #tab-visao .ptitle{margin-top:40px}
   #tab-visao .loopflow{margin-top:20px}
   #tab-lab .ptitle{margin-top:40px}
-  #tab-time .ptitle,#tab-kpis .ptitle{margin-top:40px}
+  #tab-time .ptitle,#tab-kpis .ptitle,#tab-logica .ptitle,#tab-evals .ptitle{margin-top:40px}
+  .ref-row{padding:6px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px}
+  .ref-row:last-child{border-bottom:0}
+  .ref-row .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .ref-row .fator{color:var(--ink)}
+  .ref-row .valor{color:var(--ink);font-weight:700;background:var(--jota-wash);border:1px solid var(--jota-edge);border-radius:4px;padding:0 6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .ref-row .oq{color:var(--grey);font-size:11px;margin-top:2px;line-height:1.4}
+  .teach .grow{grid-template-columns:34px 200px 1.4fr 1fr}
+  .teach .grow .vd{text-align:left}
+  .teach .grow .cd{color:var(--ink)}
   #tab-time .frow,#tab-kpis .frow,#tab-evals .frow{grid-template-columns:230px 1fr}
   .badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin-left:8px;vertical-align:middle;white-space:nowrap}
   .badge.med{background:var(--jota);border:1px solid var(--jota-edge);color:var(--ink)}
@@ -237,20 +246,19 @@
     <button data-tab="visao" class="on">visão</button>
     <button data-tab="jornada">jornada</button>
     <button data-tab="lab">laboratório</button>
-    <button data-tab="intercept">interceptação</button>
+    <button data-tab="logica">lógica &amp; interceptação</button>
+    <button data-tab="evals">evals</button>
     <button data-tab="time">time de atendimento</button>
     <button data-tab="kpis">kpis</button>
-    <button data-tab="logica">lógica &amp; modelos</button>
-    <button data-tab="evals">evals</button>
   </nav>
 
   <!-- VISÃO -->
   <section class="tab on" id="tab-visao">
     <h2 class="hl">O melhor chamado é o que não nasce.</h2>
-    <p class="hl-sub">A conta de 300 mil para 1 milhão só fecha se cada vez menos problemas precisarem virar chamado: detectar o atrito na origem, pelo evento, pelo comportamento ou pela ausência, resolver ancorado em fonte e escalar com contexto. E o loop fecha no produto: atrito que se repete vira <span class="mk">melhoria</span>, não chamado recorrente.</p>
+    <p class="hl-sub">A conta de 300 mil para 1 milhão só fecha se cada vez menos problemas precisarem virar chamado: detectar o atrito na origem, pelo evento, pelo comportamento ou pela ausência, resolver ancorado em fonte e escalar com contexto.</p>
     <div class="contrast" style="margin:-4px 0 22px">Todo mundo trata atendimento como custo. Aqui ele vira ativo: <b>chamado vira dado, dado vira produto.</b></div>
 
-    <div class="ptitle" style="margin-top:2px">a tese · um cérebro, dois modos</div>
+    <div class="ptitle" style="margin-top:2px">o modelo</div>
     <p class="tese-bridge">Na prática: um só motor decide nos dois números do WhatsApp, e o loop transfere trabalho do reativo para o proativo.</p>
     <div class="loopflow">
       <div class="lnode"><div class="lt">reativo · atende</div><p>Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede e descobre o atrito que ainda não conhecemos.</p><p class="lab-note">laboratório para o atrito novo · fábrica para o já conhecido</p></div>
@@ -262,7 +270,7 @@
     <div class="ptitle">os princípios</div>
     <div class="plist">
       <div class="pline"><span class="pn">1</span><span><b>Contenção é consequência, não meta.</b> Todo escalonamento é sintoma de jornada que falhou.</span></div>
-      <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório; o produto é a cura.</b> <span style="color:var(--grey)">(o motor)</span></span></div>
+      <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório; o produto é a cura.</b></span></div>
       <div class="pline"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão.</b> Quem reclama é minoria; a maioria trava em silêncio e abandona.</span></div>
       <div class="pline key"><span class="pn">4</span><span><b>Confiança é o produto.</b> Protegê-la vem antes de resolver o problema. <span style="color:var(--grey)">(a chave)</span></span></div>
       <div class="pline"><span class="pn">5</span><span><b>A natureza do erro define como detectá-lo:</b> evento, comportamento ou ausência.</span></div>
@@ -273,12 +281,8 @@
 
     <div class="ptitle">o que construí</div>
     <div class="built">
-      <button class="brow" data-goto="jornada"><span class="bn">jornada</span><span class="bd">os 4 níveis de proatividade e o funil real de onde a jornada quebra</span></button>
+      <button class="brow" data-goto="logica"><span class="bn">interceptação</span><span class="bd">o motor decidindo ao vivo: cole uma mensagem e veja a cascata de gates</span></button>
       <button class="brow" data-goto="lab"><span class="bn">laboratório</span><span class="bd">10 mil conversas viram dado: gargalos, tendências e lacunas de KB</span></button>
-      <button class="brow" data-goto="intercept"><span class="bn">interceptação</span><span class="bd">o motor decidindo ao vivo: cole uma mensagem e veja a cascata de gates</span></button>
-      <button class="brow" data-goto="time"><span class="bn">time de atendimento</span><span class="bd">handoff quente, filas por especialidade, horários e a escada de adoção</span></button>
-      <button class="brow" data-goto="kpis"><span class="bn">kpis</span><span class="bd">o norte e as 4 famílias de métricas: antecipação, resolução, confiança, loop</span></button>
-      <button class="brow" data-goto="logica"><span class="bn">lógica &amp; modelos</span><span class="bd">a mecânica auditável: gates, fórmulas e os números que recalibram</span></button>
       <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida em 4 camadas, e o que ainda é hipótese</span></button>
       <button class="brow"><span class="bn">demo ao vivo</span><span class="bd">o mesmo cérebro num chat estilo WhatsApp, e num bot real no Telegram</span></button>
     </div>
@@ -286,7 +290,7 @@
 
   <!-- JORNADA -->
   <section class="tab" id="tab-jornada">
-    <div class="ptitle" style="margin-top:0">os 4 níveis de proatividade · o mesmo atrito (kyc/biometria) em cada um</div>
+    <div class="ptitle" style="margin-top:0">os 4 níveis de proatividade</div>
     <div class="ladder-wrap">
       <div class="ch-band" style="grid-column:1;grid-row:2">suporte</div>
       <div class="ch-band" style="grid-column:1;grid-row:3 / span 3">produto</div>
@@ -299,59 +303,37 @@
     <div class="contrast"><b>Escala não é atender mais rápido, é precisar atender menos.</b> Nível 1 apaga um incêndio; nível 3 tira o combustível. Cada nível a mais cobre mais gente com menos esforço, e é assim que 300 mil viram 1 milhão.</div>
 
     <div class="ptitle">onde agir · a régua que decide o nível (e evita spam)</div>
-    <div class="jnote">eixo 1: frequência do gargalo (vem do laboratório) · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
+    <div class="jnote">eixo 1: frequência do gargalo · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
     <div class="matrix">
-      <div class="mh"></div><div class="mh">freq baixa</div><div class="mh">freq alta</div>
+      <div class="mh"></div><div class="mh">freq. baixa</div><div class="mh">freq. alta</div>
       <div class="mh">crit. baixa</div><div class="cell">reativo</div><div class="cell">por sinal</div>
       <div class="mh">crit. alta</div><div class="cell">por sinal</div><div class="cell deep">jornada / produto</div>
     </div>
     <div class="jrule">Antecipar todo mundo o tempo todo é spam. Por isso a régua é a mesma da interceptação: frequência (do laboratório) × criticidade. E o que dói muito e dói sempre não vira só antecipação: vira jornada agora e melhoria de produto depois, a cura na fonte.</div>
 
-    <div class="ptitle">onde a jornada quebra · todos os atritos que o lab mediu (100% do suporte)</div>
+    <div class="ptitle">onde a jornada quebra · o que o laboratório mediu</div>
     <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
     <div class="funnel-wrap">
       <div class="funnel">
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
-          <div class="fpct">22.6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
+          <div class="fpct">22,6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:91px"></div></div>
-          <div class="fpct">18.3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
+          <div class="fpct">18,3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:73px"></div></div>
-          <div class="fpct">14.8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
+          <div class="fpct">14,8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:72px"></div></div>
-          <div class="fpct">14.5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
+          <div class="fpct">14,5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:48px"></div></div>
-          <div class="fpct">9.7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
+          <div class="fpct">9,7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:42px"></div></div>
-          <div class="fpct">8.5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
+          <div class="fpct">8,5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:34px"></div></div>
-          <div class="fpct">6.9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
+          <div class="fpct">6,9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:23px"></div></div>
-          <div class="fpct">4.7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
+          <div class="fpct">4,7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
       </div>
     </div>
     <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; recebimento e KYC são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a matriz acima.</div>
-  </section>
-
-  <!-- INTERCEPTAÇÃO -->
-  <section class="tab" id="tab-intercept">
-    <div class="composer">
-      <div class="cbox">
-        <textarea id="txt" placeholder="mensagem do cliente…  (ex.: 'fui cobrado duas vezes no boleto')"></textarea>
-        <div class="actions"><span class="hint">⌘⏎</span><button class="go" id="go">interceptar ►</button></div>
-      </div>
-      <div class="row"><span class="chiplabel">ou testa um caso:</span><div class="chips" id="chips"></div></div>
-    </div>
-    <div class="loading" id="load" style="display:none">rodando o motor…</div>
-    <div id="out">
-      <div class="grid">
-        <div class="card" id="c-det"><h3>detecção</h3><div id="det"></div></div>
-        <div class="card" id="c-res"><h3>resolubilidade</h3><div id="res"></div></div>
-        <div class="card full"><h3>cascata de decisão · gate a gate</h3><div id="gates"></div></div>
-        <div class="card"><h3>rag · ranking</h3><div id="rag"></div></div>
-        <div class="card" id="c-hand"><h3>handoff</h3><div id="hand"></div></div>
-        <div class="card full"><h3>resposta recomendada</h3><div id="reply"></div></div>
-      </div>
-    </div>
   </section>
 
   <!-- TIME DE ATENDIMENTO (Q3) -->
@@ -430,21 +412,22 @@
 
   <!-- LABORATÓRIO -->
   <section class="tab" id="tab-lab">
+    <div class="ptitle" style="margin-top:0">a base · cenários criados para simular a base do jota</div>
     <div class="lab-stats" id="lab-overview"></div>
-    <div class="ptitle" style="margin-top:0">a triagem do motor · os 5 mil chamados reais do suporte</div>
+    <div class="ptitle">a triagem do motor · os 5 mil chamados do suporte</div>
     <div class="lab-stats" id="lab-triagem" style="border-bottom:0;padding-bottom:2px"></div>
     <div class="jrule" style="margin-top:0">O motor rodou em cada chamado: o que resolveria ancorado na KB, e o que mandaria para uma pessoa. Na dúvida, pessoa (fail-safe por desenho). Derrubar o "vai para humano" curando KB e produto é exatamente o trabalho do loop.</div>
-    <div class="ptitle">explorar os dados · o método à mostra</div>
-    <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: 10 mil conversas rotuladas (suporte + produto), a mesma base onde o motor é medido. As queries abaixo são reais: clique numa, ou escreva a sua (somente leitura).</p>
-    <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
-    <div class="cbox">
-      <textarea id="lab-sql" spellcheck="false"></textarea>
-      <div class="actions"><span class="hint">read-only · select/with</span><button class="go" id="lab-run">rodar ►</button></div>
-    </div>
-    <div id="lab-result"></div>
     <div class="ptitle">lacunas de KB · o backlog do loop (perguntas sem procedimento)</div>
     <div class="jnote">quando o motor não acha procedimento relevante, ele escala para o humano e registra a lacuna aqui; o Product Ops cura a KB e o atrito para de escalar. É o reativo alimentando o proativo.</div>
     <div id="lab-gaps"></div>
+    <div class="ptitle">explorar os dados · o método à mostra</div>
+    <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: 10 mil conversas rotuladas (suporte + produto), a mesma base onde o motor é medido. As queries abaixo são reais: clique numa ou escreva a sua (somente leitura).</p>
+    <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
+    <div class="cbox">
+      <textarea id="lab-sql" spellcheck="false"></textarea>
+      <div class="actions"><span class="hint">somente leitura · select / with</span><button class="go" id="lab-run">rodar ►</button></div>
+    </div>
+    <div id="lab-result"></div>
   </section>
 
   <!-- LÓGICA & MODELOS -->
@@ -471,14 +454,14 @@
         <div class="abox" style="left:4px;width:150px"><div class="at">sinal</div>
           <div class="ai">mensagem<br>evento<br>ausência</div></div>
         <div class="abox" style="left:190px;width:200px"><div class="at">detecção</div>
-          <div class="ai">3 naturezas<br>system · behavior · absence<br>+ tema</div></div>
+          <div class="ai">3 naturezas<br>evento · comportamento · ausência<br>+ tema</div></div>
         <div class="abox" style="left:426px;width:220px"><div class="at">cascata de gates</div>
-          <div class="ai">seg · esgot · política<br>confiança · ROI<br>conf.jogo · capacidade</div></div>
+          <div class="ai">segurança · esgotamento<br>política da KB · ROI<br>confiança em jogo · capacidade</div></div>
         <div class="abox" style="left:682px;width:150px"><div class="at">ação</div>
           <div class="ai">observa<br>resolve<br>assiste<br>handoff</div></div>
         <div class="abox hot" style="left:868px;width:224px"><div class="at">desfecho</div>
           <span class="tag">fechado ≠ resolvido</span>
-          <div class="ai">system_confirmed<br>no_recontact<br>explicit</div></div>
+          <div class="ai">cura confirmada<br>confirmação do cliente<br>sem recontato</div></div>
 
         <div class="albl" style="left:602px;top:178px">recalibra · o modelo aprende</div>
         <div class="albl" style="left:286px;top:238px">lacuna de KB &amp; backlog de produto · menos atrito nasce</div>
@@ -487,11 +470,74 @@
       </div>
     </div>
 
-    <h2 class="hl">Não são números mágicos — são priors que recalibram contra o desfecho real.</h2>
-    <p class="hl-sub">Vivem numa política separada do mecanismo de decisão. Cada handoff e cada correção do atendente vira um label. O número certo é o que o A/B mostra, não o que foi chutado hoje.</p>
-    <div id="logica-body"></div>
-    <button class="toggle" id="logica-toggle" aria-expanded="false">ver a matemática do motor ▸</button>
-    <div id="logica-more" style="display:none"></div>
+    <h2 class="hl">A decisão é aritmética: fatos viram quatro sinais, sinais passam por réguas.</h2>
+    <p class="hl-sub">Nada aqui decide por "sentimento de IA". Os fatos do caso viram certeza, criticidade, confiança em jogo e resolubilidade; a cascata compara os quatro com as réguas abaixo e a primeira que dispara decide. Mesma entrada, mesma decisão, sempre. E cada régua é política versionada: começa como julgamento de produto e recalibra contra o desfecho real.</p>
+
+    <div class="ptitle">fase 1 · medir: os fatos do caso viram 4 sinais</div>
+    <div class="jnote">cada sinal responde uma pergunta simples, numa escala conhecida. E todo valor vem de uma tabela de referência nomeada no código (política, não mágica): abra as fichas abaixo.</div>
+    <div class="teach">
+    <div class="grow head"><span class="num">#</span><span class="nm">sinal · escala</span><span class="cd">a pergunta que ele responde</span><span class="vd">de onde vem</span></div>
+    <div class="grow"><span class="num">1</span><span class="nm">certeza · 0 a 1</span><span class="cd">"quão bem eu entendi o problema?"</span><span class="vd">similaridade medida + tabela por fonte</span></div>
+    <div class="grow"><span class="num">2</span><span class="nm">criticidade · 1 a 5</span><span class="cd">"quão grave é, agora, para este cliente?"</span><span class="vd">tabela por tema × agravantes</span></div>
+    <div class="grow"><span class="num">3</span><span class="nm">confiança em jogo · 0 a 1</span><span class="cd">"quanto estrago na relação se eu errar?"</span><span class="vd">checklist de pesos que somam</span></div>
+    <div class="grow"><span class="num">4</span><span class="nm">resolubilidade · 0 a 1</span><span class="cd">"eu sei consertar isso sozinho, com manual?"</span><span class="vd">três sim/não que multiplicam</span></div>
+    </div>
+    <button class="toggle" id="ref-toggle" aria-expanded="false">ver as tabelas de referência ▸</button>
+    <div id="ref-more" style="display:none;border-top:1px solid var(--line)"></div>
+
+    <div class="ptitle">fase 2 · decidir: a cascata compara os sinais com as réguas, em ordem</div>
+    <div class="jnote">como a triagem de um pronto-socorro: perguntas em ordem fixa, a primeira que dá "sim" decide e as de baixo nem são olhadas. Segurança primeiro, dinheiro depois, eficiência por último.</div>
+    <div class="teach">
+    <div class="grow head"><span class="num">#</span><span class="nm">régua</span><span class="cd">a pergunta</span><span class="vd">se sim</span></div>
+    <div class="grow"><span class="num">0</span><span class="nm">segurança</span><span class="cd">o cliente é vulnerável? (ludopatia, autoexclusão)</span><span class="vd"><b>humano</b>, prioridade máx.</span></div>
+    <div class="grow"><span class="num">0.5</span><span class="nm">esgotamento</span><span class="cd">já tentei e o cliente disse 2× que não funcionou?</span><span class="vd"><b>humano</b>, com contexto</span></div>
+    <div class="grow"><span class="num">0.7</span><span class="nm">política da KB</span><span class="cd">o procedimento é marcado como "só humano"? (LGPD, exclusão)</span><span class="vd"><b>humano</b>, por política</span></div>
+    <div class="grow"><span class="num">1</span><span class="nm">certeza mínima</span><span class="cd">estou agindo no palpite? (certeza abaixo do mínimo)</span><span class="vd"><b>não age</b>: observa mais</span></div>
+    <div class="grow"><span class="num">2</span><span class="nm">ROI</span><span class="cd">é trivial demais para valer o incômodo?</span><span class="vd"><b>silencioso</b> ou não toca</span></div>
+    <div class="grow"><span class="num">3</span><span class="nm">confiança em jogo</span><span class="cd">há muita coisa em jogo que eu não sei consertar?</span><span class="vd"><b>humano</b> quente</span></div>
+    <div class="grow"><span class="num">4</span><span class="nm">capacidade</span><span class="cd">tenho capacidade de sobra? (parcial = assiste)</span><span class="vd"><b>IA resolve</b> / assiste</span></div>
+    <div class="grow"><span class="num">fim</span><span class="nm">padrão</span><span class="cd">nada disparou</span><span class="vd"><b>humano</b> · na dúvida, pessoa</span></div>
+    </div>
+    <button class="toggle" id="gate-toggle" aria-expanded="false">ver como cada régua decide ▸</button>
+    <div id="gate-more" style="display:none;border-top:1px solid var(--line)">
+      <div class="jnote" style="margin-top:12px">três réguas leem fatos binários (texto, histórico, etiqueta da KB); cinco fazem aritmética com os sinais da fase 1. Nenhuma informação nova entra aqui: a fase 2 só consome o que a fase 1 mediu.</div>
+      <div class="teach">
+      <div class="grow head"><span class="num">#</span><span class="nm">régua</span><span class="cd">o que ela lê</span><span class="vd">como vira sim ou não</span></div>
+      <div class="grow"><span class="num">0</span><span class="nm">segurança</span><span class="cd">o texto do cliente</span><span class="vd">fato binário: radical de vulnerabilidade presente? (lista larga de propósito: falso alarme só escala à toa)</span></div>
+      <div class="grow"><span class="num">0.5</span><span class="nm">esgotamento</span><span class="cd">o histórico da conversa</span><span class="vd">contador: "não funcionou" APÓS uma sugestão minha; 2 sinais = sim (ou 1 + frustração)</span></div>
+      <div class="grow"><span class="num">0.7</span><span class="nm">política da KB</span><span class="cd">o documento recuperado</span><span class="vd">fato binário: etiqueta requires_human, carimbada pelo Product Ops</span></div>
+      <div class="grow"><span class="num">1</span><span class="nm">certeza mínima</span><span class="cd">o sinal 1, direto</span><span class="vd">comparação: certeza &lt; 0,50</span></div>
+      <div class="grow"><span class="num">2</span><span class="nm">ROI</span><span class="cd">os sinais 2 e 3, juntos</span><span class="vd">comparação dupla (E): criticidade &lt; 2,0 e confiança em jogo &lt; 0,20</span></div>
+      <div class="grow"><span class="num">3</span><span class="nm">confiança em jogo</span><span class="cd">combina os sinais 3 e 4</span><span class="vd">conta nova: pressão = confiança × (1 − resolubilidade), "o que está em risco e eu não sei consertar"; sim se ≥ 0,40</span></div>
+      <div class="grow"><span class="num">4</span><span class="nm">capacidade</span><span class="cd">combina os sinais 4 e 1</span><span class="vd">conta nova: capacidade = resolubilidade × certeza, "sei consertar E entendi direito"; ≥ 0,50 resolve · ≥ 0,35 assiste</span></div>
+      <div class="grow"><span class="num">fim</span><span class="nm">padrão</span><span class="cd">nada</span><span class="vd">sem pergunta: o destino de segurança é pessoa</span></div>
+      </div>
+    </div>
+
+    <div class="ptitle">interceptação · a prova: as duas fases rodando ao vivo</div>
+    <div class="jnote">escreva como cliente, ou clique num caso pronto. O motor mede os 4 sinais, roda a prancheta e mostra a régua que disparou, com a resposta que o cliente receberia. Nada é maquete: é o motor de verdade, decidindo agora.</div>
+    <div class="composer">
+      <div class="cbox">
+        <textarea id="txt" placeholder="mensagem do cliente…  (ex.: 'fui cobrado duas vezes no boleto')"></textarea>
+        <div class="actions"><span class="hint">⌘⏎</span><button class="go" id="go">interceptar ►</button></div>
+      </div>
+      <div class="row"><span class="chiplabel">ou testa um caso:</span><div class="chips" id="chips"></div></div>
+    </div>
+    <div class="loading" id="load" style="display:none">rodando o motor…</div>
+    <div id="out">
+      <div class="grid">
+        <div class="card" id="c-det"><h3>detecção</h3><div id="det"></div></div>
+        <div class="card" id="c-res"><h3>resolubilidade</h3><div id="res"></div></div>
+        <div class="card full"><h3>cascata de decisão · gate a gate</h3><div id="gates"></div></div>
+        <div class="card"><h3>rag · ranking</h3><div id="rag"></div></div>
+        <div class="card" id="c-hand"><h3>handoff</h3><div id="hand"></div></div>
+        <div class="card full"><h3>resposta recomendada</h3><div id="reply"></div></div>
+      </div>
+    </div>
+    <div class="jrule" id="contra" style="display:none"></div>
+
+
+
   </section>
 
   <!-- EVALS -->
@@ -526,11 +572,20 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
   b.onclick=()=>{
     document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+b.dataset.tab));
-    if(b.dataset.tab==='logica') loadPolicy();
+    if(b.dataset.tab==='logica'){ loadPolicy(); seedIntercept(); }
     if(b.dataset.tab==='lab'){ loadLab(); loadGaps(); }
     if(b.dataset.tab==='evals') loadEvals();
   };
 });
+
+/* a interceptação abre já com o caso de ponta a ponta rodado (o boleto 2x) —
+   na demo é só apagar e digitar outro caso */
+let interceptSeeded=false;
+function seedIntercept(){
+  if(interceptSeeded) return; interceptSeeded=true;
+  $('#txt').value="fui cobrado duas vezes no mesmo boleto, quero o estorno";
+  run();
+}
 
 /* evals — scorecard real (CI) + soak + camadas */
 let evalsLoaded=false;
@@ -563,9 +618,9 @@ async function loadLab(){
     const a=await (await fetch('/api/lab/atendimento')).json();
     if(a && a.triagem){
       const lbl={'IA resolve sozinha':'IA resolve sozinha','IA assiste o humano':'IA assiste','Vai pra humano':'vai para humano'};
-      $('#lab-triagem').innerHTML=a.triagem.map(t=>
+      $('#lab-triagem').innerHTML=a.triagem.filter(t=>t.n>0).map(t=>
         `<div class="lstat"><span class="v">${String(t.pct).replace('.',',')}%</span><span class="l">${esc(lbl[t.balde]||t.balde)}</span></div>`).join('')
-        +`<div class="lstat"><span class="v">${String(a.theme_accuracy).replace('.',',')}%</span><span class="l">tema correto</span></div>`;
+        +`<div class="lstat"><span class="v">${String(a.theme_accuracy).replace('.',',')}%</span><span class="l">tema correto (medição)</span></div>`;
     }
   }catch(e){ /* sem lab_atendimento.json, a régua fica vazia — o resto da aba segue */ }
   const pr=await (await fetch('/api/lab/presets')).json();
@@ -605,14 +660,24 @@ document.querySelectorAll('.brow').forEach(b=>{
   };
 });
 
-/* toggle da matemática do motor — colapsado por padrão */
-$('#logica-toggle').onclick=()=>{
-  const more=$('#logica-more'), t=$('#logica-toggle');
+/* toggle das tabelas de referência (fase 1) — colapsado por padrão */
+$('#ref-toggle').onclick=()=>{
+  const more=$('#ref-more'), t=$('#ref-toggle');
   const open=more.style.display==='none';
   more.style.display=open?'block':'none';
   t.setAttribute('aria-expanded',open?'true':'false');
-  t.textContent=open?'ocultar a matemática do motor ▾':'ver a matemática do motor ▸';
+  t.textContent=open?'ocultar as tabelas de referência ▾':'ver as tabelas de referência ▸';
 };
+
+/* toggle "como cada régua decide" (fase 2) */
+$('#gate-toggle').onclick=()=>{
+  const more=$('#gate-more'), t=$('#gate-toggle');
+  const open=more.style.display==='none';
+  more.style.display=open?'block':'none';
+  t.setAttribute('aria-expanded',open?'true':'false');
+  t.textContent=open?'ocultar como cada régua decide ▾':'ver como cada régua decide ▸';
+};
+
 
 /* casos plantados */
 const CASES=[
@@ -686,7 +751,32 @@ function render(p){
       ${h.sinais&&h.sinais.length?`<div class="line" style="margin-top:4px"><span class="k">sinais</span> <span class="v">${h.sinais.map(esc).join(' · ')}</span></div>`:''}
       <div class="line" style="margin-top:4px">${esc(h.nota)}</div>`;
   } else { $('#c-hand').style.display='none'; }
+  contraf(p);
   $('#out').style.display='block';
+}
+
+/* contrafactual VIVO — calculado do caso na tela (mesma política do motor):
+   sem KB, resolubilidade = 0,25 × 0,45 (× 0,15 se irreversível) ≈ 0,11 */
+function contraf(p){
+  const el=$('#contra'), R=p.resolubilidade, dec=p.decisao;
+  const f=x=>x.toFixed(2).replace('.',',');
+  if(!el) return;
+  if(dec && dec.trust!=null && R && R.kb_existe && (dec.acao==='ai_resolve'||dec.acao==='ai_assist')){
+    const resolCf=0.25*0.45*(R.reversivel?1:0.15);
+    const pressCf=dec.trust*(1-resolCf);
+    const capCf=resolCf*(dec.certeza||0);
+    if(pressCf>=0.4){
+      el.innerHTML=`O contrafactual que prova o desenho: tire a KB deste caso e a resolubilidade despenca para ${f(resolCf)}; a pressão por humano vira ${f(dec.trust)} × ${f(1-resolCf)} = <b>${f(pressCf)} ≥ 0,40</b> e a régua da confiança dispara: <b>humano quente, com contexto</b>. Um fato muda, uma régua vira, a decisão muda. E dá para apontar qual.`;
+    } else {
+      el.innerHTML=`O contrafactual que prova o desenho: tire a KB deste caso e a pressão por humano fica em ${f(pressCf)} &lt; 0,40 (pouca confiança em jogo), mas a capacidade despenca para ${f(capCf)} &lt; 0,35 e o caso cai no destino padrão: <b>humano</b>. Réguas diferentes, mesmo cuidado: sem manual, ninguém improvisa.`;
+    }
+    el.style.display='block';
+  } else if(dec && dec.acao==='human_handoff'){
+    el.innerHTML=`Repare qual régua disparou acima: escalar aqui tem motivo nomeado, não reflexo. É esse motivo que viaja no pacote de contexto até o time.`;
+    el.style.display='block';
+  } else {
+    el.style.display='none';
+  }
 }
 
 /* Lógica & Modelos — lê os thresholds reais do código */
@@ -694,21 +784,23 @@ let policyLoaded=false;
 async function loadPolicy(){
   if(policyLoaded) return; policyLoaded=true;
   const p=await (await fetch('/api/policy')).json();
-  // camada 2 — visível: só os thresholds (a prova concreta)
-  let h='<div class="ptitle">thresholds de decisão (policy · recalibrável)</div>';
-  h+='<div class="trow head"><span class="nme">parâmetro</span><span class="rg">regra (dispara quando)</span><span class="ef">então</span></div>';
-  p.thresholds.forEach(t=>{ h+=`<div class="trow"><span class="nme">${t.nome}</span><span class="rg">${esc(t.grandeza)}<span class="op">${t.op}</span><span class="vv">${t.valor}</span></span><span class="ef">${esc(t.efeito)}</span></div>`; });
-  $('#logica-body').innerHTML=h;
+  // tabelas de referência da fase 1 (lidas do código) — uma ficha por sinal
+  const R=p.referencia||{};
+  const fv=v=>v==null?'—':String(v).replace('.',',');
+  const rows=(items,pref='')=>(items||[]).map(r=>
+    `<div class="ref-row"><div class="top"><span class="fator">${esc(r.nome)}</span>`+
+    (r.valor==null?'':`<span class="valor">${pref}${fv(r.valor)}</span>`)+
+    `</div>${r.o_que?`<div class="oq">${esc(r.o_que)}</div>`:''}</div>`).join('');
+  const baseTemas=(R.criticidade_base||[]).map(r=>`${esc(r.nome)} <b>${r.valor}</b>`).join(' · ');
+  $('#ref-more').innerHTML=`<div class="grid" style="margin-top:14px;margin-bottom:6px">
+    <div class="card"><h3>1 · certeza (base por fonte)</h3>${rows(R.certeza)}</div>
+    <div class="card"><h3>2 · criticidade (base × agravantes)</h3>
+      <div class="ref-row"><div class="top"><span class="fator">gravidade-base por tema (1–5)</span></div>
+      <div class="oq">${baseTemas}</div></div>${rows(R.criticidade_mult,'×')}</div>
+    <div class="card"><h3>3 · confiança em jogo (pesos que somam)</h3>${rows(R.trust,'+')}</div>
+    <div class="card"><h3>4 · resolubilidade (o preço de cada "não")</h3>${rows(R.resolubilidade)}</div>
+  </div>`;
 
-  // camada 3 — colapsada: a matemática do motor
-  let m='<div class="ptitle">grandezas do motor · como cada número nasce</div>';
-  p.formulas.forEach(t=>{ m+=`<div class="frow"><span class="fn">${t.nome}</span><span class="fx">${esc(t.expr)}<span class="fo">${esc(t.o_que)}</span></span></div>`; });
-  m+='<div class="ptitle">confiança-base por natureza do atrito</div>';
-  m+='<div class="prow head"><span class="nme">natureza</span><span class="val" style="background:none;border:0;padding:0">valor</span><span class="desc">por quê</span></div>';
-  p.confianca_base.forEach(t=>{ m+=`<div class="prow"><span class="nme">${t.natureza}</span><span class="val">${t.valor}</span><span class="desc">${esc(t.o_que)}</span></div>`; });
-  m+='<div class="ptitle">o que cada ação significa</div>';
-  (p.acoes||[]).forEach(t=>{ m+=`<div class="frow"><span class="fn">${t.nome}</span><span class="fx" style="color:var(--grey)">${esc(t.o_que)}</span></div>`; });
-  $('#logica-more').innerHTML=m;
 }
 </script>
 </body></html>

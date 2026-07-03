@@ -49,6 +49,12 @@ from product_ops_jota.friction_model import (                            # noqa:
 from product_ops_jota.rag import Retriever                              # noqa: E402
 from product_ops_jota.decision import explain_gates, derive_resolubilidade, DEFAULT_THRESHOLDS  # noqa: E402
 from product_ops_jota.friction_model import DEFAULT_CONFIDENCE                # noqa: E402
+from product_ops_jota.friction_model import DEFAULT_TRUST_WEIGHTS, DEFAULT_CRITICALITY_WEIGHTS  # noqa: E402
+from product_ops_jota.decision import BASE_SEVERITY, HEAT_TRUST_BUMP           # noqa: E402
+from product_ops_jota.decision import RESOL_FAIL                               # noqa: E402
+from product_ops_jota.classifier import (                                      # noqa: E402
+    NATURE_CONF_WITH_EVENT, NATURE_CONF_NO_EVENT, NATURE_CONF_ABSENCE,
+)
 from product_ops_jota.handoff import build_context_pack                 # noqa: E402
 import telegram_bot as brain     # noqa: E402  — o MESMO cérebro do bot em prod (import não dispara polling)
 from copiloto import ACK_BY_THEME, montar_sugestao     # noqa: E402
@@ -390,7 +396,7 @@ def intercept(inp: InterceptIn):
         "rag": [{"id": d.id, "titulo": d.title, "score": d.score, "requires_human": d.requires_human} for d in docs],
         "decisao": {"acao": dec.action.value, "motivo": dec.reason, "prioridade": dec.priority,
                     "capacidade": gx["capacidade"], "pressao_humano": gx["pressao_humano"],
-                    "resolubilidade": di.resolvability, "criticidade": di.criticality},
+                    "resolubilidade": di.resolvability, "criticidade": di.criticality, "trust": di.trust_risk, "certeza": di.detection_confidence},
         "resposta": r["reply"], "kind": r["kind"], "guardrail": r["guardrail"],
         "kb_gap": r.get("kb_gap", False),
     }
@@ -400,6 +406,12 @@ def intercept(inp: InterceptIn):
                               "nota": pack.routing.note, "prioridade": round(pack.routing.priority, 2),
                               "evidencia": pack.evidence, "sinais": pack.signals, "motivo": pack.reason}
     return payload
+
+
+_TEMA_PT = {"pix": "pix / pagamentos", "account_access": "acesso à conta",
+            "kyc": "cadastro & kyc", "fala_tap": "fala tap", "boleto": "boleto / cobranças",
+            "account_data": "dados & lgpd", "yield_open_finance": "rendimento / open finance",
+            "other": "outros"}
 
 
 @app.get("/api/policy")
@@ -422,6 +434,36 @@ def policy():
             {"nome": "assist_floor", "grandeza": "capacidade da IA", "op": "≥", "valor": t.assist_floor,
              "efeito": "a IA assiste — humano no loop"},
         ],
+        "referencia": {
+            "certeza": [
+                {"nome": "evento correlacionado", "valor": NATURE_CONF_WITH_EVENT, "o_que": "o backend apitou: quase fato"},
+                {"nome": "ausência vigiada", "valor": NATURE_CONF_ABSENCE, "o_que": "o timer viu o que NÃO aconteceu"},
+                {"nome": "só comportamento", "valor": NATURE_CONF_NO_EVENT, "o_que": "deduzido do texto: age, mas com pé atrás"},
+                {"nome": "tema", "valor": None, "o_que": "medido, não tabelado: similaridade com frases-exemplo (0–1)"},
+            ],
+            "criticidade_base": [{"nome": _TEMA_PT.get(th.value, th.value), "valor": sev, "o_que": ""}
+                                 for th, sev in sorted(BASE_SEVERITY.items(), key=lambda kv: -kv[1])],
+            "criticidade_mult": [
+                {"nome": "venda em curso agora", "valor": DEFAULT_CRITICALITY_WEIGHTS.in_active_sale, "o_que": "PJ/MEI com cliente na frente (o seu João na feira)"},
+                {"nome": "irreversível", "valor": DEFAULT_CRITICALITY_WEIGHTS.irreversible, "o_que": "dinheiro que já foi pro destino errado"},
+                {"nome": "estágio frágil", "valor": DEFAULT_CRITICALITY_WEIGHTS.fragile_stage, "o_que": "antes do primeiro valor: a confiança nem nasceu"},
+                {"nome": "recorrente", "valor": DEFAULT_CRITICALITY_WEIGHTS.recurring, "o_que": "já travou nisso antes"},
+            ],
+            "trust": [
+                {"nome": "mexe com dinheiro", "valor": DEFAULT_TRUST_WEIGHTS.touches_money, "o_que": "saldo, transação, recebimento"},
+                {"nome": "irreversível", "valor": DEFAULT_TRUST_WEIGHTS.irreversible, "o_que": "não dá pra desfazer"},
+                {"nome": "recuperável", "valor": DEFAULT_TRUST_WEIGHTS.recoverable, "o_que": "dá pra reverter com esforço (estorno)"},
+                {"nome": "concorrente a um toque", "valor": DEFAULT_TRUST_WEIGHTS.exit_barrier_low, "o_que": "custo de troca quase zero (o vilão do Fala Tap)"},
+                {"nome": "saída média", "valor": DEFAULT_TRUST_WEIGHTS.exit_barrier_medium, "o_que": "trocar dá trabalho, mas dá"},
+                {"nome": "fragilidade da jornada", "valor": DEFAULT_TRUST_WEIGHTS.journey_fragility, "o_que": "multiplica o quão frágil é o momento"},
+                {"nome": "frustração / pediu humano", "valor": HEAT_TRUST_BUMP, "o_que": "a relação esfriando agora soma no risco"},
+            ],
+            "resolubilidade": [
+                {"nome": "sem procedimento na KB", "valor": RESOL_FAIL["kb"], "o_que": "faltou manual: derruba quase tudo e vira item de backlog"},
+                {"nome": "não executável pela IA", "valor": RESOL_FAIL["exec"], "o_que": "precisa de privilégio ou decisão humana"},
+                {"nome": "irreversível", "valor": RESOL_FAIL["rev"], "o_que": "pesa mais: dinheiro ido a IA não desfaz"},
+            ],
+        },
         "confianca_base": [
             {"natureza": n.value, "valor": v,
              "o_que": ("fato: um evento de sistema" if v >= 1.0 else "probabilístico — calibrável contra o real")}
