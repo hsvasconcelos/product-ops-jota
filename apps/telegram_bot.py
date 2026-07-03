@@ -307,6 +307,7 @@ def _msgs(history, base: datetime):
     return out
 
 
+RELEVANCE_FLOOR = 0.38   # cosseno mín. query×doc p/ confiar no procedimento (calibrado: boas ≥0.43, fora-de-escopo <0.38)
 KB_GAPS = ROOT / "data" / "kb_gaps.jsonl"
 
 
@@ -330,15 +331,23 @@ def analisar(sess):
                                 expected_events=sess.get("expected_events") or None,
                                 retriever=retriever, judge=theme_judge)
     txt = " ".join(h["content"] for h in hist if h["role"] == "user")
-    # pool amplo (8) ANTES do gate p/ o doc do tema aparecer mesmo se rankeado no meio
-    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_',' ')}", top_k=8)
+    # pool amplo (8) ANTES do gate. Retrieval na query CRUA (sem colar o nome do tema — isso
+    # distorcia o intra-tema, ex "rende"→CONECTA/open-finance); o prefer_theme já alinha o tema.
+    docs = retriever.retrieve(txt, top_k=8)
     # o RAG respeita o tema detectado: promove o doc DO tema à frente (senão o léxico/denso
     # confunde "acessar wpp" com "reconectar banco"). Sem match, ordem original.
     docs = prefer_theme(docs, det.predicted_theme, det.theme_confidence)[:TOP_K]
     doc = docs[0] if docs else None
     # GATE DE RELEVÂNCIA: o doc recuperado REALMENTE responde à pergunta? Senão é lacuna de KB
     # (has_kb=False → escala pro humano) e registra a lacuna pro backlog (o loop cura o KB).
-    kb_relevant = relevance_judge(txt, doc) if (doc is not None and det.predicted_theme is not _T.OTHER) else True
+    # GATE DE RELEVÂNCIA ESTRITO (fail-safe > fail-loud, protege o #4 em texto livre):
+    # DETERMINÍSTICO — piso de cosseno query×doc. Abaixo do piso, a IA não confia no
+    # procedimento e escala ("não tenho certeza, te levo pra uma pessoa"). Nada de juiz LLM
+    # no gate (era flaky/não-determinístico → imprevisível). Em BM25 (sim=None) não trava.
+    kb_relevant = True
+    if doc is not None and det.predicted_theme is not _T.OTHER:
+        sim = retriever.doc_similarity(txt, doc)
+        kb_relevant = (sim is None) or (sim >= RELEVANCE_FLOOR)
     # lacuna de KB = tema não reconhecido (OTHER) OU doc recuperado não responde à pergunta
     kb_gap = (det.predicted_theme is _T.OTHER) or (not kb_relevant)
     if kb_gap:

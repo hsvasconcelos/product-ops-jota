@@ -144,6 +144,20 @@ class Retriever:
         norms = np.linalg.norm(vecs, axis=1, keepdims=True)
         return vecs / np.clip(norms, 1e-9, None)
 
+    def doc_similarity(self, query: str, doc) -> float | None:
+        """Cosseno (0–1) entre a query e um doc específico — o sinal CALIBRADO pro gate de
+        relevância estrito (fail-safe > fail-loud). None em BM25 (sem densos): o chamador cai no juiz."""
+        if self._doc_embeddings is None or doc is None:
+            return None
+        try:
+            idx = next((i for i, d in enumerate(self.docs) if d["id"] == doc.id), None)
+            if idx is None:
+                return None
+            q = self._encode([query])[0]
+            return float(self._doc_embeddings[idx] @ q)
+        except Exception:
+            return None
+
     def _encode(self, texts):
         """Embeddings normalizados p/ cosseno — dispatch local vs hospedado.
         None em BM25 puro (o chamador cai no keyword)."""

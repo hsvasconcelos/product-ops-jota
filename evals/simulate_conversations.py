@@ -70,9 +70,10 @@ SCENARIOS = [
      "turns": ["to abrindo conta mas a selfie nao passa de jeito nenhum"]},
     {"id": "frustracao_fria_resolve", "seg": "pf", "expect": R,
      "turns": ["poxa, o pix ta dando erro na chave, to meio decepcionado"]},
-    # lacuna real: não há procedimento pra transferência ENTRE bancos → o gate de relevância
-    # escala + registra (humano), em vez de chutar num doc errado. Label corrigido R→H.
-    {"id": "nubank_externo", "seg": "pf", "expect": H,
+    # transferência entre bancos é ambígua e sem doc dedicado — o certo NÃO é chutar: a IA
+    # faz uma PERGUNTA de esclarecimento segura ("é um Pix do Nubank pra sua conta Jota?").
+    # Clarificar > escalar aqui; resolve (ai) com pergunta, sem inventar nada sobre dinheiro.
+    {"id": "nubank_externo", "seg": "pf", "expect": R,
      "turns": ["nao consigo transferir do meu nubank pro jota"]},
 ]
 

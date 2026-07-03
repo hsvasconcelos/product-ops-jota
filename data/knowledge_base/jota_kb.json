@@ -3,7 +3,7 @@
     "id": "KB-PIX-001",
     "title": "Pix enviado não caiu na conta do destinatário",
     "category": "erro_pix",
-    "content": "Quando um Pix é enviado e o destinatário não recebe, o valor fica em processamento ou foi devolvido automaticamente. O valor enviado nunca some: se não for creditado, retorna para a conta de origem em até 30 minutos. Em casos de instabilidade ou análise antifraude o crédito pode levar alguns minutos.",
+    "content": "Meu Pix não caiu, não chegou, não foi creditado, o destinatário não recebeu, mandei o Pix e não caiu na conta da pessoa, o dinheiro saiu mas não chegou. Quando um Pix é enviado e o destinatário não recebe, o valor fica em processamento ou foi devolvido automaticamente. O valor enviado nunca some: se não for creditado, retorna para a conta de origem em até 30 minutos. Em casos de instabilidade ou análise antifraude o crédito pode levar alguns minutos.",
     "steps": [
       "Confira o status do Pix no histórico. Se estiver 'Processando', aguarde até 5 minutos.",
       "Peça ao destinatário para conferir se a chave usada está correta e ativa.",
@@ -16,7 +16,7 @@
     "id": "KB-PIX-002",
     "title": "Chave Pix não reconhecida ou não encontrada",
     "category": "chave_pix_invalida",
-    "content": "Para um Pix chegar, a chave de destino (CPF, e-mail, celular ou aleatória) precisa estar REGISTRADA como chave Pix em algum banco pelo dono. Um CPF ou e-mail que existe mas não foi cadastrado como chave não funciona como destino. Esta é uma confusão comum: ter o número não significa que ele é uma chave ativa.",
+    "content": "A chave Pix dá erro, a chave não é reconhecida, chave não encontrada, erro na chave de destino, não consigo enviar Pix pra essa chave. Para um Pix chegar, a chave de destino (CPF, e-mail, celular ou aleatória) precisa estar REGISTRADA como chave Pix em algum banco pelo dono. Um CPF ou e-mail que existe mas não foi cadastrado como chave não funciona como destino. Esta é uma confusão comum: ter o número não significa que ele é uma chave ativa.",
     "steps": [
       "Confirme com o destinatário qual é a chave Pix ATIVA dele (pode ser diferente do CPF).",
       "Peça para ele verificar as chaves cadastradas no banco onde quer receber.",
