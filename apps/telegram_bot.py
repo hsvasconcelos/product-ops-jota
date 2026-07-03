@@ -508,7 +508,9 @@ def handle_command(chat_id, cmd, name=""):
             DEBUG.discard(chat_id); send(chat_id, "🕵🏻‍♀️ Debug desativado.")
         else:
             DEBUG.add(chat_id)
-            send(chat_id, "🕵🏻‍♀️ Debug ativo. Vou mostrar a engenharia por trás de cada interação.")
+            llm = OPENAI_MODEL if LLM is not None else "OFF (template determinístico)"
+            send(chat_id, "🕵🏻‍♀️ Debug ativo. Vou mostrar a engenharia por trás de cada interação.\n"
+                          f"_saúde: RAG {retriever.mode} · LLM {llm} · {len(retriever.docs)} docs na KB_")
         return
     if cmd in COMMANDS:
         sid = COMMANDS[cmd]

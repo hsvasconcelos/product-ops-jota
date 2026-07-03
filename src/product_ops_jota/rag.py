@@ -160,11 +160,16 @@ class Retriever:
 
     def _encode(self, texts):
         """Embeddings normalizados p/ cosseno — dispatch local vs hospedado.
-        None em BM25 puro (o chamador cai no keyword)."""
-        if self._dense_model is not None:
-            return self._dense_model.encode(list(texts), normalize_embeddings=True)
-        if self._oai is not None:
-            return self._oai_embed(texts)
+        None em BM25 puro (o chamador cai no keyword) E em falha por chamada
+        (rede/API caiu AGORA): um soluço de embedding não pode derrubar o turno —
+        degrada esta query pro léxico e a próxima tenta de novo."""
+        try:
+            if self._dense_model is not None:
+                return self._dense_model.encode(list(texts), normalize_embeddings=True)
+            if self._oai is not None:
+                return self._oai_embed(texts)
+        except Exception as e:
+            logger.warning("embeddings falharam nesta chamada (%s) — degradando p/ léxico", type(e).__name__)
         return None
 
     # ── ranking helpers ──────────────────────────────────────────────────────
@@ -191,13 +196,19 @@ class Retriever:
         return self._encode(list(texts))
 
     def retrieve(self, query: str, top_k: int = TOP_K) -> list[RetrievedDoc]:
-        """Recupera os top_k docs mais relevantes. Funciona em qualquer modo."""
+        """Recupera os top_k docs mais relevantes. Funciona em qualquer modo.
+        Fail-safe por query: se os densos falharem NESTA chamada (rede/API),
+        responde só com BM25 — nunca propaga exceção pro turno do cliente."""
+        scored = None
         if self._doc_embeddings is not None:          # híbrido (densos locais OU hospedados)
-            fused = self._rrf([self._bm25_ranking(query), self._dense_ranking(query)])
-            ordered = sorted(fused, key=lambda i: fused[i], reverse=True)
-            scored = [(i, fused[i]) for i in ordered]
-            scored = self._maybe_rerank(query, scored)
-        else:
+            try:
+                fused = self._rrf([self._bm25_ranking(query), self._dense_ranking(query)])
+                ordered = sorted(fused, key=lambda i: fused[i], reverse=True)
+                scored = [(i, fused[i]) for i in ordered]
+                scored = self._maybe_rerank(query, scored)
+            except Exception as e:
+                logger.warning("híbrido falhou nesta query (%s) — respondendo só com BM25", type(e).__name__)
+        if scored is None:
             scores = self._bm25.get_scores(_tokenize(query))
             ordered = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
             scored = [(i, float(scores[i])) for i in ordered]
