@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from datetime import datetime
 
-from product_ops_jota.classifier import classify_conversation
+from product_ops_jota.classifier import LOOP_PATTERNS, _normalize, classify_conversation
 from product_ops_jota.decision import (
     decide, derive_decision_input, derive_resolubilidade, UserProfile,
 )
@@ -63,6 +63,19 @@ def _load(conn):
                    profile=UserProfile(segment=seg, digital_literacy=lit, age_band=age, signup_at=sign))
 
 
+def _stuck_batch(msgs, det) -> bool:
+    """Esgotamento em lote, com a MESMA régua do bot ao vivo: conta mensagens do cliente
+    com feedback de falha ('não funcionou', 'já tentei') APÓS a primeira resposta do
+    atendimento; escala com 2 sinais, ou 1 + emoção (frustração/desânimo)."""
+    replied, sig = False, 0
+    for s, t, _ in msgs:
+        if s in ("bot", "human_agent"):
+            replied = True
+        elif s == "customer" and replied and any(p in _normalize(t) for p in LOOP_PATTERNS):
+            sig += 1
+    return sig >= 2 or (sig >= 1 and (det.frustrated or det.disappointed))
+
+
 def main():
     conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
     retriever = Retriever()              # tema SEMÂNTICO (o motor real); cai p/ keyword se sem deps
@@ -89,9 +102,11 @@ def main():
         ref = datetime.fromisoformat(c["started"])
         docs = retriever.retrieve(f"{customer_text} {theme.value.replace('_', ' ')}", top_k=1)
         doc = docs[0] if docs else None
-        # esgotamento (batch, sem estado por turno): loop + conversa longa = tentou e falhou
-        n_cust = sum(1 for s, _, _ in c["msgs"] if s == "customer")
-        stuck = det.in_loop and n_cust >= 4
+        # esgotamento (batch) — espelha a POLICY do vivo: sinal de falha ("não funcionou",
+        # "já tentei") só conta DEPOIS de o atendimento ter sugerido algo; 2 sinais escalam,
+        # ou 1 + emoção. "Já tentei" ANTES da 1ª resposta descreve o passado do cliente,
+        # não a IA falhando — o proxy antigo (in_loop + conversa longa) escalava quase tudo.
+        stuck = _stuck_batch(c["msgs"], det)
         inp = derive_decision_input(det, c["profile"], customer_text, ref, doc=doc, stuck=stuck)
         dec = decide(inp)
         resol = derive_resolubilidade(det, doc)

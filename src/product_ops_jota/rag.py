@@ -62,7 +62,17 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _doc_text(doc: dict) -> str:
-    """Texto indexável: título + conteúdo + categoria + passos."""
+    """Texto indexável p/ BUSCA: título + hints + conteúdo + categoria + passos.
+    `hints` = linguagem do cliente ("meu pix não caiu, não chegou…") — ajuda a ACHAR
+    o doc, mas NUNCA aparece na resposta nem no juízo de relevância (_core_text)."""
+    return " ".join([doc.get("title", ""), doc.get("hints", ""), doc.get("content", ""),
+                     doc.get("category", ""), " ".join(doc.get("steps", []))])
+
+
+def _core_text(doc: dict) -> str:
+    """Texto REAL do procedimento (sem hints) — é contra ISTO que o gate de relevância
+    julga: hints engordam o cosseno de qualquer pergunta do mesmo assunto e mascarariam
+    a lacuna (ex.: 'limite do pix' parecia coberto pelo doc de 'pix não caiu')."""
     return " ".join([doc.get("title", ""), doc.get("content", ""),
                      doc.get("category", ""), " ".join(doc.get("steps", []))])
 
@@ -81,7 +91,8 @@ class Retriever:
         # ── Densos + re-rank (tranca 1 e 2) ──────────────────────────────────
         self._dense_model = None      # modelo local (sentence-transformers), se houver
         self._oai = None              # cliente OpenAI (densos hospedados), se houver
-        self._doc_embeddings = None
+        self._doc_embeddings = None   # índice de BUSCA (com hints)
+        self._core_embeddings = None  # texto REAL (sem hints) — p/ o gate de relevância
         self._cross_encoder = None
         self.mode = "bm25"
         motivo = self._try_load_dense()
@@ -111,6 +122,8 @@ class Retriever:
             model = SentenceTransformer(DENSE_MODEL)               # tranca 2
             self._doc_embeddings = model.encode(
                 [_doc_text(d) for d in self.docs], normalize_embeddings=True)
+            self._core_embeddings = model.encode(
+                [_core_text(d) for d in self.docs], normalize_embeddings=True)
             self._dense_model = model
         except Exception as e:  # sem internet, modelo não baixado, etc.
             return f"modelo não carregou ({type(e).__name__})"
@@ -130,9 +143,11 @@ class Retriever:
             from openai import OpenAI
             self._oai = OpenAI()                                  # key vem do ambiente
             self._doc_embeddings = self._oai_embed([_doc_text(d) for d in self.docs])
+            self._core_embeddings = self._oai_embed([_core_text(d) for d in self.docs])
         except Exception as e:
             self._oai = None
             self._doc_embeddings = None
+            self._core_embeddings = None
             return f"openai embeddings indisponível ({type(e).__name__})"
         return ""
 
@@ -145,16 +160,20 @@ class Retriever:
         return vecs / np.clip(norms, 1e-9, None)
 
     def doc_similarity(self, query: str, doc) -> float | None:
-        """Cosseno (0–1) entre a query e um doc específico — o sinal CALIBRADO pro gate de
-        relevância estrito (fail-safe > fail-loud). None em BM25 (sem densos): o chamador cai no juiz."""
-        if self._doc_embeddings is None or doc is None:
+        """Cosseno (0–1) entre a query e o texto REAL do doc (sem hints) — o sinal do gate
+        de relevância estrito (fail-safe > fail-loud). Julgar contra o texto COM hints
+        mascararia lacunas (qualquer pergunta de pix 'gruda' num doc cheio de frases de
+        cliente). None em BM25 (sem densos): o gate não trava."""
+        if self._core_embeddings is None or doc is None:
             return None
         try:
             idx = next((i for i, d in enumerate(self.docs) if d["id"] == doc.id), None)
             if idx is None:
                 return None
-            q = self._encode([query])[0]
-            return float(self._doc_embeddings[idx] @ q)
+            q = self._encode([query])
+            if q is None:
+                return None
+            return float(self._core_embeddings[idx] @ q[0])
         except Exception:
             return None
 

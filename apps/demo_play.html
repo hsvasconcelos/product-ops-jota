@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jota · Atendimento</title>
+<title>Case Product Ops · Atendimento Proativo</title>
 <style>
   /* Marca: FFMarkPro (display) + Aeonik (body). Comerciais, sem CDN — embutir .woff2 via @font-face p/ renderizar exatas; senão fallback grotesk. */
   :root{
@@ -105,8 +105,8 @@
   .albl{position:absolute;font-family:var(--mono);font-size:10.5px;color:var(--ink);background:var(--paper);padding:0 5px;white-space:nowrap}
   .albl.sub{color:var(--grey);font-size:9.5px}
   .acap{position:absolute;font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;background:var(--paper);padding:0 6px}
-  .hl{font-family:var(--disp);font-size:clamp(21px,2.8vw,30px);font-weight:700;letter-spacing:-.01em;line-height:1.16;margin:6px 0 12px;max-width:26ch;text-wrap:balance}
-  .hl-sub{font-size:13.5px;color:var(--grey);line-height:1.6;max-width:66ch;margin:0 0 24px}
+  .hl{font-family:var(--disp);font-size:clamp(21px,2.8vw,30px);font-weight:700;letter-spacing:-.01em;line-height:1.16;margin:6px 0 12px;text-wrap:balance}
+  .hl-sub{font-size:14px;color:var(--grey);line-height:1.6;margin:0 0 24px}
   .toggle{background:none;border:0;font-family:var(--mono);font-size:12.5px;color:var(--grey);cursor:pointer;padding:16px 0 6px;margin-top:6px}
   .toggle:hover{color:var(--ink)}
   #logica-more{border-top:1px solid var(--line);margin-top:2px}
@@ -123,9 +123,9 @@
   .frow .fn{color:var(--grey)} .frow .fx{color:var(--ink)} .frow .fo{color:var(--grey);display:block;margin-top:2px;font-size:11.5px}
 
   /* laboratório */
-  .lab-stats{display:flex;gap:28px;flex-wrap:wrap;padding:2px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .lab-stats{display:flex;gap:28px;flex-wrap:wrap;justify-content:space-between;padding:2px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}
   .lstat{display:flex;flex-direction:column;gap:2px}
-  .lstat .v{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .lstat .v{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
   .lstat .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
   #lab-sql{min-height:104px;font-family:var(--mono);font-size:12.5px}
   .tblwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px}
@@ -160,7 +160,7 @@
   .pline b{font-weight:600}
   .pline.key{background:var(--jota-wash);border-radius:6px;border-bottom-color:transparent}
   .pline.key .pn{color:var(--ink);font-weight:700}
-  .hl-sharp{font-size:14px;line-height:1.55;color:var(--ink);margin:-8px 0 22px;max-width:66ch;font-weight:400}
+  .hl-sharp{font-size:14px;line-height:1.55;color:var(--ink);margin:-8px 0 22px;font-weight:400}
   .tese-bridge{font-family:var(--mono);font-size:12px;color:var(--grey);margin:0 0 14px;line-height:1.5}
   .lab-note{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:8px 0 0;border-top:1px solid var(--line);padding-top:7px;line-height:1.4}
   .built{display:flex;flex-direction:column;margin-top:2px}
@@ -207,8 +207,16 @@
   .flvl.j{color:var(--ink);background:var(--jota);border:1px solid var(--jota-edge)}
   .flvl.s{color:var(--grey);border:1px solid var(--line2)}
   .flvl.none{color:var(--faint);border:1px solid var(--line)}
-  /* ritmo entre seções (só na jornada): 40px entre seções, ~20px dentro */
+  /* ritmo entre seções (jornada e visão): 40px entre seções, ~20px dentro */
   #tab-jornada .ptitle{margin-top:40px}
+  #tab-visao .ptitle{margin-top:40px}
+  #tab-visao .loopflow{margin-top:20px}
+  #tab-lab .ptitle{margin-top:40px}
+  #tab-time .ptitle,#tab-kpis .ptitle{margin-top:40px}
+  #tab-time .frow,#tab-kpis .frow,#tab-evals .frow{grid-template-columns:230px 1fr}
+  .badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+  .badge.med{background:var(--jota);border:1px solid var(--jota-edge);color:var(--ink)}
+  .badge.prod{border:1px solid var(--line2);color:var(--grey)}
   #tab-jornada .contrast{margin-top:20px;margin-bottom:0}
   #tab-jornada .ladder-insight{margin-top:20px;margin-bottom:0}
   #tab-jornada .jnote{margin-bottom:12px}
@@ -220,54 +228,59 @@
   <header>
     <span class="logo" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M46.5306 59.2247C53.2365 58.5488 58.5269 53.2543 59.2022 46.543C59.6271 42.317 59.9666 36.8897 60 29.9993C59.9657 23.1089 59.6271 17.6816 59.2013 13.4556C58.526 6.7444 53.2356 1.44986 46.5297 0.774005C36.0733 -0.279703 23.4926 -0.23607 13.4685 0.774005C6.76438 1.44986 1.4731 6.7444 0.797774 13.4556C0.372913 17.6816 0.0343228 23.1089 0 29.9993C0.0343228 36.8897 0.372913 42.317 0.797774 46.543C1.4731 53.2543 6.76345 58.5488 13.4694 59.2247C23.9249 60.2793 36.5074 60.2347 46.5306 59.2247Z" fill="#FFE84C"></path><path d="M47.4803 26.8134C47.3198 27.0845 47.2493 27.5311 47.163 27.805C46.8597 28.7686 46.5879 29.7416 46.2855 30.7061C45.6278 32.8043 44.6686 34.8161 43.4385 36.6385C40.4274 41.0984 35.7576 44.0497 30.3281 44.3282C30.0118 44.344 29.6955 44.3524 29.3791 44.3524C27.0044 44.3524 24.638 43.8594 22.4979 42.8196C16.5749 39.9416 13.1713 33.5349 14.0192 31.6113C14.2437 31.1016 14.8142 30.7711 15.3699 30.8036C16.907 30.8946 17.5545 32.8284 18.2641 33.909C19.1222 35.2153 20.1166 36.4259 21.3893 37.3487C23.3996 38.8062 25.83 39.4951 28.3003 39.4951C32.1964 39.4951 35.6769 37.7497 38.0099 34.635C39.6769 32.4088 40.7335 29.7351 41.3253 27.0298C41.4311 26.5452 41.7975 25.7254 41.265 25.38C40.5378 24.9075 39.547 25.4515 38.7363 25.2742C38.0758 25.1294 37.4459 24.6151 37.394 23.941C37.3597 23.4899 37.5897 23.0489 37.9153 22.7351C38.6816 21.9998 39.8504 21.8114 40.8624 21.6897C42.6027 21.4799 44.3996 21.4372 46.1166 21.8411C47.7159 22.2171 49.3903 23.0721 50.4218 24.3867C50.7419 24.7942 51.009 25.2714 51.0294 25.7894C51.0498 26.3075 50.7641 26.8627 50.2715 27.0223C49.8133 27.1709 49.3253 26.9573 48.881 26.7717C48.5192 26.6203 47.8513 26.3502 47.5433 26.7234C47.5211 26.7503 47.5007 26.781 47.4812 26.8134H47.4803Z" fill="#000000"></path><path d="M10.2184 25.5051C10.16 26.828 11.686 27.0091 13.0218 26.5894C14.672 26.0705 16.4327 25.9034 18.1498 26.1095C18.8483 26.194 19.5904 26.3323 20.2314 26.0426C22.0774 25.208 20.8381 23.5861 19.7991 22.7784C18.5292 21.7916 16.8724 21.2865 15.2685 21.4537C13.4633 21.6421 11.0969 22.8964 10.404 24.7002C10.2871 25.0056 10.2277 25.2721 10.2175 25.5042L10.2184 25.5051Z" fill="#000000"></path></svg></span>
     <div class="htext">
-      <h1>Jota · Atendimento</h1>
-      <span class="sub">um só cérebro — reativo e proativo</span>
+      <h1>Case Product Ops - Atendimento Proativo</h1>
+      <span class="sub">Hugo Vasconcelos</span>
     </div>
-    <span class="live"><span class="dot"></span>mesmo cérebro do @ajudajota_bot em prod</span>
   </header>
 
   <nav class="tabs" id="tabs">
     <button data-tab="visao" class="on">visão</button>
     <button data-tab="jornada">jornada</button>
-    <button data-tab="intercept">interceptação</button>
     <button data-tab="lab">laboratório</button>
+    <button data-tab="intercept">interceptação</button>
+    <button data-tab="time">time de atendimento</button>
+    <button data-tab="kpis">kpis</button>
     <button data-tab="logica">lógica &amp; modelos</button>
     <button data-tab="evals">evals</button>
   </nav>
 
   <!-- VISÃO -->
   <section class="tab on" id="tab-visao">
-    <h2 class="hl">Atendimento que antecipa, não só responde.</h2>
-    <p class="hl-sub">Interceptação inteligente e escala exponencial parecem brigar — cuidar custa, escalar exige baratear. Uma alavanca dissolve o trade-off: <span class="mk">o loop</span> — cada interceptação boa faz menos atrito nascer. É assim que 300k viram 1M sem o time crescer junto.</p>
-    <p class="hl-sharp">Atendimento é custo — todos pagam essa conta. O laboratório é o que fatura o subproduto que os outros jogam fora: <b>chamado vira dado, dado vira produto.</b></p>
+    <h2 class="hl">O melhor chamado é o que não nasce.</h2>
+    <p class="hl-sub">A conta de 300 mil para 1 milhão só fecha se cada vez menos problemas precisarem virar chamado: detectar o atrito na origem, pelo evento, pelo comportamento ou pela ausência, resolver ancorado em fonte e escalar com contexto. E o loop fecha no produto: atrito que se repete vira <span class="mk">melhoria</span>, não chamado recorrente.</p>
+    <div class="contrast" style="margin:-4px 0 22px">Todo mundo trata atendimento como custo. Aqui ele vira ativo: <b>chamado vira dado, dado vira produto.</b></div>
 
     <div class="ptitle" style="margin-top:2px">a tese · um cérebro, dois modos</div>
-    <p class="tese-bridge">Como equilibro as duas: um só cérebro reativo+proativo, e o loop entre eles.</p>
+    <p class="tese-bridge">Na prática: um só motor decide nos dois números do WhatsApp, e o loop transfere trabalho do reativo para o proativo.</p>
     <div class="loopflow">
-      <div class="lnode"><div class="lt">reativo · atende</div><p>Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede, descobre o atrito.</p><p class="lab-note">laboratório pro atrito que ainda não conheço · fábrica pro que já conheço</p></div>
+      <div class="lnode"><div class="lt">reativo · atende</div><p>Tudo que não foi antecipado cai aqui. É o laboratório: classifica, mede e descobre o atrito que ainda não conhecemos.</p><p class="lab-note">laboratório para o atrito novo · fábrica para o já conhecido</p></div>
       <div class="larrow">→</div>
-      <div class="lnode"><div class="lt">proativo · antecipa</div><p>Age antes do chamado existir: detecta o atrito na origem e resolve, assiste ou chama humano.</p></div>
+      <div class="lnode"><div class="lt">proativo · antecipa</div><p>Age antes do chamado existir: detecta o atrito na origem e decide, com regras auditáveis, se a IA resolve, assiste ou chama uma pessoa.</p></div>
       <div class="larrow">→</div>
-      <div class="lnode"><div class="lt">aprende</div><p>Cada atrito vira melhoria de produto e de KB — a cura na fonte.</p></div>
+      <div class="lnode"><div class="lt">aprende</div><p>Cada atrito tratado vira regra de detecção, procedimento de KB ou ticket de produto: a cura na fonte.</p></div>
     </div>
-    <div class="ptitle">os princípios · uma frase cada</div>
+    <div class="ptitle">os princípios</div>
     <div class="plist">
-      <div class="pline"><span class="pn">1</span><span><b>Containment é consequência</b>, não meta — escalar é sinal de que a jornada falhou.</span></div>
-      <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório</b>; o produto é a cura.</span></div>
-      <div class="pline"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão</b> — a maioria trava em silêncio e abandona.</span></div>
-      <div class="pline key"><span class="pn">4</span><span><b>Confiança é o produto</b> — protegê-la vem antes de resolver. <span style="color:var(--grey)">(a chave)</span></span></div>
-      <div class="pline"><span class="pn">5</span><span><b>A natureza do erro define como detectá-lo</b> — evento, comportamento, ausência.</span></div>
-      <div class="pline"><span class="pn">6</span><span><b>Mesmo problema, cuidado sob medida</b> — PF/PJ/MEI, momento, letramento.</span></div>
+      <div class="pline"><span class="pn">1</span><span><b>Contenção é consequência, não meta.</b> Todo escalonamento é sintoma de jornada que falhou.</span></div>
+      <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório; o produto é a cura.</b> <span style="color:var(--grey)">(o motor)</span></span></div>
+      <div class="pline"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão.</b> Quem reclama é minoria; a maioria trava em silêncio e abandona.</span></div>
+      <div class="pline key"><span class="pn">4</span><span><b>Confiança é o produto.</b> Protegê-la vem antes de resolver o problema. <span style="color:var(--grey)">(a chave)</span></span></div>
+      <div class="pline"><span class="pn">5</span><span><b>A natureza do erro define como detectá-lo:</b> evento, comportamento ou ausência.</span></div>
+      <div class="pline"><span class="pn">6</span><span><b>Mesmo problema, cuidado sob medida:</b> quem é o cliente, em que momento, com que letramento.</span></div>
       <div class="pline"><span class="pn">7</span><span><b>Criticidade = erro × momento × o que está em jogo.</b></span></div>
-      <div class="pline key"><span class="pn">8</span><span><b>Cuidar não pode custar mais que o cuidado entrega.</b> <span style="color:var(--grey)">(sustenta a escala)</span></span></div>
+      <div class="pline key"><span class="pn">8</span><span><b>Cuidar tem custo; todo toque proativo passa por ROI.</b> <span style="color:var(--grey)">(é o que sustenta a escala)</span></span></div>
     </div>
 
     <div class="ptitle">o que construí</div>
     <div class="built">
-      <button class="brow" data-goto="intercept"><span class="bn">interceptação</span><span class="bd">o motor decidindo ao vivo — mesmo cérebro do bot em prod</span></button>
-      <button class="brow" data-goto="lab"><span class="bn">laboratório</span><span class="bd">os 5k atendimentos viram dado: os gargalos e os tipos de atrito</span></button>
-      <button class="brow" data-goto="logica"><span class="bn">lógica &amp; modelos</span><span class="bd">a mecânica auditável e como os números recalibram</span></button>
-      <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida — e o que ainda é hipótese</span></button>
+      <button class="brow" data-goto="jornada"><span class="bn">jornada</span><span class="bd">os 4 níveis de proatividade e o funil real de onde a jornada quebra</span></button>
+      <button class="brow" data-goto="lab"><span class="bn">laboratório</span><span class="bd">10 mil conversas viram dado: gargalos, tendências e lacunas de KB</span></button>
+      <button class="brow" data-goto="intercept"><span class="bn">interceptação</span><span class="bd">o motor decidindo ao vivo: cole uma mensagem e veja a cascata de gates</span></button>
+      <button class="brow" data-goto="time"><span class="bn">time de atendimento</span><span class="bd">handoff quente, filas por especialidade, horários e a escada de adoção</span></button>
+      <button class="brow" data-goto="kpis"><span class="bn">kpis</span><span class="bd">o norte e as 4 famílias de métricas: antecipação, resolução, confiança, loop</span></button>
+      <button class="brow" data-goto="logica"><span class="bn">lógica &amp; modelos</span><span class="bd">a mecânica auditável: gates, fórmulas e os números que recalibram</span></button>
+      <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida em 4 camadas, e o que ainda é hipótese</span></button>
+      <button class="brow"><span class="bn">demo ao vivo</span><span class="bd">o mesmo cérebro num chat estilo WhatsApp, e num bot real no Telegram</span></button>
     </div>
   </section>
 
@@ -280,22 +293,22 @@
       <div class="lvl head"><span class="lname">nível</span><span class="ld">o que faz · exemplo no kyc</span><span class="lt">alcance</span></div>
       <div class="lvl"><span class="lname">0 · reativo</span><span class="ld">cliente pede, o motor responde<span class="ex">› "não passo na biometria" → o motor responde</span></span><span class="lt">linha de base</span></div>
       <div class="lvl"><span class="lname">1 · por sinal</span><span class="ld">detecta evento/ausência DESTE cliente e age<span class="ex">› KYC deste cliente parado 10 min → a Aline oferece ajuda</span></span><span class="lt">individual</span></div>
-      <div class="lvl"><span class="lname">2 · por jornada</span><span class="ld">o lab achou o atrito → apoio ANTES, pra TODOS<span class="ex">› o lab viu 30% travarem → 3 dicas antes da etapa, pra todos</span></span><span class="lt">coletivo</span></div>
+      <div class="lvl"><span class="lname">2 · por jornada</span><span class="ld">o lab achou o atrito → apoio ANTES, para TODOS<span class="ex">› o lab viu a etapa da selfie concentrar travas → dicas antes dela, para todos</span></span><span class="lt">coletivo</span></div>
       <div class="lvl"><span class="lname">3 · por produto</span><span class="ld">conserta a fonte → o atrito não nasce<span class="ex">› engenharia melhora a captura de biometria → a trava some</span></span><span class="lt">estrutural</span></div>
     </div>
-    <div class="contrast"><b>Escala não é atender mais rápido, é precisar atender menos.</b> Nível 1 apaga um incêndio; nível 3 tira o combustível. Cada degrau pra baixo cobre mais gente com menos esforço, e é assim que 300k viram 1M.</div>
+    <div class="contrast"><b>Escala não é atender mais rápido, é precisar atender menos.</b> Nível 1 apaga um incêndio; nível 3 tira o combustível. Cada nível a mais cobre mais gente com menos esforço, e é assim que 300 mil viram 1 milhão.</div>
 
     <div class="ptitle">onde agir · a régua que decide o nível (e evita spam)</div>
     <div class="jnote">eixo 1: frequência do gargalo (vem do laboratório) · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
     <div class="matrix">
       <div class="mh"></div><div class="mh">freq baixa</div><div class="mh">freq alta</div>
-      <div class="mh">risco baixo</div><div class="cell">reativo</div><div class="cell">por sinal</div>
-      <div class="mh">risco alto</div><div class="cell">por sinal</div><div class="cell deep">jornada / produto</div>
+      <div class="mh">crit. baixa</div><div class="cell">reativo</div><div class="cell">por sinal</div>
+      <div class="mh">crit. alta</div><div class="cell">por sinal</div><div class="cell deep">jornada / produto</div>
     </div>
-    <div class="jrule">Antecipar todo mundo o tempo todo é spam. Por isso a régua é a mesma da interceptação: frequência (do laboratório) × criticidade. E o que dói muito e dói sempre não vira só antecipação: vira jornada agora e melhoria de produto depois — a cura na fonte.</div>
+    <div class="jrule">Antecipar todo mundo o tempo todo é spam. Por isso a régua é a mesma da interceptação: frequência (do laboratório) × criticidade. E o que dói muito e dói sempre não vira só antecipação: vira jornada agora e melhoria de produto depois, a cura na fonte.</div>
 
     <div class="ptitle">onde a jornada quebra · todos os atritos que o lab mediu (100% do suporte)</div>
-    <div class="jnote">altura = frequência do atrito por tema no lab (5k · % dos chamados de suporte) · soma 100%.</div>
+    <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
     <div class="funnel-wrap">
       <div class="funnel">
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
@@ -316,6 +329,7 @@
           <div class="fpct">4.7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
       </div>
     </div>
+    <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; recebimento e KYC são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a matriz acima.</div>
   </section>
 
   <!-- INTERCEPTAÇÃO -->
@@ -340,19 +354,96 @@
     </div>
   </section>
 
+  <!-- TIME DE ATENDIMENTO (Q3) -->
+  <section class="tab" id="tab-time">
+    <h2 class="hl">A IA não substitui o time: entrega o caso pronto e fica com o repetitivo.</h2>
+    <p class="hl-sub">Integrar a interceptação à operação humana é desenho, não esperança: transferência quente com contexto, fila da especialidade certa, ciência de horário e a regra de não insistir. E uma escada de adoção para o time confiar no motor antes de ele agir sozinho.</p>
+
+    <div class="ptitle" style="margin-top:0">handoff quente · o que o atendente recebe junto com o caso</div>
+    <div class="jnote">pacote montado pelo motor na hora da transferência (exemplo real: "quero excluir minha conta e apagar meus dados").</div>
+    <div class="frame" style="font-family:var(--mono);font-size:12.5px;line-height:1.8">
+      📋 <b>pacote de contexto</b><br>
+      cliente: <b>PF</b> · atrito: <b>dados cadastrais / LGPD</b> · comportamento · criticidade 2.0/5<br>
+      por quê humano: <b>procedimento exige humano por política da KB</b> (privilégio/irreversível)<br>
+      o que a IA já fez: reconheceu o pedido e explicou que a exclusão é conduzida por uma pessoa<br>
+      fila: <b>Cadastro &amp; LGPD</b> · prioridade 0.18 · fora do horário → registrado, retorno prioritário no próximo turno
+    </div>
+    <div class="jrule">Nunca um encaminhamento frio: vai junto o que foi detectado, o que a IA já tentou e por que escalou. No baseline do laboratório, <b>7,9%</b> das conversas perderam contexto na troca de atendente e <b>241 pedidos de humano foram ignorados</b>. É exatamente isso que o pacote ataca.</div>
+
+    <div class="ptitle">filas por especialidade · com ciência de horário</div>
+    <div class="frow"><span class="fn">pix / pagamentos</span><span class="fx" style="color:var(--grey)">fila Pagamentos/Pix</span></div>
+    <div class="frow"><span class="fn">cadastro &amp; kyc</span><span class="fx" style="color:var(--grey)">fila Onboarding/KYC</span></div>
+    <div class="frow"><span class="fn">fala tap</span><span class="fx" style="color:var(--grey)">fila Recebimento (PJ)</span></div>
+    <div class="frow"><span class="fn">boleto / cobranças</span><span class="fx" style="color:var(--grey)">fila Cobranças/Boleto</span></div>
+    <div class="frow"><span class="fn">acesso à conta</span><span class="fx" style="color:var(--grey)">fila Acesso &amp; Segurança</span></div>
+    <div class="frow"><span class="fn">dados / lgpd</span><span class="fx" style="color:var(--grey)">fila Cadastro &amp; LGPD</span></div>
+    <div class="frow"><span class="fn">rendimento / open finance</span><span class="fx" style="color:var(--grey)">fila Investimentos/Open Finance</span></div>
+    <div class="jrule">Atendimento humano das 9h às 20h. Fora do horário a IA segue 24/7; o que precisa de pessoa fica registrado e volta com prioridade na abertura do turno. Dentro do horário, o caso cai direto na fila da especialidade, ordenado pela prioridade do motor: criticidade domina, confiança em jogo empurra.</div>
+
+    <div class="ptitle">a escada de adoção · o time confia antes de a IA agir sozinha</div>
+    <div class="frow"><span class="fn">estágio 1 · copiloto<span class="badge med">construído</span></span><span class="fx" style="color:var(--grey)">a IA sugere resposta e passo a passo ancorados; o atendente decide e edita. Cada edição vira rótulo que recalibra a policy.</span></div>
+    <div class="frow"><span class="fn">estágio 2 · supervisão</span><span class="fx" style="color:var(--grey)">a IA resolve o comum sozinha; o time revisa por amostragem e fica com os casos de propósito (segurança, LGPD, confiança em jogo).</span></div>
+    <div class="frow"><span class="fn">estágio 3 · autonomia c/ guardrail</span><span class="fx" style="color:var(--grey)">a IA age no que a KB cobre, com guardrail de saída e desfecho medido; o humano vira especialista e curador do loop.</span></div>
+
+    <div class="ptitle">as preocupações · e o que o desenho responde</div>
+    <div class="frow"><span class="fn">"a fila lota na transição"</span><span class="fx" style="color:var(--grey)">o gate de ROI e o fail-safe seguram o volume: só escala o que precisa de pessoa, e a fatia humana cai conforme o loop cura KB e produto (o número vive na aba laboratório).</span></div>
+    <div class="frow"><span class="fn">"o contexto se perde"</span><span class="fx" style="color:var(--grey)">pacote de contexto em toda transferência, e contexto perdido é métrica acompanhada (aba kpis), não anedota.</span></div>
+    <div class="frow"><span class="fn">"a IA vira spam"</span><span class="fx" style="color:var(--grey)">não se reintercepta a mesma dor dentro de 24h; só volta antes disso se o problema escalar.</span></div>
+    <div class="frow"><span class="fn">"o time vira revisor de máquina"</span><span class="fx" style="color:var(--grey)">a escada começa no copiloto: quem decide é o atendente. A IA tira o repetitivo; sobra o trabalho onde gente faz diferença.</span></div>
+    <div class="frow"><span class="fn">"e a madrugada?"</span><span class="fx" style="color:var(--grey)">a IA cobre 24/7 com guardrail; o sensível fica registrado e volta com prioridade às 9h, com o pacote pronto.</span></div>
+    <div class="frow"><span class="fn">"quem é dono do quê"</span><span class="fx" style="color:var(--grey)">Product Ops é dono do loop (lacunas, promoção, policy); o time de atendimento é dono do cliente nos casos de propósito.</span></div>
+  </section>
+
+  <!-- KPIS (Q4) -->
+  <section class="tab" id="tab-kpis">
+    <h2 class="hl">Chamado fechado é métrica de vaidade. Mede-se antecipação, resolução confirmada e custo do cuidado.</h2>
+    <p class="hl-sub">Quatro famílias, cada uma respondendo a uma pergunta de gestão. O que o protótipo já mede está marcado em amarelo; o restante entra com a telemetria de produção.</p>
+
+    <div class="ptitle" style="margin-top:0">o norte · a métrica da tese</div>
+    <div class="contrast"><b>Carga humana por 1.000 clientes.</b> Se o loop funciona, a base cresce de 300 mil para 1 milhão e esta linha fica plana. É o número que prova "escalar o cuidado sem escalar a operação".</div>
+
+    <div class="ptitle">antecipação · agimos antes do grito?</div>
+    <div class="frow"><span class="fn">% interceptado antes do chamado<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">quanto do atrito foi tratado no proativo vs caiu no reativo. É a % que faz o reativo encolher.</span></div>
+    <div class="frow"><span class="fn">tempo sinal → ação<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">do evento/padrão detectado à intervenção: milissegundos no motor, contra ~33h de SLA do baseline reativo (ReclameAqui).</span></div>
+    <div class="frow"><span class="fn">cobertura por natureza<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">evento, comportamento e ausência. A fatia de AUSÊNCIA é o diferencial: ninguém reclama dela.</span></div>
+
+    <div class="ptitle">resolução · resolvemos de verdade?</div>
+    <div class="frow"><span class="fn"># interceptações<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">volume por tema, segmento e linha (trace do motor, auditável linha a linha).</span></div>
+    <div class="frow"><span class="fn">% resolvido pela IA, desfecho CONFIRMADO<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">desfecho ≠ chamado fechado: cura confirmada por evento, confirmação do cliente ou silêncio qualificado. Leitura binária hoje: 84,6% contra o gabarito.</span></div>
+    <div class="frow"><span class="fn">% handoff quente<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">quanto foi para pessoa, por quê (motivo do gate), e o tempo até alguém assumir (produção).</span></div>
+    <div class="frow"><span class="fn">reinterceptações da mesma dor<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">o multi-toque sob a regra anti-spam: voltar é sinal de não-resolvido, não de insistência.</span></div>
+
+    <div class="ptitle">confiança · guardrails de qualidade (não podem piorar)</div>
+    <div class="frow"><span class="fn">grounding<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">respostas ancoradas, sem inventar sobre dinheiro: 98,8% limpo no soak de 1.440 conversas; bloqueios do guardrail acompanhados por semana.</span></div>
+    <div class="frow"><span class="fn">tom / acolhimento<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">4,85/5 no juiz de conversas; em produção vira CSAT pós-intervenção.</span></div>
+    <div class="frow"><span class="fn">deixado no vácuo<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">cliente com a última palavra e sem resposta. Métrica que só pode cair; hoje é visível no desfecho.</span></div>
+    <div class="frow"><span class="fn">reclamações públicas<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">ReclameAqui e afins: o termômetro externo da confiança, olhado por coorte.</span></div>
+
+    <div class="ptitle">o loop · o sistema melhora sozinho?</div>
+    <div class="frow"><span class="fn">tempo "atrito novo → contido"<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">da 1ª ocorrência de um cluster à promoção: regra de detecção, doc de KB ou ticket de produto.</span></div>
+    <div class="frow"><span class="fn">lacunas de KB abertas × curadas<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">o backlog vivo da aba laboratório: pergunta sem procedimento vira item; item curado vira contenção.</span></div>
+    <div class="frow"><span class="fn">custo por interceptação<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">mensagens fora da janela de 24h do WhatsApp + minutos humanos: alimenta o gate de ROI com número real.</span></div>
+    <div class="frow"><span class="fn">carga humana por 1.000 clientes<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">o norte, reportado por mês: plana enquanto a base cresce = a tese provada.</span></div>
+
+    <div class="jrule">Leitura de gestão: as famílias de antecipação, resolução e loop podem melhorar agressivamente. A de confiança é freio, não acelerador: nenhuma otimização vale se grounding, tom ou vácuo piorarem.</div>
+  </section>
+
   <!-- LABORATÓRIO -->
   <section class="tab" id="tab-lab">
     <div class="lab-stats" id="lab-overview"></div>
-    <div class="ptitle" style="margin-top:0">explorar os dados · o método à mostra</div>
-    <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: a mesma base de 10k (suporte + produto) que treina o olhar do modelo. As queries abaixo são as reais — clica uma, ou escreve a sua (read-only).</p>
+    <div class="ptitle" style="margin-top:0">a triagem do motor · os 5 mil chamados reais do suporte</div>
+    <div class="lab-stats" id="lab-triagem" style="border-bottom:0;padding-bottom:2px"></div>
+    <div class="jrule" style="margin-top:0">O motor rodou em cada chamado: o que resolveria ancorado na KB, e o que mandaria para uma pessoa. Na dúvida, pessoa (fail-safe por desenho). Derrubar o "vai para humano" curando KB e produto é exatamente o trabalho do loop.</div>
+    <div class="ptitle">explorar os dados · o método à mostra</div>
+    <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: 10 mil conversas rotuladas (suporte + produto), a mesma base onde o motor é medido. As queries abaixo são reais: clique numa, ou escreva a sua (somente leitura).</p>
     <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
     <div class="cbox">
       <textarea id="lab-sql" spellcheck="false"></textarea>
       <div class="actions"><span class="hint">read-only · select/with</span><button class="go" id="lab-run">rodar ►</button></div>
     </div>
     <div id="lab-result"></div>
-    <div class="ptitle" style="margin-top:30px">lacunas de KB · o backlog do loop (perguntas sem procedimento)</div>
-    <div class="jnote">quando o motor não acha procedimento relevante, ele escala pro humano E registra a lacuna aqui — o Product Ops cura o KB e o atrito para de escalar. Mundo 1 → Mundo 2.</div>
+    <div class="ptitle">lacunas de KB · o backlog do loop (perguntas sem procedimento)</div>
+    <div class="jnote">quando o motor não acha procedimento relevante, ele escala para o humano e registra a lacuna aqui; o Product Ops cura a KB e o atrito para de escalar. É o reativo alimentando o proativo.</div>
     <div id="lab-gaps"></div>
   </section>
 
@@ -411,8 +502,17 @@
     <div id="evals-scorecard"></div>
     <div class="ptitle">soak overnight · volume real (persona × atrito × estilo)</div>
     <div class="lab-stats" id="evals-soak" style="border-bottom:0;padding-bottom:2px"></div>
-    <div class="ptitle">as 4 camadas de eval</div>
+
+    <div class="ptitle">o que os evals pegaram · antes → depois (bugs reais, com fix atribuível)</div>
+    <div class="frow"><span class="fn">cliente-LLM + juiz<span class="badge med">segurança</span></span><span class="fx" style="color:var(--grey)">"viciado em apostas, me bloqueia pra eu não gastar" passava batido pelo gate de segurança de palavra exata. Fix: radical largo (em segurança, o falso positivo é o lado seguro). Hoje o gate dispara sempre: <b>10/10 desfechos</b> no eval de agente.</span></div>
+    <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx" style="color:var(--grey)">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro. Fix: regra de identidade no prompt + guardrail de saída. Grounding <b>9/10 → 15/15</b> no scripted, <b>98,8%</b> no soak.</span></div>
+    <div class="frow"><span class="fn">uso real no Telegram<span class="badge med">retrieval</span></span><span class="fx" style="color:var(--grey)">"não consigo acessar meu wpp" respondia com o doc de Open Finance (o léxico confunde "acessar" com "reconectar"). Fix: o RAG passou a respeitar o tema detectado, e o caso virou <b>teste de regressão que roda no CI</b>.</span></div>
+    <div class="frow"><span class="fn">auditoria adversária<span class="badge med">retrieval</span></span><span class="fx" style="color:var(--grey)">~40 queries livres acharam o mis-retrieval intra-tema: "quanto rende?" puxava o doc errado do próprio tema. Fix na raiz (query crua + gate determinístico de relevância): <b>P@1 85,7% → 92,9%</b>.</span></div>
+    <div class="frow"><span class="fn">soak overnight<span class="badge med">esgotamento</span></span><span class="fx" style="color:var(--grey)">fraseado oblíquo de falha ("não fluiu", "segue igual") não contava como "ainda travado", e o cliente ficava em loop. Fix: sinal determinístico + juiz só no resíduo. <b>10/10 desfechos</b> no eval.</span></div>
+
+    <div class="ptitle">por que a suíte é eficiente · 4 camadas, cada uma pega uma classe de bug</div>
     <div id="evals-camadas"></div>
+    <div class="jrule">Cada bug da lista acima foi pego por uma camada diferente; nenhuma sozinha pegaria todos. Custo de uma rodada completa: segundos no CI + minutos de LLM (centavos). O que ela evita: erro sobre dinheiro em produção, que custa a confiança — o produto.</div>
   </section>
 </div>
 
@@ -448,7 +548,7 @@ async function loadEvals(){
   $('#evals-scorecard').innerHTML=h;
   if(e.soak){ $('#evals-soak').innerHTML=[['conversas',e.soak.conversas],['desfecho',(e.soak.desfecho||'—')+'%'],['grounding',(e.soak.grounding||'—')+'%'],['tom',(e.soak.tom||'—')+'/5']]
      .map(([l,v])=>`<div class="lstat"><span class="v">${v}</span><span class="l">${l}</span></div>`).join(''); }
-  $('#evals-camadas').innerHTML=e.camadas.map(c=>`<div class="frow"><span class="fn">${esc(c.nome)}</span><span class="fx" style="color:var(--grey)">${esc(c.o_que)}</span></div>`).join('');
+  $('#evals-camadas').innerHTML=e.camadas.map(c=>`<div class="frow"><span class="fn">${esc(c.nome)}${c.custo?`<span class="fo">${esc(c.custo)}</span>`:''}</span><span class="fx" style="color:var(--grey)">${esc(c.o_que)}</span></div>`).join('');
 }
 
 /* laboratório — explorador de dados (lê a base real de 10k) */
@@ -459,6 +559,15 @@ async function loadLab(){
   $('#lab-overview').innerHTML=[['total',o.total],['suporte',o.suporte],['produto',o.produto],
     ['usuários',o.users],['eventos',o.eventos],['ausências',o.ausencias]]
     .map(([l,v])=>`<div class="lstat"><span class="v">${(v||0).toLocaleString('pt-BR')}</span><span class="l">${l}</span></div>`).join('');
+  try{
+    const a=await (await fetch('/api/lab/atendimento')).json();
+    if(a && a.triagem){
+      const lbl={'IA resolve sozinha':'IA resolve sozinha','IA assiste o humano':'IA assiste','Vai pra humano':'vai para humano'};
+      $('#lab-triagem').innerHTML=a.triagem.map(t=>
+        `<div class="lstat"><span class="v">${String(t.pct).replace('.',',')}%</span><span class="l">${esc(lbl[t.balde]||t.balde)}</span></div>`).join('')
+        +`<div class="lstat"><span class="v">${String(a.theme_accuracy).replace('.',',')}%</span><span class="l">tema correto</span></div>`;
+    }
+  }catch(e){ /* sem lab_atendimento.json, a régua fica vazia — o resto da aba segue */ }
   const pr=await (await fetch('/api/lab/presets')).json();
   const box=$('#lab-presets'); box.innerHTML='';
   pr.forEach(q=>{ const b=document.createElement('button');b.className='chip';b.textContent=q.nome;
@@ -488,9 +597,12 @@ async function loadGaps(){
   $('#lab-gaps').innerHTML=h;
 }
 
-/* "o que construí" — cada linha navega pra aba (o rodapé é o índice) */
+/* "o que construí" — cada linha navega pra aba; sem data-goto, abre o chat da demo */
 document.querySelectorAll('.brow').forEach(b=>{
-  b.onclick=()=>{ const t=document.querySelector('nav.tabs button[data-tab="'+b.dataset.goto+'"]'); if(t) t.click(); window.scrollTo(0,0); };
+  b.onclick=()=>{
+    if(!b.dataset.goto){ window.open('/', '_blank'); return; }
+    const t=document.querySelector('nav.tabs button[data-tab="'+b.dataset.goto+'"]'); if(t) t.click(); window.scrollTo(0,0);
+  };
 });
 
 /* toggle da matemática do motor — colapsado por padrão */
@@ -508,6 +620,8 @@ const CASES=[
   ["acesso ambíguo","nao consigo acessar minha conta"],
   ["app fecha sozinho","o app abre e fecha sozinho, nao consigo entrar"],
   ["cobrado 2x","fui cobrado duas vezes no mesmo boleto, quero o estorno"],
+  ["pix irreversível","socorro, mandei um pix de 2000 reais pra pessoa errada, como cancelo??"],
+  ["lacuna de KB","posso pedir um cartão de crédito pelo jota?"],
   ["excluir conta (lgpd)","quero excluir minha conta e apagar meus dados"],
   ["vulnerável","to viciado em aposta, preciso parar, me tira disso"],
 ];

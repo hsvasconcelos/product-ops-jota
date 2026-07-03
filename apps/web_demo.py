@@ -575,13 +575,13 @@ def _db_ro() -> sqlite3.Connection:
 
 # Queries prontas (reais) que contam a história — read-only, exibidas no editor.
 LAB_PRESETS = [
-    {"nome": "Padrões de erro — volumetria por tema",
+    {"nome": "Padrões de erro · volumetria por tema",
      "sql": "SELECT gold_theme AS tema, COUNT(*) AS n\nFROM conversations\nGROUP BY gold_theme\nORDER BY n DESC;"},
     {"nome": "Os dois mundos (suporte × produto)",
      "sql": "SELECT channel AS mundo, COUNT(*) AS conversas\nFROM conversations\nGROUP BY channel;"},
     {"nome": "Resolução por mundo",
      "sql": "SELECT channel AS mundo,\n  ROUND(100.0*SUM(CASE WHEN outcome='resolved' THEN 1 ELSE 0 END)/COUNT(*),1) AS pct_resolvido\nFROM conversations\nGROUP BY channel;"},
-    {"nome": "Erros INVISÍVEIS (ausência) — só o produto vê",
+    {"nome": "Erros invisíveis (ausência) · só o proativo vê",
      "sql": "SELECT gold_theme AS tema, COUNT(*) AS ausencias\nFROM conversations\nWHERE gold_nature='absence_detected'\nGROUP BY gold_theme\nORDER BY ausencias DESC;"},
     {"nome": "Natureza do atrito por mundo",
      "sql": "SELECT channel AS mundo, gold_nature AS natureza, COUNT(*) AS n\nFROM conversations\nGROUP BY channel, gold_nature\nORDER BY mundo, n DESC;"},
@@ -662,10 +662,14 @@ def evals():
         soak = {"conversas": grab(r"conversas:\s*\*\*([\d.]+)\*\*"), "desfecho": grab(r"desfecho certo:\s*\*\*([\d.]+)%"),
                 "grounding": grab(r"grounding limpo:\s*\*\*([\d.]+)%"), "tom": grab(r"tom médio:\s*\*\*([\d.,]+)")}
     camadas = [
-        {"nome": "unit (run_all)", "o_que": "contratos do motor com limiares de regressão — vermelho se cair"},
-        {"nome": "scripted · 15 cenários", "o_que": "conversas multi-turno determinísticas ponta a ponta"},
-        {"nome": "cliente-LLM + juiz", "o_que": "um LLM finge de cliente; outro julga grounding / adequação / tom"},
-        {"nome": "proativo · /demo-*", "o_que": "os 7 cenários proativos pelo fluxo real"},
+        {"nome": "contratos (run_all)", "custo": "~30s · roda no CI a cada push",
+         "o_que": "7 métricas com limiar de regressão; vermelho = não sobe. Pega: recalibração que quebra a policy, schema, retrieval."},
+        {"nome": "scripted · 15 cenários", "custo": "minutos · determinístico",
+         "o_que": "conversas multi-turno ponta a ponta com desfecho esperado. Pega: quebra de fluxo, handoff errado, saudação dupla."},
+        {"nome": "cliente-LLM + juiz", "custo": "minutos · centavos de LLM",
+         "o_que": "um LLM finge de cliente (o red team barato: inventa fraseado que ninguém escreveria); outro julga grounding, adequação e tom. Pega: segurança e alucinação."},
+        {"nome": "soak overnight", "custo": "1.440 conversas · teto de custo",
+         "o_que": "persona × atrito × estilo em volume. Pega: o raro — flakiness, casos de borda, regressão de tom."},
     ]
     return {"scorecard": rows, "soak": soak, "camadas": camadas}
 

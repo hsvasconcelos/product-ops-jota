@@ -3,27 +3,29 @@
     "id": "KB-PIX-001",
     "title": "Pix enviado não caiu na conta do destinatário",
     "category": "erro_pix",
-    "content": "Meu Pix não caiu, não chegou, não foi creditado, o destinatário não recebeu, mandei o Pix e não caiu na conta da pessoa, o dinheiro saiu mas não chegou. Quando um Pix é enviado e o destinatário não recebe, o valor fica em processamento ou foi devolvido automaticamente. O valor enviado nunca some: se não for creditado, retorna para a conta de origem em até 30 minutos. Em casos de instabilidade ou análise antifraude o crédito pode levar alguns minutos.",
+    "content": "Quando um Pix é enviado e o destinatário não recebe, o valor fica em processamento ou foi devolvido automaticamente. O valor enviado nunca some: se não for creditado, retorna para a conta de origem em até 30 minutos. Em casos de instabilidade ou análise antifraude o crédito pode levar alguns minutos.",
     "steps": [
       "Confira o status do Pix no histórico. Se estiver 'Processando', aguarde até 5 minutos.",
       "Peça ao destinatário para conferir se a chave usada está correta e ativa.",
       "Se o status for 'Devolvido', o valor retorna automaticamente, sem custo.",
       "Após 30 minutos sem crédito, acione o suporte com o ID E2E para abertura de MED (Mecanismo Especial de Devolução)."
     ],
-    "requires_human": false
+    "requires_human": false,
+    "hints": "Meu Pix não caiu, não chegou, não foi creditado, o destinatário não recebeu, mandei o Pix e não caiu na conta da pessoa, o dinheiro saiu mas não chegou."
   },
   {
     "id": "KB-PIX-002",
     "title": "Chave Pix não reconhecida ou não encontrada",
     "category": "chave_pix_invalida",
-    "content": "A chave Pix dá erro, a chave não é reconhecida, chave não encontrada, erro na chave de destino, não consigo enviar Pix pra essa chave. Para um Pix chegar, a chave de destino (CPF, e-mail, celular ou aleatória) precisa estar REGISTRADA como chave Pix em algum banco pelo dono. Um CPF ou e-mail que existe mas não foi cadastrado como chave não funciona como destino. Esta é uma confusão comum: ter o número não significa que ele é uma chave ativa.",
+    "content": "Para um Pix chegar, a chave de destino (CPF, e-mail, celular ou aleatória) precisa estar REGISTRADA como chave Pix em algum banco pelo dono. Um CPF ou e-mail que existe mas não foi cadastrado como chave não funciona como destino. Esta é uma confusão comum: ter o número não significa que ele é uma chave ativa.",
     "steps": [
       "Confirme com o destinatário qual é a chave Pix ATIVA dele (pode ser diferente do CPF).",
       "Peça para ele verificar as chaves cadastradas no banco onde quer receber.",
       "Como alternativa, ele pode te enviar um QR Code de cobrança — aí não precisa de chave.",
       "Para receber você mesmo, veja suas chaves cadastradas no Jota e cadastre uma nova se precisar."
     ],
-    "requires_human": false
+    "requires_human": false,
+    "hints": "A chave Pix dá erro, a chave não é reconhecida, chave não encontrada, erro na chave de destino, não consigo enviar Pix pra essa chave."
   },
   {
     "id": "KB-PIX-003",
@@ -172,14 +174,15 @@
     "id": "KB-ESTORNO-001",
     "title": "Cobrança em duplicidade e estorno automático",
     "category": "estorno_duplicidade",
-    "content": "Fui cobrado duas vezes no mesmo boleto, cobrança dobrada, debitaram o boleto em dobro, paguei o boleto e cobraram de novo, duas cobranças iguais do mesmo boleto ou pagamento — tudo isso é cobrança em duplicidade. Quando o sistema identifica duas cobranças idênticas — mesmo valor, mesmo destino, em um intervalo curto — trata como duplicidade. O estorno da cobrança duplicada é automático: o cliente não precisa pedir, e o valor volta para a conta de origem em até 1 dia útil. A cobrança legítima é mantida.",
+    "content": "Quando o sistema identifica duas cobranças idênticas — mesmo valor, mesmo destino, em um intervalo curto — trata como duplicidade. O estorno da cobrança duplicada é automático: o cliente não precisa pedir, e o valor volta para a conta de origem em até 1 dia útil. A cobrança legítima é mantida.",
     "steps": [
       "Confirmar as duas cobranças idênticas (mesmo valor, destino e dia).",
       "Estornar automaticamente a cobrança duplicada — a original permanece.",
       "Avisar o cliente de forma proativa do estorno e do prazo de até 1 dia útil.",
       "Acompanhar o crédito de volta na conta de origem e confirmar quando cair."
     ],
-    "requires_human": false
+    "requires_human": false,
+    "hints": "Fui cobrado duas vezes no mesmo boleto, cobrança dobrada, debitaram o boleto em dobro, paguei o boleto e cobraram de novo, duas cobranças iguais do mesmo boleto ou pagamento — tudo isso é cobrança em duplicidade."
   },
   {
     "id": "KB-PIX-004",
@@ -199,7 +202,7 @@
     "id": "KB-PIX-005",
     "title": "Cadastrar, registrar ou criar sua chave Pix",
     "category": "cadastro_chave_pix",
-    "content": "Não consigo cadastrar minha chave Pix, como registrar/criar uma chave (CPF, e-mail, celular ou aleatória) na minha conta. Você cadastra suas próprias chaves Pix dentro do Jota. O bloqueio mais comum: a chave (CPF, e-mail ou celular) já está registrada em OUTRO banco — nesse caso não dá pra cadastrar de novo, é preciso TRAZER a chave por portabilidade (reivindicação de posse), que o outro banco tem até 7 dias pra confirmar. Também é preciso ter o contato (e-mail/celular) verificado, e cada conta PF tem limite de 5 chaves. A chave aleatória nunca dá conflito.",
+    "content": "Você cadastra suas próprias chaves Pix dentro do Jota. O bloqueio mais comum: a chave (CPF, e-mail ou celular) já está registrada em OUTRO banco — nesse caso não dá pra cadastrar de novo, é preciso TRAZER a chave por portabilidade (reivindicação de posse), que o outro banco tem até 7 dias pra confirmar. Também é preciso ter o contato (e-mail/celular) verificado, e cada conta PF tem limite de 5 chaves. A chave aleatória nunca dá conflito.",
     "steps": [
       "No Jota, vá em Pix > Minhas chaves > Cadastrar chave e escolha o tipo (CPF, e-mail, celular ou aleatória).",
       "Se pedir verificação, confirme o código enviado ao e-mail/celular antes de concluir.",
@@ -207,6 +210,7 @@
       "Se atingiu o limite de 5 chaves, exclua uma que não usa ou cadastre uma chave aleatória.",
       "Chave aleatória é a saída rápida quando não quer usar CPF/e-mail/celular — cadastra na hora, sem conflito."
     ],
-    "requires_human": false
+    "requires_human": false,
+    "hints": "Não consigo cadastrar minha chave Pix, como registrar/criar uma chave (CPF, e-mail, celular ou aleatória) na minha conta."
   }
 ]
