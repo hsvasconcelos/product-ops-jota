@@ -335,15 +335,16 @@ def derive_trust_factors(det: ClassifierOutput, prof: UserProfile,
     )
 
 
-def derive_resolubilidade(det: ClassifierOutput, doc=None) -> Resolubilidade:
+def derive_resolubilidade(det: ClassifierOutput, doc=None, kb_relevant: bool = True) -> Resolubilidade:
     """Capacidade vem da KB, NÃO de uma lista de temas no código (acaba o whack-a-mole).
-      · kb_existe   = temos procedimento pro atrito (todo tema menos OTHER tem doc na KB).
+      · kb_existe   = temos procedimento QUE RESPONDE a este atrito. Não basta o tema ter doc —
+                      o doc recuperado precisa ser RELEVANTE (kb_relevant). Senão é lacuna de
+                      conteúdo: responder ancorado no doc errado é pior que não responder.
       · executavel  = o procedimento NÃO está marcado `requires_human` (curado na KB pelo
-                      Product Ops = o loop). Mas o flag só vale se o doc for DO TEMA detectado —
-                      senão é mis-retrieval (doc errado impondo sua política).
+                      Product Ops = o loop). Só vale se o doc for DO TEMA detectado (anti mis-retrieval).
       · reversivel  = True (a AÇÃO da IA é orientar; irreversibilidade do fato é STAKES)."""
-    has_kb = det.predicted_theme is not SupportTheme.OTHER
-    on_topic = doc is not None and _doc_theme(doc.id) == det.predicted_theme
+    has_kb = (det.predicted_theme is not SupportTheme.OTHER) and kb_relevant
+    on_topic = doc is not None and _doc_theme(doc.id) == det.predicted_theme and kb_relevant
     requires_human = bool(getattr(doc, "requires_human", False)) and on_topic
     return resolubilidade(ResolubilidadeFatores(
         kb_existe=has_kb,
@@ -353,7 +354,8 @@ def derive_resolubilidade(det: ClassifierOutput, doc=None) -> Resolubilidade:
 
 
 def derive_decision_input(det: ClassifierOutput, prof: UserProfile, customer_text: str,
-                          ref: datetime, doc=None, stuck: bool = False) -> DecisionInput:
+                          ref: datetime, doc=None, stuck: bool = False,
+                          kb_relevant: bool = True) -> DecisionInput:
     """Monta os 4 sinais do decide() 100% derivados — sem gold, sem número emprestado.
     `ref` = started_at (tempo de casa) · `doc` = procedimento recuperado (resolubilidade
     vem da KB) · `stuck` = esgotamento (o chamador, que tem o estado da conversa, decide)."""
@@ -364,10 +366,10 @@ def derive_decision_input(det: ClassifierOutput, prof: UserProfile, customer_tex
         trust = min(1.0, trust + HEAT_TRUST_BUMP)
     if det.asked_for_human:
         trust = min(1.0, trust + HEAT_TRUST_BUMP)
-    resol = derive_resolubilidade(det, doc)
-    # requires_human só vale se o doc for DO TEMA detectado (anti mis-retrieval: doc errado
-    # não impõe sua política) — mesma trava do derive_resolubilidade.
-    on_topic = doc is not None and _doc_theme(doc.id) == det.predicted_theme
+    resol = derive_resolubilidade(det, doc, kb_relevant)
+    # requires_human só vale se o doc for DO TEMA detectado E relevante (anti mis-retrieval:
+    # doc errado/irrelevante não impõe sua política) — mesma trava do derive_resolubilidade.
+    on_topic = doc is not None and _doc_theme(doc.id) == det.predicted_theme and kb_relevant
     requires_human = bool(getattr(doc, "requires_human", False)) and on_topic
     return DecisionInput(
         criticality=round(crit, 2),

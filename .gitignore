@@ -10,3 +10,4 @@ prep/
 
 # trace de observabilidade (runtime, cresce)
 data/traces.jsonl
+data/kb_gaps.jsonl

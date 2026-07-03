@@ -250,6 +250,30 @@ def guardrail_check(reply: str, doc) -> tuple[bool, str]:
         return True, "guardrail falhou (fail-open)"
 
 
+def relevance_judge(customer_text: str, doc) -> bool:
+    """O procedimento recuperado REALMENTE endereça a pergunta do cliente? Só derruba (False)
+    quando é claramente OUTRO assunto — pra não confundir "não tenho KB" com "KB certo" e não
+    responder ancorado no doc errado. CONSERVADOR: na dúvida, True. Fail-safe: True se o LLM
+    cair (não se escala por falha do juiz)."""
+    if LLM is None or doc is None or not customer_text.strip():
+        return True
+    try:
+        passos = " ".join(getattr(doc, "steps", []) or [])
+        r = LLM.chat.completions.create(
+            model=OPENAI_MODEL, temperature=0, max_tokens=4,
+            messages=[{"role": "system", "content":
+                       "Você verifica se um PROCEDIMENTO de suporte é do MESMO ASSUNTO que a pergunta do "
+                       "cliente — pode ajudar, mesmo que só em parte. Seja PERMISSIVO: responda 'nao' "
+                       "SOMENTE se for um assunto claramente DIFERENTE (ex.: cliente pergunta o LIMITE do "
+                       "Pix e o procedimento é sobre DEVOLUÇÃO de Pix pra pessoa errada). Mesmo tema geral, "
+                       "ou qualquer dúvida, responda 'sim'."},
+                      {"role": "user", "content":
+                       f"PERGUNTA: {customer_text[:400]}\n\nPROCEDIMENTO ({doc.title}): {(doc.content or '')[:400]} {passos[:300]}"}])
+        return not (r.choices[0].message.content or "").strip().lower().startswith("n")
+    except Exception:
+        return True
+
+
 def gerar(history, theme, seg, doc, disappointed=False, opener=False, fatos="") -> str:
     # quando a IA resolve, tira passos de escalação/jargão do procedimento (a decisão
     # de chamar humano é do gate, não do texto — e jargão assusta o leigo).
@@ -283,6 +307,21 @@ def _msgs(history, base: datetime):
     return out
 
 
+KB_GAPS = ROOT / "data" / "kb_gaps.jsonl"
+
+
+def _log_kb_gap(pergunta: str, tema: str, doc_id):
+    """Registra uma lacuna de KB (pergunta sem procedimento relevante) — o backlog acionável
+    que o Product Ops revisa pra curar a base. É o Mundo 1 alimentando o Mundo 2. Fail-safe."""
+    try:
+        rec = {"ts": datetime.now().isoformat(timespec="seconds"), "pergunta": pergunta[:300],
+               "tema": tema, "doc_irrelevante": doc_id}
+        with open(KB_GAPS, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
+
+
 def analisar(sess):
     base = datetime.fromisoformat(sess["started_at"])
     ctx = [{"role": "user", "content": sess["context_text"]}] if sess.get("context_text") else []
@@ -297,6 +336,12 @@ def analisar(sess):
     # confunde "acessar wpp" com "reconectar banco"). Sem match, ordem original.
     docs = prefer_theme(docs, det.predicted_theme, det.theme_confidence)[:TOP_K]
     doc = docs[0] if docs else None
+    # GATE DE RELEVÂNCIA: o doc recuperado REALMENTE responde à pergunta? Senão é lacuna de KB
+    # (has_kb=False → escala pro humano) e registra a lacuna pro backlog (o loop cura o KB).
+    kb_relevant = relevance_judge(txt, doc) if (doc is not None and det.predicted_theme is not _T.OTHER) else True
+    # lacuna de KB = tema não reconhecido (OTHER) OU doc recuperado não responde à pergunta
+    if det.predicted_theme is _T.OTHER or not kb_relevant:
+        _log_kb_gap(txt, det.predicted_theme.value, doc.id if doc else None)
     # ESGOTAMENTO: o sinal PRIMÁRIO é o do CLIENTE (determinístico, independe do reply do LLM):
     # quantas vezes ele disse "não funcionou / continua / já tentei" (in_loop). 2 sinais de
     # falha → o procedimento não resolveu → humano. O fix-streak é backstop; tema novo zera.
@@ -318,7 +363,7 @@ def analisar(sess):
     # esgotamento = o CLIENTE sinalizou falha (não conversa longa!): 2 "não funcionou",
     # ou 1 + emoção. Conversa produtiva e longa NÃO escala — só falha repetida.
     stuck = sig >= 2 or (sig >= 1 and (det.frustrated or det.disappointed))
-    inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck)
+    inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck, kb_relevant=kb_relevant)
     # streak é incrementado em handle_message SÓ quando entrega um fix real (pergunta de
     # esclarecimento não conta) — senão o esgotamento dispara cedo demais.
     return det, docs, decide(inp), inp

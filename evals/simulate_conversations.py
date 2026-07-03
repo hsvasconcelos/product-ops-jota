@@ -70,8 +70,9 @@ SCENARIOS = [
      "turns": ["to abrindo conta mas a selfie nao passa de jeito nenhum"]},
     {"id": "frustracao_fria_resolve", "seg": "pf", "expect": R,
      "turns": ["poxa, o pix ta dando erro na chave, to meio decepcionado"]},
-    {"id": "nubank_externo", "seg": "pf", "expect": R,
-     "forbidden": ["seu banco", "banco parceiro"],
+    # lacuna real: não há procedimento pra transferência ENTRE bancos → o gate de relevância
+    # escala + registra (humano), em vez de chutar num doc errado. Label corrigido R→H.
+    {"id": "nubank_externo", "seg": "pf", "expect": H,
      "turns": ["nao consigo transferir do meu nubank pro jota"]},
 ]
 
