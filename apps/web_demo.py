@@ -41,7 +41,6 @@ if _envf.exists():
             os.environ.setdefault(_k, _v)
 
 from product_ops_jota.channels import WhatsAppLine, proactive_line      # noqa: E402
-from product_ops_jota.classifier import classify_conversation           # noqa: E402
 from product_ops_jota.decision import decide                            # noqa: E402
 from product_ops_jota.friction_model import (                            # noqa: E402
     InterceptionAction, SupportTheme, FrictionNature,
@@ -52,7 +51,7 @@ from product_ops_jota.decision import explain_gates, derive_resolubilidade, DEFA
 from product_ops_jota.friction_model import DEFAULT_CONFIDENCE                # noqa: E402
 from product_ops_jota.handoff import build_context_pack                 # noqa: E402
 import telegram_bot as brain     # noqa: E402  — o MESMO cérebro do bot em prod (import não dispara polling)
-from copiloto import ACK_BY_THEME, derivar_decisao, montar_sugestao     # noqa: E402
+from copiloto import ACK_BY_THEME, montar_sugestao     # noqa: E402
 
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o")
 TOP_K = 2
@@ -314,24 +313,13 @@ def gerar(history, theme, seg, doc, opener=False, fatos="", perfil="") -> str:
     return "Vou te conectar com um atendente que resolve isso com você, com todo o contexto. 🙏"
 
 
-# ─── pipeline real sobre a conversa atual ────────────────────────────────────
-def _msgs(history, base: datetime):
-    out = []
-    for i, h in enumerate(history):
-        snd = "customer" if h["role"] == "user" else "bot"
-        out.append((snd, h["content"], (base + timedelta(minutes=i)).isoformat()))
-    return out
-
 
 def analisar(sess):
-    base = datetime.fromisoformat(sess["started_at"])
-    # contexto do atrito (sinal) entra como turnos de cliente p/ a detecção
-    ctx_turns = [{"role": "user", "content": sess["context_text"]}] if sess["context_text"] else []
-    hist = ctx_turns + sess["history"]
-    det = classify_conversation(_msgs(hist, base), sess["events"], sess["started_at"])
-    txt = " ".join(h["content"] for h in hist if h["role"] == "user")
-    docs = retriever.retrieve(f"{txt} {det.predicted_theme.value.replace('_', ' ')}", top_k=TOP_K)
-    dec = decide(derivar_decisao(det.predicted_theme, det, docs, txt))
+    """UM SÓ CÉREBRO (a tese do header): delega pro analisar REAL do bot em prod
+    (telegram_bot) — detecção semântica + juiz, prefer_theme, gate de relevância,
+    resolubilidade derivada da KB e cascata de gates. Nada de heurística paralela
+    aqui: mesma frase → mesma decisão, no chat, na aba interceptação e no Telegram."""
+    det, docs, dec, _inp, _kb_gap = brain.analisar(sess)
     return det, docs, dec
 
 
@@ -486,11 +474,11 @@ def start(inp: StartIn):
     c = SCEN[inp.id]
     nome, modo, emoji = UI[inp.id]
     seg = c.get("segment", "pf")
-    sess = {
-        "modo": modo, "segment": seg, "events": [(e["event_type"], e["occurred_at"])
-                                                  for e in c.get("eventos", [])],
-        "started_at": c["started_at"], "history": [], "context_text": _customer_text(c),
-    }
+    sess = brain._new_session(seg, [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])],
+                              _customer_text(c), c["started_at"])
+    sess["modo"] = modo
+    if inp.id == "ex_kyc_limbo":                    # limbo = AUSÊNCIA: vigia o evento esperado
+        sess["expected_events"] = [("onboarding.completed", 60)]
     SESSIONS[inp.id] = sess
     det, docs, dec = analisar(sess)
     doc = docs[0] if docs else None
@@ -523,12 +511,11 @@ def replay(inp: StartIn):
     c = SCEN[inp.id]
     seg = c.get("segment", "pf")
     f = FACTS.get(inp.id, {})
-    sess = {
-        "modo": "proativo", "segment": seg,
-        "events": [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])],
-        "started_at": c["started_at"], "history": [], "context_text": _customer_text(c),
-        "fatos": f.get("fatos", ""), "perfil": f.get("perfil", ""),
-    }
+    sess = brain._new_session(seg, [(e["event_type"], e["occurred_at"]) for e in c.get("eventos", [])],
+                              _customer_text(c), c["started_at"])
+    sess.update({"modo": "proativo", "fatos": f.get("fatos", ""), "perfil": f.get("perfil", "")})
+    if inp.id == "ex_kyc_limbo":                    # limbo = AUSÊNCIA: vigia o evento esperado
+        sess["expected_events"] = [("onboarding.completed", 60)]
     SESSIONS[inp.id] = sess
     det, docs, dec = analisar(sess)
     doc = docs[0] if docs else None
@@ -696,7 +683,14 @@ def lab_gaps():
                 except Exception:
                     pass
     rows.reverse()   # mais recente primeiro
-    return {"gaps": rows}
+    # dedupe por pergunta (mantém a mais recente) — o backlog é de TIPOS de lacuna,
+    # não de ocorrências; teste repetido não vira 5 linhas na tela.
+    seen, dedup = set(), []
+    for g in rows:
+        k = (g.get("pergunta") or "").strip().lower()
+        if k and k not in seen:
+            seen.add(k); dedup.append(g)
+    return {"gaps": dedup}
 
 
 class SQLIn(BaseModel):
