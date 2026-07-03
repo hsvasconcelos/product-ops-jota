@@ -33,6 +33,7 @@ from product_ops_jota.rag import Retriever
 from run_classifier_eval import coletar as classifier_coletar
 from run_rag_eval import metrics as rag_metrics
 from run_decision_eval import coletar as decision_coletar
+from run_outcome_eval import coletar as outcome_coletar
 
 DB = ROOT / "data" / "jota_support.db"
 OUT = ROOT / "data" / "eval_scorecard.json"
@@ -46,6 +47,7 @@ THRESHOLDS = {
     "rag_mrr": 0.70,
     "decisao_acuracia": 0.95,
     "decisao_divergencias": 0,     # exato: zero divergências com o julgamento de produto
+    "desfecho_binario": 0.80,      # resolvido × não-resolvido vs gabarito (fechado ≠ resolvido)
 }
 
 
@@ -70,6 +72,15 @@ def run(sample: int | None):
     dec_acc = sum(1 for _, exp, got, _ in rows if exp == got) / len(rows)
     divergencias = [(cid, exp, got) for cid, exp, got, _ in rows if exp != got]
 
+    # 4) DESFECHO (chamado fechado ≠ atrito resolvido) — binário resolvido × não-resolvido
+    conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        n_out, o_true, o_pred, _ = outcome_coletar(conn)
+    finally:
+        conn.close()
+    bin_ = lambda c: c == "resolved"
+    out_bin = sum(1 for t, p in zip(o_true, o_pred) if bin_(t) == bin_(p)) / n_out
+
     return {
         "amostra_deteccao": n_det,
         "metrics": {
@@ -84,6 +95,8 @@ def run(sample: int | None):
             "decisao_acuracia": round(dec_acc, 4),
             "decisao_cenarios": len(rows),
             "decisao_divergencias": len(divergencias),
+            "desfecho_binario": round(out_bin, 4),
+            "desfecho_amostra": n_out,
         },
         "divergencias": divergencias,
     }
@@ -103,6 +116,8 @@ def render(res):
         ("Retrieval · MRR", "rag_mrr", m["rag_mrr"], "ranking do doc certo"),
         ("Decisão · acurácia", "decisao_acuracia", m["decisao_acuracia"], f"{m['decisao_cenarios']} cenários"),
         ("Decisão · divergências", "decisao_divergencias", m["decisao_divergencias"], "vs julgamento de produto"),
+        ("Desfecho · resolvido×não", "desfecho_binario", m["desfecho_binario"],
+         f"fechado ≠ resolvido · {m['desfecho_amostra']} conversas"),
     ]
     t = Table(box=SIMPLE_HEAVY, expand=True, title="SCORECARD — qualidade do motor (com limiares de regressão)")
     t.add_column("Métrica"); t.add_column("Valor", justify="right")

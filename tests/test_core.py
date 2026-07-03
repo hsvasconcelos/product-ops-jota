@@ -138,6 +138,39 @@ def test_retrieval_duplicidade_vs_agendado():
     assert agendado[0].id.startswith("KB-BOLETO"), f"agendado veio {agendado[0].id}"
 
 
+def test_desfecho():
+    """Desfecho ≠ chamado fechado: os 3 sinais (cura > explícito > silêncio/recontato),
+    e o silêncio lido por QUEM falou por último — cliente no vácuo nunca vira sucesso."""
+    from product_ops_jota.friction_model import SupportTheme
+    from product_ops_jota.outcome import Desfecho, derive_desfecho
+
+    bot = ("bot", "Segue o passo a passo...", "2026-06-28T10:01:00")
+    # cura confirmada pelo sistema (o mais forte) — evento de cura após a intervenção
+    r = derive_desfecho([("customer", "nao consigo entrar", "2026-06-28T10:00:00"), bot],
+                        [("session.started", "2026-06-28T10:30:00")], SupportTheme.ACCOUNT_ACCESS)
+    assert r.desfecho == Desfecho.RESOLVIDO_CONFIRMADO and r.confianca == 1.0
+    # fecho explícito do cliente
+    r = derive_desfecho([bot, ("customer", "consegui, obrigado!", "2026-06-28T10:05:00")],
+                        [], SupportTheme.PIX)
+    assert r.desfecho == Desfecho.RESOLVIDO_EXPLICITO
+    # desistência explícita — o abandono que grita
+    r = derive_desfecho([bot, ("customer", "esquece, deixa pra la", "2026-06-28T10:05:00")],
+                        [], SupportTheme.PIX)
+    assert r.desfecho == Desfecho.ABANDONADO
+    # recontato na janela → NÃO resolveu (alimenta o multi-toque/re-interceptação)
+    r = derive_desfecho([("customer", "pix travou", "2026-06-28T10:00:00"), bot],
+                        [], SupportTheme.PIX, next_contact_at="2026-06-29T09:00:00")
+    assert r.desfecho == Desfecho.NAO_RESOLVIDO
+    # cliente falou por último e ninguém respondeu → vácuo, nunca sucesso (#3)
+    r = derive_desfecho([bot, ("customer", "e o prazo disso?", "2026-06-28T10:05:00")],
+                        [], SupportTheme.PIX)
+    assert r.desfecho == Desfecho.SEM_RESPOSTA
+    # atendimento respondeu, cliente sumiu sem recontato → ASSUMIDO (fraco, 0.55)
+    r = derive_desfecho([("customer", "pix travou", "2026-06-28T10:00:00"), bot],
+                        [], SupportTheme.PIX)
+    assert r.desfecho == Desfecho.RESOLVIDO_ASSUMIDO and r.confianca < 0.6
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):

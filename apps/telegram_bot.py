@@ -48,6 +48,7 @@ from product_ops_jota.classifier import classify_conversation, prefer_theme  # n
 from product_ops_jota.decision import (                                    # noqa: E402
     decide, derive_decision_input, UserProfile,
 )
+from product_ops_jota.outcome import explicit_close_signal                 # noqa: E402
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme as _T  # noqa: E402
 from product_ops_jota.handoff import build_context_pack                    # noqa: E402
 from product_ops_jota.trace import trace                                   # noqa: E402
@@ -628,13 +629,17 @@ def run_turn(sess, text):
                          if sug else "Deixa eu confirmar isso certinho pra não te passar nada errado sobre a sua conta. 🙏")
             sess["history"].append({"role": "assistant", "content": reply})
             kind = "resolve"
+    # DESFECHO ao vivo (fechado ≠ resolvido): quando o cliente fecha explicitamente
+    # ("consegui, obrigado" / "esquece"), o sinal vai pro trace — é o label de produção
+    # que recalibra a policy (o loop do diagrama). Só log; não muda o comportamento.
+    fecho = explicit_close_signal(text)
     trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
            "confianca": inp.detection_confidence, "criticidade": inp.criticality,
            "trust": inp.trust_risk, "resolubilidade": inp.resolvability,
            "capacidade": dec.ai_capability, "pressao": dec.handoff_pressure,
            "acao": dec.action.value, "prioridade": dec.priority, "motivo": dec.reason,
            "fonte": doc.id if doc else None, "kind": kind, "guardrail": guardrail,
-           "cliente_msg": text[:200]})
+           "desfecho": fecho, "cliente_msg": text[:200]})
     return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply,
             "kind": kind, "guardrail": guardrail, "kb_gap": kb_gap}
 

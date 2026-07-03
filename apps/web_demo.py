@@ -648,6 +648,8 @@ def evals():
         {"metrica": "retrieval · MRR", "valor": m.get("rag_mrr"), "limiar": 0.70, "fmt": "pct", "o_que": "ranking do doc certo"},
         {"metrica": "decisão · acurácia", "valor": m.get("decisao_acuracia"), "limiar": 0.95, "fmt": "pct", "o_que": f"{m.get('decisao_cenarios','')} cenários"},
         {"metrica": "decisão · divergências", "valor": m.get("decisao_divergencias"), "limiar": 0, "fmt": "int", "invert": True, "o_que": "vs julgamento de produto"},
+        {"metrica": "desfecho · resolvido×não", "valor": m.get("desfecho_binario"), "limiar": 0.80, "fmt": "pct",
+         "o_que": f"fechado ≠ resolvido · {m.get('desfecho_amostra','')} conversas"},
     ]
     for row in rows:
         v = row["valor"]
