@@ -684,14 +684,14 @@ def evals():
     sc = json.loads((ROOT / "data" / "eval_scorecard.json").read_text("utf-8")) if (ROOT / "data" / "eval_scorecard.json").exists() else {"metrics": {}}
     m = sc.get("metrics", {})
     rows = [
-        {"metrica": "detecção · natureza", "valor": m.get("deteccao_natureza"), "limiar": 0.95, "fmt": "pct", "o_que": f"acurácia vs gabarito · amostra {sc.get('amostra_deteccao','')}"},
-        {"metrica": "detecção · tema", "valor": m.get("deteccao_tema"), "limiar": 0.80, "fmt": "pct", "o_que": "semântico"},
-        {"metrica": "retrieval · Hit@3", "valor": m.get("rag_hit_at_k"), "limiar": 0.80, "fmt": "pct", "o_que": f"{m.get('rag_modo','')} · {m.get('rag_queries','')} queries"},
-        {"metrica": "retrieval · MRR", "valor": m.get("rag_mrr"), "limiar": 0.70, "fmt": "pct", "o_que": "ranking do doc certo"},
-        {"metrica": "decisão · acurácia", "valor": m.get("decisao_acuracia"), "limiar": 0.95, "fmt": "pct", "o_que": f"{m.get('decisao_cenarios','')} cenários"},
-        {"metrica": "decisão · divergências", "valor": m.get("decisao_divergencias"), "limiar": 0, "fmt": "int", "invert": True, "o_que": "vs julgamento de produto"},
+        {"metrica": "detecção · natureza", "valor": m.get("deteccao_natureza"), "limiar": 0.95, "fmt": "pct", "o_que": f"classificador em {sc.get('amostra_deteccao','')} conversas · gabarito que ele nunca lê"},
+        {"metrica": "detecção · tema", "valor": m.get("deteccao_tema"), "limiar": 0.80, "fmt": "pct", "o_que": "tema por similaridade semântica, nas mesmas conversas"},
+        {"metrica": "retrieval · Hit@3", "valor": m.get("rag_hit_at_k"), "limiar": 0.80, "fmt": "pct", "o_que": f"{m.get('rag_queries','')} perguntas anotadas com o doc certo: está entre os 3?"},
+        {"metrica": "retrieval · MRR", "valor": m.get("rag_mrr"), "limiar": 0.70, "fmt": "pct", "o_que": "posição do doc certo: 1º vale 1,0 · 2º vale 0,5 · 3º vale 0,33"},
+        {"metrica": "decisão · acurácia", "valor": m.get("decisao_acuracia"), "limiar": 0.95, "fmt": "pct", "o_que": f"contrato: {m.get('decisao_cenarios','')} cenários curados, ação decidida × esperada"},
+        {"metrica": "decisão · divergências", "valor": m.get("decisao_divergencias"), "limiar": 0, "fmt": "int", "invert": True, "o_que": "contrato exato: recalibração que muda um cenário curado acusa aqui"},
         {"metrica": "desfecho · resolvido×não", "valor": m.get("desfecho_binario"), "limiar": 0.80, "fmt": "pct",
-         "o_que": f"fechado ≠ resolvido · {m.get('desfecho_amostra','')} conversas"},
+         "o_que": f"derivado do bruto em {m.get('desfecho_amostra','')} conversas fechadas · binário vs gabarito"},
     ]
     for row in rows:
         v = row["valor"]
@@ -703,17 +703,42 @@ def evals():
         grab = lambda pat: (re.search(pat, txt).group(1) if re.search(pat, txt) else None)
         soak = {"conversas": grab(r"conversas:\s*\*\*([\d.]+)\*\*"), "desfecho": grab(r"desfecho certo:\s*\*\*([\d.]+)%"),
                 "grounding": grab(r"grounding limpo:\s*\*\*([\d.]+)%"), "tom": grab(r"tom médio:\s*\*\*([\d.,]+)")}
+    # acerto por ESTILO de cliente (robustez ao fraseado) — lido do soak_results.jsonl.
+    # nota: o token do id junta "apressado" e "com typos" no mesmo balde ("com") — rotulado junto.
+    estilos = None
+    sr = ROOT / "data" / "soak_results.jsonl"
+    if sr.exists():
+        rotulo = {"forma": "informal, com gírias", "idoso": "idoso, pouca tecnologia",
+                  "com": "apressado / com typos", "formal": "formal e educado", "MEI": "MEI, fala de trabalho"}
+        agg: dict = {}
+        for line in sr.read_text("utf-8").splitlines():
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            tok = r.get("id", "").rpartition("·")[2]
+            ok = bool(r.get("outcome_ok")) and bool(r.get("grounded", True))
+            n_ok, n = agg.get(tok, (0, 0))
+            agg[tok] = (n_ok + ok, n + 1)
+        estilos = [{"estilo": rotulo.get(k, k), "pct": round(100.0 * a_ / n_, 1), "n": n_}
+                   for k, (a_, n_) in agg.items() if n_ >= 20]
+        estilos.sort(key=lambda e: -e["pct"])
+
     camadas = [
-        {"nome": "contratos (run_all)", "custo": "~30s · roda no CI a cada push",
-         "o_que": "7 métricas com limiar de regressão; vermelho = não sobe. Pega: recalibração que quebra a policy, schema, retrieval."},
+        {"nome": "contratos (run_all)", "custo": "~30s · roda no CI a cada mudança",
+         "o_que": "7 métricas com limiar de regressão; reprovou, a mudança não entra.",
+         "pega": "recalibração que quebra a política · schema · retrieval"},
         {"nome": "scripted · 15 cenários", "custo": "minutos · determinístico",
-         "o_que": "conversas multi-turno ponta a ponta com desfecho esperado. Pega: quebra de fluxo, handoff errado, saudação dupla."},
+         "o_que": "conversas de várias mensagens, ponta a ponta, com desfecho esperado.",
+         "pega": "quebra de fluxo · handoff errado · saudação dupla"},
         {"nome": "cliente-LLM + juiz", "custo": "minutos · centavos de LLM",
-         "o_que": "um LLM finge de cliente (o red team barato: inventa fraseado que ninguém escreveria); outro julga grounding, adequação e tom. Pega: segurança e alucinação."},
+         "o_que": "um LLM finge de cliente (o red team barato: inventa fraseado que ninguém escreveria); outro julga a resposta.",
+         "pega": "segurança · alucinação sobre dinheiro · tom"},
         {"nome": "soak overnight", "custo": "1.440 conversas · teto de custo",
-         "o_que": "persona × atrito × estilo em volume. Pega: o raro — flakiness, casos de borda, regressão de tom."},
+         "o_que": "persona × atrito × estilo, em volume, madrugada adentro.",
+         "pega": "o raro: instabilidade, casos de borda, regressão de tom"},
     ]
-    return {"scorecard": rows, "soak": soak, "camadas": camadas}
+    return {"scorecard": rows, "soak": soak, "estilos": estilos, "camadas": camadas}
 
 
 @app.get("/api/lab/gaps")

@@ -226,6 +226,16 @@
   .badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin-left:8px;vertical-align:middle;white-space:nowrap}
   .badge.med{background:var(--jota);border:1px solid var(--jota-edge);color:var(--ink)}
   .badge.prod{border:1px solid var(--line2);color:var(--grey)}
+  .sbar{display:grid;grid-template-columns:190px 1fr 64px;gap:14px;align-items:center;font-family:var(--mono);font-size:12px;padding:5px 0}
+  .sbar .sl{color:var(--grey)}
+  .sbar .tr{height:10px;background:var(--panel2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .sbar .fl{height:100%;background:var(--ink)}
+  .sbar .sv{color:var(--ink);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .pega{display:block;margin-top:5px;color:var(--ink)}
+  .pega .pk{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--jota);border:1px solid var(--jota-edge);border-radius:3px;padding:1px 6px;margin-right:7px}
+  .bff{display:grid;grid-template-columns:38px 1fr;gap:3px 10px;font-family:var(--mono);font-size:12.5px}
+  .bff .k{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+  .bff .t{color:var(--grey)} .bff .t b{color:var(--ink)}
   #tab-jornada .contrast{margin-top:20px;margin-bottom:0}
   #tab-jornada .ladder-insight{margin-top:20px;margin-bottom:0}
   #tab-jornada .jnote{margin-bottom:12px}
@@ -542,23 +552,26 @@
 
   <!-- EVALS -->
   <section class="tab" id="tab-evals">
-    <h2 class="hl">Todos os contratos no verde — mas contra um gabarito curado. A arquitetura não se apoia nesses números.</h2>
-    <p class="hl-sub">Precisão em tráfego real do Jota é hipótese até rodar em produção. Por isso o motor é determinístico onde dá — pra não depender de um 99% que não sobrevive à produção. Honesto acima de inflado.</p>
-    <div class="ptitle" style="margin-top:4px">scorecard · contratos com limiar de regressão (roda no CI a cada push)</div>
+    <h2 class="hl">O eval do motor: cada peça com prova, cada mudança re-testada.</h2>
+    <p class="hl-sub">Cada peça tem prova contra gabarito; cada mudança repassa por todas no CI. O que o eval já pegou de erro meu está listado abaixo: funcionou.</p>
+    <div class="contrast" style="margin:-4px 0 22px"><b>Isso roda sozinho.</b> A cada mudança enviada ao repositório, o CI (GitHub Actions) executa a suíte inteira e aprova ou reprova a mudança. Reprovada, não entra. Todas as mudanças deste case foram aprovadas.</div>
+    <div class="ptitle" style="margin-top:4px">scorecard · contratos com limiar de regressão</div>
     <div id="evals-scorecard"></div>
     <div class="ptitle">soak overnight · volume real (persona × atrito × estilo)</div>
     <div class="lab-stats" id="evals-soak" style="border-bottom:0;padding-bottom:2px"></div>
-
-    <div class="ptitle">o que os evals pegaram · antes → depois (bugs reais, com fix atribuível)</div>
-    <div class="frow"><span class="fn">cliente-LLM + juiz<span class="badge med">segurança</span></span><span class="fx" style="color:var(--grey)">"viciado em apostas, me bloqueia pra eu não gastar" passava batido pelo gate de segurança de palavra exata. Fix: radical largo (em segurança, o falso positivo é o lado seguro). Hoje o gate dispara sempre: <b>10/10 desfechos</b> no eval de agente.</span></div>
-    <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx" style="color:var(--grey)">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro. Fix: regra de identidade no prompt + guardrail de saída. Grounding <b>9/10 → 15/15</b> no scripted, <b>98,8%</b> no soak.</span></div>
-    <div class="frow"><span class="fn">uso real no Telegram<span class="badge med">retrieval</span></span><span class="fx" style="color:var(--grey)">"não consigo acessar meu wpp" respondia com o doc de Open Finance (o léxico confunde "acessar" com "reconectar"). Fix: o RAG passou a respeitar o tema detectado, e o caso virou <b>teste de regressão que roda no CI</b>.</span></div>
-    <div class="frow"><span class="fn">auditoria adversária<span class="badge med">retrieval</span></span><span class="fx" style="color:var(--grey)">~40 queries livres acharam o mis-retrieval intra-tema: "quanto rende?" puxava o doc errado do próprio tema. Fix na raiz (query crua + gate determinístico de relevância): <b>P@1 85,7% → 92,9%</b>.</span></div>
-    <div class="frow"><span class="fn">soak overnight<span class="badge med">esgotamento</span></span><span class="fx" style="color:var(--grey)">fraseado oblíquo de falha ("não fluiu", "segue igual") não contava como "ainda travado", e o cliente ficava em loop. Fix: sinal determinístico + juiz só no resíduo. <b>10/10 desfechos</b> no eval.</span></div>
+    <div class="jnote" id="soak-styles-note" style="display:none">acerto (desfecho certo e resposta ancorada) por estilo de cliente · escala 0 a 100%. A leitura: o motor não escorrega quando o fraseado muda.</div>
+    <div id="soak-styles"></div>
 
     <div class="ptitle">por que a suíte é eficiente · 4 camadas, cada uma pega uma classe de bug</div>
     <div id="evals-camadas"></div>
-    <div class="jrule">Cada bug da lista acima foi pego por uma camada diferente; nenhuma sozinha pegaria todos. Custo de uma rodada completa: segundos no CI + minutos de LLM (centavos). O que ela evita: erro sobre dinheiro em produção, que custa a confiança — o produto.</div>
+
+    <div class="ptitle">o que os evals pegaram · antes → depois (bugs reais, com fix atribuível)</div>
+    <div class="frow"><span class="fn">cliente-LLM + juiz<span class="badge med">segurança</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"viciado em apostas, me bloqueia pra eu não gastar" passava batido pelo gate de palavra exata</span><span class="k">fix</span><span class="t">radical largo: em segurança, o falso alarme é o lado seguro</span><span class="k">prova</span><span class="t"><b>10/10 desfechos</b> no eval de agente; o gate dispara sempre</span></span></span></div>
+    <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro</span><span class="k">fix</span><span class="t">regra de identidade no prompt + guardrail de saída</span><span class="k">prova</span><span class="t">grounding <b>9/10 → 15/15</b> no scripted · <b>98,8%</b> no soak</span></span></span></div>
+    <div class="frow"><span class="fn">uso real no Telegram<span class="badge med">retrieval</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"não consigo acessar meu wpp" respondia com o doc de Open Finance ("acessar" confunde com "reconectar")</span><span class="k">fix</span><span class="t">o RAG passou a respeitar o tema detectado</span><span class="k">prova</span><span class="t">virou <b>teste de regressão no CI</b>: não volta sem acusar</span></span></span></div>
+    <div class="frow"><span class="fn">auditoria adversária<span class="badge med">retrieval</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"quanto rende?" puxava o doc errado do próprio tema (~40 queries livres acharam o padrão)</span><span class="k">fix</span><span class="t">na raiz: query crua + gate determinístico de relevância</span><span class="k">prova</span><span class="t">P@1 <b>85,7% → 92,9%</b></span></span></span></div>
+    <div class="frow"><span class="fn">soak overnight<span class="badge med">esgotamento</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">fraseado oblíquo de falha ("não fluiu", "segue igual") não contava como travado; o cliente ficava em loop</span><span class="k">fix</span><span class="t">sinal determinístico + juiz só no resíduo ambíguo</span><span class="k">prova</span><span class="t"><b>10/10 desfechos</b> no eval</span></span></span></div>
+    <div class="jrule">Cada bug da lista acima foi pego por uma camada diferente; nenhuma sozinha pegaria todos. Custo de uma rodada completa: segundos no CI + minutos de LLM (centavos). O que ela evita: erro sobre dinheiro em produção, que custa a confiança, o produto.</div>
   </section>
 </div>
 
@@ -592,7 +605,7 @@ let evalsLoaded=false;
 async function loadEvals(){
   if(evalsLoaded) return; evalsLoaded=true;
   const e=await (await fetch('/api/evals')).json();
-  const fmt=(v,f)=> v==null?'—':(f==='pct'?(v*100).toFixed(1)+'%':String(v));
+  const fmt=(v,f)=> v==null?'—':(f==='pct'?(v*100).toFixed(1).replace('.',',')+'%':String(v));
   let h='<div class="scrow head"><span>métrica</span><span class="vl">valor</span><span class="lm">limiar</span><span class="st">status</span></div>';
   e.scorecard.forEach(s=>{
     const lim=(s.fmt==='pct'?(s.limiar*100).toFixed(0)+'%':s.limiar);
@@ -601,9 +614,14 @@ async function loadEvals(){
       <span class="st ${s.ok?'':'fail'}">${s.ok?'ok':'▸ abaixo'}</span></div>`;
   });
   $('#evals-scorecard').innerHTML=h;
-  if(e.soak){ $('#evals-soak').innerHTML=[['conversas',e.soak.conversas],['desfecho',(e.soak.desfecho||'—')+'%'],['grounding',(e.soak.grounding||'—')+'%'],['tom',(e.soak.tom||'—')+'/5']]
+  if(e.soak){ $('#evals-soak').innerHTML=[['conversas',String(e.soak.conversas||'—')],['desfecho',String(e.soak.desfecho||'—').replace('.',',')+'%'],['grounding',String(e.soak.grounding||'—').replace('.',',')+'%'],['tom',String(e.soak.tom||'—').replace('.',',')+'/5']]
      .map(([l,v])=>`<div class="lstat"><span class="v">${v}</span><span class="l">${l}</span></div>`).join(''); }
-  $('#evals-camadas').innerHTML=e.camadas.map(c=>`<div class="frow"><span class="fn">${esc(c.nome)}${c.custo?`<span class="fo">${esc(c.custo)}</span>`:''}</span><span class="fx" style="color:var(--grey)">${esc(c.o_que)}</span></div>`).join('');
+  if(e.estilos&&e.estilos.length){
+    $('#soak-styles-note').style.display='block';
+    $('#soak-styles').innerHTML=e.estilos.map(x=>
+      `<div class="sbar"><span class="sl">${esc(x.estilo)} · ${x.n}</span><span class="tr"><span class="fl" style="width:${x.pct}%;display:block"></span></span><span class="sv">${String(x.pct).replace('.',',')}%</span></div>`).join('');
+  }
+  $('#evals-camadas').innerHTML=e.camadas.map(c=>`<div class="frow"><span class="fn">${esc(c.nome)}${c.custo?`<span class="fo">${esc(c.custo)}</span>`:''}</span><span class="fx" style="color:var(--grey)">${esc(c.o_que)}${c.pega?`<span class="pega"><span class="pk">pega</span>${esc(c.pega)}</span>`:''}</span></div>`).join('');
 }
 
 /* laboratório — explorador de dados (lê a base real de 10k) */
