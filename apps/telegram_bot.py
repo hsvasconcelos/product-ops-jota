@@ -46,7 +46,7 @@ if _envf.exists():
 
 from product_ops_jota.classifier import classify_conversation, prefer_theme  # noqa: E402
 from product_ops_jota.decision import (                                    # noqa: E402
-    decide, derive_decision_input, derive_resolubilidade, UserProfile,
+    decide, derive_decision_input, UserProfile,
 )
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme as _T  # noqa: E402
 from product_ops_jota.handoff import build_context_pack                    # noqa: E402
@@ -519,9 +519,14 @@ def handle_command(chat_id, cmd, name=""):
         # tema correto sem sinal-fantasma de emoção (que vinha do texto de cliente injetado).
         # Arma o cenário e ESPERA o cliente abrir o chat (jornada real).
         sess = _new_session(seg, events, FACTS.get(sid, ""), c["started_at"], name=name)
-        sess["proactive_pending"] = sid
         if sid == "ex_kyc_limbo":                       # limbo = AUSÊNCIA: vigia o evento esperado
             sess["expected_events"] = [("onboarding.completed", 60)]
+        # PROATIVO só com SINAL (evento ou ausência vigiada). Cenário sem evento é REATIVO:
+        # não há nada a detectar antes de o cliente falar — cai no fluxo normal (run_turn),
+        # que decide resolve/assiste/humano (ex.: /excluir → gate requires_human da KB).
+        proativo = bool(events) or sid == "ex_kyc_limbo"
+        if proativo:
+            sess["proactive_pending"] = sid
         SESSIONS[chat_id] = sess
         counts: dict = {}
         for et, _ in events:
@@ -530,12 +535,14 @@ def handle_command(chat_id, cmd, name=""):
         if events:
             label = ", ".join(_esc(et) + (f" ×{n}" if n > 1 else "") for et, n in counts.items())
             banner = f"🔔 <b>Evento detectado:</b> <code>{label}</code>" + (f" — {hora}" if hora else "")
+            send(chat_id, banner, html=True)
+            send(chat_id, "_(o cliente abre o chat — manda uma mensagem — e a Aline já atende sabendo do evento)_")
         elif sid == "ex_kyc_limbo":
-            banner = "🔔 <b>Ausência detectada</b> — onboarding parou sem erro."
+            send(chat_id, "🔔 <b>Ausência detectada</b> — onboarding parou sem erro.", html=True)
+            send(chat_id, "_(o cliente abre o chat — manda uma mensagem — e a Aline já atende sabendo do evento)_")
         else:
-            banner = "🔔 <b>Atrito detectado.</b>"
-        send(chat_id, banner, html=True)
-        send(chat_id, "_(o cliente abre o chat — manda uma mensagem — e a Aline já atende sabendo do evento)_")
+            send(chat_id, "📎 <b>Cenário reativo armado</b> (sem evento — o Jota só sabe o que o cliente disser).", html=True)
+            send(chat_id, f"_(escreva como o cliente — ex.: “{c['mensagens'][0]['text']}”)_")
         return
     send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
 
@@ -646,13 +653,25 @@ def _deliver_proactive(chat_id, sess, text):
         if enriched:
             docs = enriched
     doc = docs[0] if docs else None
-    opener = gerar([], det.predicted_theme, sess["segment"], doc, opener=True, fatos=facts)
-    ok, _why = guardrail_check(opener, doc)
-    guardrail = "pass" if ok else "blocked"
-    if not ok:
-        sug = montar_sugestao(det.predicted_theme, docs)
-        opener = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
-                  if sug else opener)
+    if dec.action == InterceptionAction.HUMAN_HANDOFF:
+        # o motor decidiu HUMANO (segurança/política da KB/trust): o proativo NÃO "resolve" —
+        # avisa que detectou e já conecta uma pessoa, com contexto. Mesma regra do reativo.
+        em_horario = 9 <= datetime.now().hour < 20
+        sla = ("Como é horário comercial (9h–20h), te retornam em seguida."
+               if em_horario else
+               "O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade.")
+        opener = ("A gente detectou isso por aqui e, pra resolver direito, já estou te conectando "
+                  f"com uma *pessoa do time*, que te retorna *aqui mesmo, neste número*. {sla} "
+                  "Todo o contexto vai junto, você não repete nada. 🙏")
+        guardrail = "skip"          # resposta canônica, não passa pelo LLM
+    else:
+        opener = gerar([], det.predicted_theme, sess["segment"], doc, opener=True, fatos=facts)
+        ok, _why = guardrail_check(opener, doc)
+        guardrail = "pass" if ok else "blocked"
+        if not ok:
+            sug = montar_sugestao(det.predicted_theme, docs)
+            opener = ((sug["resposta"] + "\n\n" + "\n".join(f"{i}. {p}" for i, p in enumerate(sug["passos"], 1)))
+                      if sug else opener)
     sess["history"].append({"role": "assistant", "content": opener})
     if not sess.get("greeted"):
         sess["greeted"] = True

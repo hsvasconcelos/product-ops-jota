@@ -3,9 +3,11 @@
 O bot faz **long polling** (não precisa de URL pública/webhook), roda em modo **híbrido via densos
 HOSPEDADOS** (`JOTA_RAG_MODE=openai`): BM25 + embeddings da OpenAI (`text-embedding-3-small`) + RRF,
 **sem torch**. Worker stateless leve + embedder gerenciado = arquitetura de produção real. Imagem
-~650MB, RAM ~200MB → cabe no plano trial do Railway. Qualidade medida: tema 90.5%, natureza 100%,
-retrieval Hit@k 92.9% cru / ~100% com o gate de tema (`prefer_theme`) no fluxo do bot — iguala/supera
-o híbrido local. Custo dos embeddings desprezível (1 chamada por mensagem). O bot já depende da OpenAI
+~650MB, RAM ~200MB → cabe no plano trial do Railway. Qualidade medida neste modo (`run_rag_eval` com
+`JOTA_RAG_MODE=openai`): retrieval Hit@3 92.9% · P@1 92.9% · MRR 0.929 — antes do gate de tema
+(`prefer_theme`) do fluxo do bot, que corrige o único miss. A fonte de verdade das métricas do motor é
+`data/eval_scorecard.json` (regenerado por `evals/run_all.py`): natureza 99.8%, tema 85.8%, Hit@3 100%,
+decisão 15/15. Custo dos embeddings desprezível (1 chamada por mensagem). O bot já depende da OpenAI
 (LLM da resposta), então o embedder hospedado não adiciona ponto de falha novo.
 
 > **Variantes do RAG** (`JOTA_RAG_MODE`): `openai` (padrão do deploy) · `bm25` (só léxico, offline,
@@ -68,6 +70,6 @@ Como é long polling (sem porta HTTP), no `fly.toml` gerado dá pra remover a se
 - Railway: redeploy automático a cada push no `main`.
 - Fly: `fly deploy` de novo após um push; `fly apps destroy <app>` pra remover.
 
-> Produção de verdade (fora do case): trocar o BM25 por um embedder hospedado (API), serving
-> assíncrono (webhook + fila + workers) e observabilidade/alertas. A imagem leve aqui é o
+> Produção de verdade (fora do case): serving assíncrono (webhook + fila + workers), sessões em
+> Redis e observabilidade/alertas. O embedder hospedado já é o padrão aqui; a imagem leve é o
 > "no ar de verdade" com o mesmo cérebro.

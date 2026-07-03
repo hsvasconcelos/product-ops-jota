@@ -19,18 +19,18 @@
     "turns_usados": 5,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏\n\nE enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo, sem precisar esperar. 😉"
+    "ultima": "Pra resolver isso direito, vou te conectar com uma *pessoa do time*, que continua com você e te retorna *aqui mesmo, neste número*. O time atende das *9h às 20h* — te retornam logo na abertura, com prioridade. Todo o contexto vai junto, você não repete nada. 🙏"
   },
   {
     "id": "acesso_resolve_1a",
     "expect": "ai",
-    "final": "no_intercept",
+    "final": "ai_resolve",
     "action_ok": true,
     "escalate_turn": null,
     "turns_usados": 2,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Ok! Para resolver o problema do app travando, vamos tentar alguns passos simples:\n\n1. **Atualize o app** para a última versão na Play Store (ou App Store se for iPhone).\n2. Se for Android e isso não resolver, veja se o **Modo Desenvolvedor** está ativado com a opção 'Não manter atividades' marcada. Desative essa opção em Configurações > Sistema.\n3. **Limpe o cache do app**: Configurações do app > Armazenamento > Limpar cache.\n4. Se ainda assim travar, **reinstale o app**. Seus dados e saldo estão seguros.\n\nSe precisar de algo mais, avisa! 🙌"
+    "ultima": "Para resolver isso no Android, você pode tentar:\n\n1. Abra **Configurações** > **Sistema** > **Opções do desenvolvedor**. Desative a opção **'Não manter atividades'** (ou desligue o Modo desenvolvedor inteiro).\n2. **Atualize o app** para a última versão na Play Store.\n3. Se continuar travando, **limpe o cache** do app: Configurações do app > Armazenamento > Limpar cache.\n\nNo iPhone, apenas atualize o app na App Store e certifique-se de ter espaço livre suficiente.\n\nFuncionou? 😊"
   },
   {
     "id": "pix_errado",
@@ -41,7 +41,7 @@
     "turns_usados": 3,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Beleza! Você pode verificar o comprovante diretamente aqui no Jota pra confirmar o **nome e o banco** do destinatário. Dessa forma, você poderá entrar em contato e solicitar a devolução. Se precisar, podemos ajudar a acionar o banco de destino. 👍 Tem mais alguma dúvida?"
+    "ultima": "Perfeito, você fez o Pix usando sua conta Jota. Vou ajudar a puxar o comprovante. Assim, conseguimos ver o **nome e banco do destinatário**. Pode me enviar o comprovante ou os detalhes do Pix?"
   },
   {
     "id": "pix_chave_invalida",
@@ -52,7 +52,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Só pra confirmar, você tá tentando fazer o Pix usando uma *chave específica* (como CPF, e-mail, celular ou chave aleatória)? Pode ser que essa chave não esteja ativa. Se puder, **verifica com o destinatário** se a chave Pix que está usando é a mesma que tá registrada no banco dele. 🙂 Se preferir, ele também pode te enviar um QR Code."
+    "ultima": "Parece que a *chave Pix* do destinatário pode não estar ativa ou foi inserida incorretamente. Vamos resolver isso! \n\n1. **Confirme** com a pessoa qual é a *chave Pix ativa* dela.\n2. Peça para ela **verificar** as chaves cadastradas no banco onde ela quer receber.\n3. Como alternativa, ela pode te enviar um *QR Code de cobrança* — aí não precisa de chave. 😄\n\nSe precisar de mais alguma coisa, tô aqui!"
   },
   {
     "id": "ludopatia_seguranca",
@@ -85,7 +85,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Entendi, vou te ajudar com isso! Primeiro, vamos conferir algumas informações. Você se lembra de ter feito mais de um agendamento ou pagamento desse boleto? Isso pode ajudar a entender o que aconteceu."
+    "ultima": "Se foi cobrado duas vezes pelo mesmo boleto, é uma cobrança em *duplicidade*. O estorno é automático e o valor volta para a sua conta em até *1 dia útil*. Pode ficar tranquilo! 😊"
   },
   {
     "id": "falatap_nao_caiu",
@@ -96,7 +96,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Confira direitinho: a venda aparece como **APROVADA** no seu histórico? E você sabe qual é o plano de recebimento que está usando, se é **D0** ou **D1**? Vamos dar uma olhada nisso! 😊"
+    "ultima": "Vamos verificar isso! 😊 Primeiro, preciso que você confirme no histórico se a venda está marcada como *APROVADA*. E também, por favor, me diga qual é o seu plano de recebimento: *D0* (na hora) ou *D1* (próximo dia útil)?"
   },
   {
     "id": "open_finance_saldo",
@@ -107,7 +107,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Pode ser que o consentimento de **Open Finance** tenha expirado ou a conexão com o banco foi interrompida. Vou te ajudar a reconectar:\n\n1. Peça 'reconectar meu banco' no Jota e escolha a instituição.\n2. Você será levado ao app do banco para autorizar novamente.\n3. Defina a duração da conexão.\n\nIsso deve resolver e os **saldos** voltarão a atualizar. Se precisar de mais alguma coisa, me avisa! 😊"
+    "ultima": "Pode ser que o consentimento de **Open Finance** tenha expirado ou a conexão tenha sido interrompida. Vamos tentar resolver isso. \n\n1. Peça 'reconectar meu banco' e escolha a instituição.\n2. Você será levado ao app do banco para autorizar novamente.\n3. Defina a duração da conexão para evitar nova expiração.\n\nAssim, os saldos devem voltar a atualizar. Se precisar de mais alguma coisa, é só chamar! 😊"
   },
   {
     "id": "rendimento_duvida",
@@ -118,7 +118,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "O saldo na sua conta Jota rende automaticamente *100% do CDI* desde o primeiro real! 😄 O rendimento é calculado por dia útil sobre o saldo mantido. Lembre que os impostos já são retidos na fonte. Se você quiser, posso fazer uma projeção para um período específico!"
+    "ultima": "O saldo no Jota rende **100% do CDI** automaticamente desde o primeiro real. ✨\n\nAlguns pontos importantes:\n1. O rendimento é calculado por **dia útil** sobre o saldo mantido.\n2. Os impostos (**IR + PIS + COFINS**) são retidos na fonte.\n3. Valores que entram no fim de semana ou ficam pouco tempo rendem menos.\n\nSe precisar de uma projeção para um período específico, me avise!"
   },
   {
     "id": "confusao_canal_falatap",
@@ -129,7 +129,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Oi! O **Fala Tap** é um serviço pro recebimento de pagamentos por aproximação, mas ele não fica dentro do WhatsApp. Dá uma olhada direto no app do Jota no seu celular. 😄 Se precisar de ajuda com outra coisa, estou aqui!"
+    "ultima": "Oi! 📱 Para usar o *Fala Tap*, você precisa acessar o app do Jota no seu celular. Você conseguiu acessar o app?"
   },
   {
     "id": "kyc_selfie",
@@ -140,7 +140,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Vamos resolver isso! 😊 A validação pode falhar por alguns motivos. Tente seguir esses passos:\n\n1. Procure um ambiente bem iluminado, sem luz forte atrás de você.\n2. Tire óculos, boné ou máscara e mantenha o rosto centralizado.\n3. Toque em *'Tentar novamente'* para refazer a verificação.\n\nMe avise se precisar de mais ajuda! 📸"
+    "ultima": "Para conseguir validar a identidade, é importante seguir alguns passos. Vamos lá:\n\n1. **Procure um ambiente bem iluminado**, evitando luz forte atrás de você.\n2. **Tire óculos, boné ou máscara** e mantenha o rosto centralizado.\n3. Toque em **'Tentar novamente'** para refazer a verificação.\n\nTente novamente e me avise se precisar de mais ajuda! 📸"
   },
   {
     "id": "frustracao_fria_resolve",
@@ -151,7 +151,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Poxa, sinto muito por essa experiência frustrante! 😕 Vamos resolver isso juntos. Me conta mais: o erro aparece quando você tenta enviar ou ao receber o Pix?"
+    "ultima": "Poxa, sinto muito por isso. 😔 Vamos resolver juntos! Primeiro, confirma com o destinatário qual é a **chave Pix ATIVA** dele. Pode ser que seja diferente do CPF ou do e-mail. Às vezes, a chave não está cadastrada como ele imaginava. Pergunta se ele pode verificar isso no banco onde quer receber. ❤️ Se preferir, ele pode te enviar um **QR Code de cobrança** como alternativa. Isso resolveria o problema sem precisar da chave! ✨"
   },
   {
     "id": "nubank_externo",
@@ -162,6 +162,6 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Vamos resolver isso! Você já verificou se tem saldo suficiente na sua conta do Nubank? Se sim, poderia me dizer se aparece alguma mensagem de erro?"
+    "ultima": "Oi! vi que você pode estar tendo dificuldade com um Pix, é isso?\n\nNão consigo cadastrar minha chave Pix, como registrar/criar uma chave (CPF, e-mail, celular ou aleatória) na minha conta. Você cadastra suas próprias chaves Pix dentro do Jota. O bloqueio mais comum: a chave (CPF, e-mail ou celular) já está registrada em OUTRO banco — nesse caso não dá pra cadastrar de novo, é preciso TRAZER a chave por portabilidade (reivindicação de posse), que o outro banco tem até 7 dias pra confirmar. Também é preciso ter o contato (e-mail/celular) verificado, e cada conta PF tem limite de 5 chaves. A chave aleatória nunca dá conflito.\n\n1. No Jota, vá em Pix > Minhas chaves > Cadastrar chave e escolha o tipo (CPF, e-mail, celular ou aleatória).\n2. Se pedir verificação, confirme o código enviado ao e-mail/celular antes de concluir.\n3. Se aparecer 'chave já cadastrada em outro banco': peça a portabilidade ali mesmo — o Jota reivindica a posse e o outro banco confirma em até 7 dias.\n4. Se atingiu o limite de 5 chaves, exclua uma que não usa ou cadastre uma chave aleatória.\n5. Chave aleatória é a saída rápida quando não quer usar CPF/e-mail/celular — cadastra na hora, sem conflito."
   }
 ]

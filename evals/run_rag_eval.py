@@ -66,7 +66,8 @@ def metrics(retriever=None):
 def main():
     m = metrics()
     r_mode = m["mode"]
-    mode = "modo híbrido" if r_mode == "hibrido" else "modo BM25 fallback"
+    mode = {"hibrido": "modo híbrido", "hibrido-api": "modo híbrido (densos hospedados)"}.get(
+        r_mode, "modo BM25 fallback")
     rows, hits, p1, rr_sum, n = m["rows"], m["hit_at_k"] * m["n"], m["p_at_1"] * m["n"], m["mrr"] * m["n"], m["n"]
     console.print(Panel(
         f"RAG ({mode}) avaliado em [bold]{n}[/bold] queries reais de cliente, top-{TOP_K}.\n"

@@ -1,0 +1,54 @@
+# Soak overnight — relatório
+
+- início: 2026-07-01T01:00:33
+- conversas: **1440** (avaliadas 1440, erros 0)
+- desfecho certo: **98.1%**
+- grounding limpo: **98.8%**
+- tom médio: **4.85/5**
+- falhas por caso: {'boleto_2x': 7, 'excluir_conta': 5, 'pix_chave': 4, 'impaciente_venda': 4, 'nubank_externo': 3, 'app_nao_resolve': 2, 'falatap_ansiosa': 2}
+
+## Falhas (43) — o que atacar
+
+- `pix_chave·com` [desfecho] esperava ai, deu human — A orientação foi clara e empática, e a escalada foi apropriada.
+- `app_nao_resolve·formal` [desfecho] esperava human, deu ai — O atendimento foi claro e empático, mas deveria ter escalado para suporte humano mais cedo
+- `impaciente_venda·idoso` [desfecho] esperava human, deu ai — O cliente deveria ser escalado para suporte humano mais cedo.
+- `boleto_2x·idoso` [grounding] esperava ai, deu ai — A resposta foi confusa e não resolveu o problema do cliente.
+- `impaciente_venda·idoso` [desfecho] esperava human, deu ai — A resposta foi repetitiva e não resolveu o problema do cliente.
+- `nubank_externo·forma` [desfecho] esperava ai, deu human — A resposta foi clara e direcionou corretamente para suporte humano.
+- `falatap_ansiosa·com` [grounding] esperava ai, deu ai — O atendimento foi simpático, mas não resolveu o problema.
+- `falatap_ansiosa·forma` [grounding] esperava ai, deu ai — A resposta foi confusa e não resolveu o problema do cliente.
+- `excluir_conta·formal` [desfecho] esperava human, deu ai — Repetiu informações irrelevantes antes de resolver.
+- `falatap_ansiosa·MEI` [desfecho] esperava ai, deu human — Atendimento claro e empático, com encaminhamento correto para suporte humano.
+- `idoso_pix·formal` [grounding] esperava ai, deu ai — A resposta não abordou a dúvida do cliente sobre como enviar um Pix.
+- `excluir_conta·formal` [desfecho] esperava human, deu ai — Repetiu informações desnecessárias e não escalou para humano.
+- `excluir_conta·forma` [desfecho] esperava human, deu ai — Instruções claras e tom amigável.
+- `pix_chave·com` [desfecho] esperava ai, deu human — O atendimento foi claro, empático e escalou corretamente para suporte humano.
+- `falatap_ansiosa·forma` [grounding] esperava ai, deu ai — A resposta foi confusa e não abordou o problema corretamente.
+- `falatap_ansiosa·forma` [desfecho] esperava ai, deu human — A atendente foi clara, empática e seguiu o procedimento correto.
+- `idoso_pix·formal` [grounding] esperava ai, deu ai — A resposta não abordou a dúvida do cliente sobre como enviar um Pix.
+- `boleto_2x·idoso` [grounding] esperava ai, deu ai — A resposta não resolve o problema do cliente e repete informações desnecessárias.
+- `boleto_2x·com` [desfecho] esperava ai, deu human — A solução foi escalar para um humano, mas houve repetição desnecessária.
+- `boleto_2x·idoso` [grounding] esperava ai, deu ai — A resposta foi confusa e não resolveu o problema do cliente.
+- `pix_chave·com` [grounding] esperava ai, deu ai — A resposta foi confusa e não abordou o problema corretamente.
+- `impaciente_venda·idoso` [desfecho] esperava human, deu ai — O atendimento foi claro e empático, mas deveria ter escalado para um humano mais cedo.
+- `nubank_externo·com` [desfecho] esperava ai, deu human — A orientação foi correta e o tom foi empático e claro.
+- `boleto_2x·com` [desfecho] esperava ai, deu human — A escalada para um humano foi correta, mas repetiu informações desnecessárias.
+- `nubank_externo·com` [desfecho] esperava ai, deu human — A orientação foi correta e o tom foi empático e claro.
+- `boleto_2x·com` [desfecho] esperava ai, deu human — A assistente foi clara e encaminhou corretamente para suporte humano.
+- `excluir_conta·com` [desfecho] esperava human, deu ai — Repetiu informações irrelevantes antes de resolver.
+- `pix_chave·com` [grounding] esperava ai, deu ai — A resposta foi repetitiva e não abordou o problema real do cliente.
+- `excluir_conta·forma` [desfecho] esperava human, deu ai — Instruções incorretas para exclusão de conta.
+- `boleto_2x·forma` [desfecho] esperava ai, deu human — A escalada para um humano foi correta, mas repetição de respostas confunde.
+- `pix_chave·com` [desfecho] esperava ai, deu human — A atendente foi clara, empática e escalou corretamente para suporte humano.
+- `boleto_2x·com` [desfecho] esperava ai, deu human — A escalada para suporte humano foi correta.
+- `boleto_2x·forma` [grounding] esperava ai, deu ai — A resposta não abordou o problema de cobrança duplicada.
+- `falatap_ansiosa·formal` [grounding] esperava ai, deu ai — A resposta foi confusa e não abordou corretamente o problema do cliente.
+- `pix_chave·com` [desfecho] esperava ai, deu human — A assistente foi clara e empática, e escalou corretamente para suporte humano.
+- `boleto_2x·idoso` [grounding] esperava ai, deu ai — A resposta foi confusa e não resolveu o problema do cliente.
+- `boleto_2x·idoso` [grounding] esperava ai, deu ai — Repetitivo e não resolve o problema do cliente.
+- `falatap_ansiosa·MEI` [grounding] esperava ai, deu ai — Confusão sobre o tipo de transação e falta de solução clara.
+- `falatap_ansiosa·formal` [grounding] esperava ai, deu ai — A resposta foi confusa e não abordou diretamente a questão do cliente.
+- `app_nao_resolve·forma` [desfecho] esperava human, deu ai — O atendimento foi simpático, mas não resolveu o problema.
+- `boleto_2x·com` [desfecho] esperava ai, deu human — A Aline foi clara e empática, e escalou corretamente para um humano.
+- `impaciente_venda·formal` [desfecho] esperava human, deu ai — Deveria ter escalado para um humano.
+- `boleto_2x·MEI` [desfecho] esperava ai, deu human — A Aline lidou bem com o problema e escalou corretamente.
