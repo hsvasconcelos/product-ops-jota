@@ -281,7 +281,7 @@
     <div class="plist">
       <div class="pline"><span class="pn">1</span><span><b>Contenção é consequência, não meta.</b> Todo escalonamento é sintoma de jornada que falhou.</span></div>
       <div class="pline"><span class="pn">2</span><span><b>O atendimento é o laboratório; o produto é a cura.</b></span></div>
-      <div class="pline"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão.</b> Quem reclama é minoria; a maioria trava em silêncio e abandona.</span></div>
+      <div class="pline key"><span class="pn">3</span><span><b>Cuidar de quem não levanta a mão.</b> Quem reclama é minoria; a maioria trava em silêncio e abandona.</span></div>
       <div class="pline key"><span class="pn">4</span><span><b>Confiança é o produto.</b> Protegê-la vem antes de resolver o problema. <span style="color:var(--grey)">(a chave)</span></span></div>
       <div class="pline"><span class="pn">5</span><span><b>A natureza do erro define como detectá-lo:</b> evento, comportamento ou ausência.</span></div>
       <div class="pline"><span class="pn">6</span><span><b>Mesmo problema, cuidado sob medida:</b> quem é o cliente, em que momento, com que letramento.</span></div>
@@ -313,7 +313,7 @@
     <div class="contrast"><b>Escala não é atender mais rápido, é precisar atender menos.</b> Nível 1 apaga um incêndio; nível 3 tira o combustível. Cada nível a mais cobre mais gente com menos esforço, e é assim que 300 mil viram 1 milhão.</div>
 
     <div class="ptitle">onde agir · a régua que decide o nível (e evita spam)</div>
-    <div class="jnote">eixo 1: frequência do gargalo · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
+    <div class="jnote">eixo 1: frequência do gargalo (medida na aba laboratório) · eixo 2: criticidade = erro × momento × o que está em jogo (#7)</div>
     <div class="matrix">
       <div class="mh"></div><div class="mh">freq. baixa</div><div class="mh">freq. alta</div>
       <div class="mh">crit. baixa</div><div class="cell">reativo</div><div class="cell">por sinal</div>
@@ -321,29 +321,6 @@
     </div>
     <div class="jrule">Antecipar todo mundo o tempo todo é spam. Por isso a régua é a mesma da interceptação: frequência (do laboratório) × criticidade. E o que dói muito e dói sempre não vira só antecipação: vira jornada agora e melhoria de produto depois, a cura na fonte.</div>
 
-    <div class="ptitle">onde a jornada quebra · o que o laboratório mediu</div>
-    <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
-    <div class="funnel-wrap">
-      <div class="funnel">
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
-          <div class="fpct">22,6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:91px"></div></div>
-          <div class="fpct">18,3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:73px"></div></div>
-          <div class="fpct">14,8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:72px"></div></div>
-          <div class="fpct">14,5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:48px"></div></div>
-          <div class="fpct">9,7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:42px"></div></div>
-          <div class="fpct">8,5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:34px"></div></div>
-          <div class="fpct">6,9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:23px"></div></div>
-          <div class="fpct">4,7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
-      </div>
-    </div>
-    <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; recebimento e KYC são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a matriz acima.</div>
   </section>
 
   <!-- TIME DE ATENDIMENTO (Q3) -->
@@ -370,20 +347,36 @@
     <div class="frow"><span class="fn">acesso à conta</span><span class="fx" style="color:var(--grey)">fila Acesso &amp; Segurança</span></div>
     <div class="frow"><span class="fn">dados / lgpd</span><span class="fx" style="color:var(--grey)">fila Cadastro &amp; LGPD</span></div>
     <div class="frow"><span class="fn">rendimento / open finance</span><span class="fx" style="color:var(--grey)">fila Investimentos/Open Finance</span></div>
-    <div class="jrule">Atendimento humano das 9h às 20h. Fora do horário a IA segue 24/7; o que precisa de pessoa fica registrado e volta com prioridade na abertura do turno. Dentro do horário, o caso cai direto na fila da especialidade, ordenado pela prioridade do motor: criticidade domina, confiança em jogo empurra.</div>
+    <div class="jrule">Atendimento humano das 9h às 20h. Fora do horário a IA segue 24/7; o que precisa de pessoa fica registrado e volta com prioridade na abertura do turno. Dentro do horário, o caso cai na fila da especialidade, ordenado pela prioridade do motor (criticidade domina, confiança em jogo empurra). Cada fila tem SLA próprio pelo risco do tema, e transborda para a fila geral quando lota: o pacote de contexto viaja junto, então quem pegar atende sem recomeçar do zero.</div>
 
     <div class="ptitle">a escada de adoção · o time confia antes de a IA agir sozinha</div>
     <div class="frow"><span class="fn">estágio 1 · copiloto<span class="badge med">construído</span></span><span class="fx" style="color:var(--grey)">a IA sugere resposta e passo a passo ancorados; o atendente decide e edita. Cada edição vira rótulo que recalibra a policy.</span></div>
     <div class="frow"><span class="fn">estágio 2 · supervisão</span><span class="fx" style="color:var(--grey)">a IA resolve o comum sozinha; o time revisa por amostragem e fica com os casos de propósito (segurança, LGPD, confiança em jogo).</span></div>
     <div class="frow"><span class="fn">estágio 3 · autonomia c/ guardrail</span><span class="fx" style="color:var(--grey)">a IA age no que a KB cobre, com guardrail de saída e desfecho medido; o humano vira especialista e curador do loop.</span></div>
 
-    <div class="ptitle">as preocupações · e o que o desenho responde</div>
+    <div class="ptitle">o dia a dia do atendente · o copiloto é o console</div>
+    <div class="jnote">construído (apps/copiloto.py): é onde a operação encontra o motor, todos os dias.</div>
+    <div class="frow"><span class="fn">abrir o caso</span><span class="fx" style="color:var(--grey)">o atendente abre a fila e o caso já chega com o pacote de contexto: atrito detectado, o que a IA tentou, por que escalou. Ninguém pergunta tudo de novo.</span></div>
+    <div class="frow"><span class="fn">responder</span><span class="fx" style="color:var(--grey)">a sugestão da IA (resposta + passo a passo ancorados na KB) fica ao lado; o atendente edita e envia. Quem decide é a pessoa.</span></div>
+    <div class="frow"><span class="fn">corrigir</span><span class="fx" style="color:var(--grey)">cada edição vira rótulo: o que o atendente mudou é o dado que recalibra a política e cura a KB. O time não só usa o motor, treina o motor.</span></div>
+
+    <div class="ptitle">os rituais · onde os dois times se encontram</div>
+    <div class="frow"><span class="fn">semanal · triagem do loop</span><span class="fx" style="color:var(--grey)">atendimento traz os clusters e as lacunas de KB da semana; Product Ops promove cada um: regra de detecção, doc de KB ou ticket de produto. Sai com dono e prazo.</span></div>
+    <div class="frow"><span class="fn">mensal · recalibração</span><span class="fx" style="color:var(--grey)">os limiares da política são revisados contra o desfecho real (não contra opinião); toda mudança repassa pelos contratos do eval antes de subir.</span></div>
+
+    <div class="ptitle">as preocupações que o desenho já responde</div>
     <div class="frow"><span class="fn">"a fila lota na transição"</span><span class="fx" style="color:var(--grey)">o gate de ROI e o fail-safe seguram o volume: só escala o que precisa de pessoa, e a fatia humana cai conforme o loop cura KB e produto (o número vive na aba laboratório).</span></div>
     <div class="frow"><span class="fn">"o contexto se perde"</span><span class="fx" style="color:var(--grey)">pacote de contexto em toda transferência, e contexto perdido é métrica acompanhada (aba kpis), não anedota.</span></div>
     <div class="frow"><span class="fn">"a IA vira spam"</span><span class="fx" style="color:var(--grey)">não se reintercepta a mesma dor dentro de 24h; só volta antes disso se o problema escalar.</span></div>
     <div class="frow"><span class="fn">"o time vira revisor de máquina"</span><span class="fx" style="color:var(--grey)">a escada começa no copiloto: quem decide é o atendente. A IA tira o repetitivo; sobra o trabalho onde gente faz diferença.</span></div>
     <div class="frow"><span class="fn">"e a madrugada?"</span><span class="fx" style="color:var(--grey)">a IA cobre 24/7 com guardrail; o sensível fica registrado e volta com prioridade às 9h, com o pacote pronto.</span></div>
-    <div class="frow"><span class="fn">"quem é dono do quê"</span><span class="fx" style="color:var(--grey)">Product Ops é dono do loop (lacunas, promoção, policy); o time de atendimento é dono do cliente nos casos de propósito.</span></div>
+    <div class="frow"><span class="fn">"quem é dono do quê"</span><span class="fx" style="color:var(--grey)">Product Ops é dono do loop (lacunas, promoção, política); o time de atendimento é dono do cliente nos casos de propósito.</span></div>
+
+    <div class="ptitle">e as que me deixam de olho aberto</div>
+    <div class="jnote">preocupações genuínas, sem resposta pronta: é aqui que eu gastaria as primeiras semanas.</div>
+    <div class="frow"><span class="fn">incidente em massa</span><span class="fx" style="color:var(--grey)">um bug de Pix que atinge 50 mil clientes de uma vez faria a interceptação individual virar spam e afogaria as filas. Precisa de um modo incidente (comunicação em massa + congelar a proativa individual), que ainda não desenhei.</span></div>
+    <div class="frow"><span class="fn">detecção errada, fila errada</span><span class="fx" style="color:var(--grey)">o pacote é tão bom quanto o tema detectado (85,8% hoje): o caso mal classificado chega na especialidade errada. Mitigação: transbordo + a correção do atendente vira rótulo. Mas é um custo real de transição.</span></div>
+    <div class="frow"><span class="fn">a avaliação do time muda</span><span class="fx" style="color:var(--grey)">se a IA fica com o repetitivo, medir atendente por volume vira injustiça na hora. É preciso repactuar a métrica de gente: qualidade no caso difícil, curadoria do loop, não quantidade. Conversa de liderança, não de motor.</span></div>
   </section>
 
   <!-- KPIS (Q4) -->
@@ -424,6 +417,29 @@
   <section class="tab" id="tab-lab">
     <div class="ptitle" style="margin-top:0">a base · cenários criados para simular a base do jota</div>
     <div class="lab-stats" id="lab-overview"></div>
+    <div class="ptitle">onde a jornada quebra · o que o laboratório mediu</div>
+    <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
+    <div class="funnel-wrap">
+      <div class="funnel">
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
+          <div class="fpct">22,6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:91px"></div></div>
+          <div class="fpct">18,3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:73px"></div></div>
+          <div class="fpct">14,8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:72px"></div></div>
+          <div class="fpct">14,5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:48px"></div></div>
+          <div class="fpct">9,7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:42px"></div></div>
+          <div class="fpct">8,5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:34px"></div></div>
+          <div class="fpct">6,9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:23px"></div></div>
+          <div class="fpct">4,7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
+      </div>
+    </div>
+    <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; recebimento e KYC são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a régua da aba jornada (frequência × criticidade).</div>
     <div class="ptitle">a triagem do motor · os 5 mil chamados do suporte</div>
     <div class="lab-stats" id="lab-triagem" style="border-bottom:0;padding-bottom:2px"></div>
     <div class="jrule" style="margin-top:0">O motor rodou em cada chamado: o que resolveria ancorado na KB, e o que mandaria para uma pessoa. Na dúvida, pessoa (fail-safe por desenho). Derrubar o "vai para humano" curando KB e produto é exatamente o trabalho do loop.</div>
