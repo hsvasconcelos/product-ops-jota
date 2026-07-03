@@ -1,122 +1,86 @@
-# Product Ops · Jota — Atendimento Proativo
+# Case Product Ops · Jota — Atendimento Proativo
 
-Visão e protótipo de um modelo de **atendimento proativo** para o Jota (assistente
-financeiro no WhatsApp), pensado para escalar de **300 mil → 1 milhão de clientes**
-sem que a operação cresça na mesma proporção.
+> **O melhor chamado é o que não nasce.**
+> A conta de 300 mil para 1 milhão de clientes só fecha se cada vez menos problemas
+> precisarem virar chamado: detectar o atrito na origem (pelo evento, pelo comportamento
+> ou pela ausência), resolver ancorado em fonte, escalar com contexto — e devolver cada
+> atrito como melhoria de produto, para ele não nascer de novo.
 
-A tese: **transformar o atendimento de uma central que apaga incêndios numa rede
-invisível que antecipa o atrito, protege a confiança e devolve cada problema como
-melhoria de produto.**
-
----
-
-## Os dois mundos
-
-O Jota tem dois canais de WhatsApp, e a estratégia é diferente em cada um:
-
-**Mundo 1 — o número de atendimento (reativo → laboratório).**
-Tudo que não foi antecipado cai aqui. Este canal é a *mina de dados*: a gente analisa
-todas as conversas, classifica, mede SLA e volumetria, e descobre **o que deveria estar
-sendo antecipado no produto**. É o laboratório.
-
-**Mundo 2 — o número do Jota (proativo → antecipação).**
-Onde a gente age antes do chamado existir: detecta o atrito na origem, decide se a IA
-resolve, assiste ou chama um humano, e responde ancorado em dados reais.
-
-O **loop** entre eles é a tese central: o Mundo 1 alimenta o Mundo 2, para que cada vez
-menos coisa precise cair no Mundo 1. *Containment não como meta, mas como consequência
-de antecipar melhor.*
+Protótipo funcional de **atendimento proativo** para o Jota (assistente financeiro no
+WhatsApp): um só motor decidindo nos dois mundos (reativo e proativo), com detecção
+determinística, decisão por réguas auditáveis, RAG ancorado em base de conhecimento,
+medição de desfecho (fechado ≠ resolvido) e uma suíte de evals que roda no CI.
 
 ---
 
-## O que já está construído (e testado)
+## A apresentação (comece por aqui)
 
-| Peça | Arquivo | Mundo |
-|---|---|---|
-| **Mapa de problemas** — schema tipado do atrito (natureza, criticidade, risco de confiança) + 3 casos-herói | `src/product_ops_jota/friction_model.py` | 2 |
-| **Score de priorização** — decide resolver / assistir / humano + prioridade na fila | `src/product_ops_jota/decision.py` | 2 |
-| **Banco do laboratório** — schema relacional (4 tabelas) do canal de suporte | `src/product_ops_jota/support_db.py` | 1 |
-| **Gerador de conversas** — 1.000 conversas sintéticas rotuladas, ancoradas no ReclameAqui real do Jota | `src/product_ops_jota/generate_support_data.py` | 1 |
+```bash
+bash scripts/demo.sh        # sobe tudo e abre http://localhost:8800/play
+```
 
-Princípios de engenharia aplicados: *store facts, derive views* (o banco guarda fatos;
-SLA/idades/scores são funções puras), *policy vs mechanism* (pesos e limiares são
-configuração tipada e versionável), e *fail-fast* (schema inconsistente quebra na
-construção, não em produção).
+**`/play`** — a apresentação em 7 abas: **visão** (a tese e os 8 princípios) ·
+**jornada** (os 4 níveis de proatividade e a régua de onde agir) · **laboratório**
+(10 mil conversas rotuladas: onde a jornada quebra, a triagem do motor, lacunas de KB
+e um explorador SQL ao vivo) · **lógica & interceptação** (o motor ensinado em duas
+fases — medir e decidir — e provado ao vivo, caso a caso) · **evals** (a prova do
+próprio motor) · **time de atendimento** (handoff quente, filas, horários e as
+preocupações honestas) · **kpis** (o norte e as 4 famílias de métricas).
 
----
+**`/`** — o mockup de fluxo (Pergunta 5): chat estilo WhatsApp com cenários reativos e
+proativos, radar de sinais em tempo real e o painel de engenharia de cada resposta.
 
-## Ambiente recomendado
+**Bot real no Telegram** — o mesmo cérebro em produção (long polling):
+`.venv/bin/python apps/telegram_bot.py` · comandos `/demo-*` para os cenários
+proativos, `/debug` para ver a engenharia e a saúde (modo RAG · LLM · KB).
 
-Rode o projeto em Python 3.12 dentro de um venv isolado — isso evita os atritos do Python 3.9/pip antigo do sistema (não precisa de `eval_type_backport` nem de `python3 -m pip`).
+## O motor (`src/product_ops_jota/`)
+
+| Peça | O que faz |
+|---|---|
+| `classifier.py` | detecção: tema (semântica + léxico + juiz no resíduo) e natureza (evento · comportamento · ausência), com sinais auditáveis |
+| `decision.py` | a cascata: 4 sinais derivados dos fatos (certeza, criticidade, confiança em jogo, resolubilidade) × 8 réguas em ordem fixa; a primeira que dispara decide |
+| `rag.py` | retrieval híbrido (BM25 + densos hospedados + RRF) com fallback gracioso por chamada — um soluço de rede degrada a query, nunca derruba o turno |
+| `outcome.py` | desfecho: chamado fechado ≠ atrito resolvido (cura confirmada · confirmação do cliente · silêncio lido por quem falou por último) |
+| `handoff.py` | operação humana: pacote de contexto, fila por especialidade, ciência de horário, anti-reincidência |
+| `trace.py` | observabilidade: cada decisão vira uma linha auditável (JSONL) |
+
+Princípios de engenharia: **determinístico onde decide, LLM só onde redige** ·
+*store facts, derive views* · *policy vs mechanism* (todo número vive em tabela
+nomeada e recalibrável) · *fail-safe* (na dúvida, pessoa).
+
+## A prova (`evals/` — roda no CI a cada mudança)
+
+Quatro camadas: **contratos** (7 métricas com limiar; reprovou, não entra) ·
+**scripted** (15 conversas ponta a ponta) · **cliente-LLM + juiz** (red team barato) ·
+**soak** (1.440 conversas overnight, robustez por estilo de cliente).
+
+```bash
+.venv/bin/python tests/test_core.py     # o gate rápido (o mesmo do CI)
+.venv/bin/python evals/run_all.py       # o scorecard completo
+```
+
+Scorecard atual (contra gabarito curado; em produção a régua é o desfecho real):
+natureza 99,8% · tema 85,8% · Hit@3 100% · decisão 15/15 (zero divergências) ·
+desfecho binário 84,6%. Triagem do motor nos 5 mil chamados do laboratório:
+**IA resolve 56,8% · vai para humano 43,2%** — fail-safe por desenho; derrubar esse
+número curando KB e produto é o trabalho do loop.
+
+## O dado (honestidade)
+
+A base (`data/jota_support.db`, 10 mil conversas rotuladas + eventos) é **sintética,
+com rótulo determinístico e ancorada nas reclamações reais do Jota no ReclameAqui** —
+nenhuma informação confidencial de terceiros. O gabarito (`gold_*`) existe só para o
+avaliador: o motor nunca o lê. Reproduzível com `python scripts/build_db.py` (seed fixa).
+
+## Ambiente
 
 ```bash
 brew install python@3.12
-python3.12 -m venv .venv
-source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e .
+# opcional (.env): OPENAI_API_KEY para redação/juízes; sem ela, a demo roda em template
 ```
 
----
-
-## Como rodar
-
-```bash
-pip install -e .            # ou: pip install pydantic
-
-# 1) gerar o banco do laboratório (1000 conversas rotuladas)
-python scripts/build_db.py
-
-# 2) ver o teaser do painel (volumetria, SLA, naturezas, tendência) em SQL real
-python scripts/painel_queries.py
-
-# 3) painel completo do Mundo 1 (laboratório): TUI navegável por teclado — abas 1-5, setas, t p/ drill-down, q sai (num terminal real; cai em modo não-interativo sem TTY)
-python scripts/painel.py
-
-# 4) rodar os testes (schema, score, banco)
-python tests/test_core.py
-```
-
-O banco (`data/jota_support.db`) já vem gerado — o passo 1 só é necessário para
-regenerar do zero. É reproduzível (seed fixa).
-
-### Espiar o score em ação
-
-```python
-from product_ops_jota.friction_model import HERO_CASES
-from product_ops_jota.decision import decide_for_case
-
-resolv = {"pix_key_loop": 0.85, "kyc_failed_onboarding": 0.45, "fala_tap_receipt_anxiety": 0.90}
-for c in HERO_CASES:
-    d = decide_for_case(c, resolv[c.case_id])
-    print(c.case_id, "→", d.action.value, "|", d.reason)
-```
-
----
-
-## Os 3 casos-herói
-
-São reclamações **reais** do Jota (ReclameAqui), não hipóteses:
-
-1. **Loop de chave Pix** — o cliente tenta o mesmo Pix 3x e trava; nada falhou no sistema
-   (`behavior_inferred`). É falha de *jornada*, não de Pix.
-2. **KYC falhou no onboarding** — `kyc.failed` (`system_signaled`), no momento mais frágil
-   da jornada (antes do primeiro valor).
-3. **Insegurança no recebimento via Fala Tap** — a venda foi aprovada, mas o plano é D1
-   (cai amanhã); a "falha" é de *percepção*, e o custo de troca é quase zero
-   (a maquininha tradicional está no bolso). Confiança pura.
-
----
-
-## Roadmap (mapeado, próximos passos)
-
-- **Painel completo** do Mundo 1 (abas navegáveis: volumetria, tendência, priorização, SLA).
-- **RAG** ancorado na base de conhecimento (`data/knowledge_base/`) — híbrido (BM25 + denso
-  + re-ranking) para o gerador de respostas do Mundo 2.
-- **Pipeline ponta-a-ponta** (conversa → detecção → score → RAG → resposta + passo a passo).
-- **Operação humana** — warm handoff com contexto entre os dois números, filas por especialidade.
-- **Versionamento da policy** — pesos/limiares como artefato versionado, promovido por gate de evals.
-
----
-
-*Protótipo de Product Ops. Dado sintético com rótulo determinístico (especificado na
-geração) e texto realista; nenhuma informação confidencial de terceiros.*
+Deploy do bot (Railway/Fly, imagem leve sem torch): ver `docs/DEPLOY.md`.
+Fundação conceitual (os 8 princípios e as decisões de modelagem): `docs/FUNDACAO.md`.
