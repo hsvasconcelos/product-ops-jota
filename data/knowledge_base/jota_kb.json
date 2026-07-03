@@ -194,5 +194,19 @@
       "O prazo do MED é de até 7 dias corridos para análise pelo banco do recebedor."
     ],
     "requires_human": false
+  },
+  {
+    "id": "KB-PIX-005",
+    "title": "Cadastrar, registrar ou criar sua chave Pix",
+    "category": "cadastro_chave_pix",
+    "content": "Não consigo cadastrar minha chave Pix, como registrar/criar uma chave (CPF, e-mail, celular ou aleatória) na minha conta. Você cadastra suas próprias chaves Pix dentro do Jota. O bloqueio mais comum: a chave (CPF, e-mail ou celular) já está registrada em OUTRO banco — nesse caso não dá pra cadastrar de novo, é preciso TRAZER a chave por portabilidade (reivindicação de posse), que o outro banco tem até 7 dias pra confirmar. Também é preciso ter o contato (e-mail/celular) verificado, e cada conta PF tem limite de 5 chaves. A chave aleatória nunca dá conflito.",
+    "steps": [
+      "No Jota, vá em Pix > Minhas chaves > Cadastrar chave e escolha o tipo (CPF, e-mail, celular ou aleatória).",
+      "Se pedir verificação, confirme o código enviado ao e-mail/celular antes de concluir.",
+      "Se aparecer 'chave já cadastrada em outro banco': peça a portabilidade ali mesmo — o Jota reivindica a posse e o outro banco confirma em até 7 dias.",
+      "Se atingiu o limite de 5 chaves, exclua uma que não usa ou cadastre uma chave aleatória.",
+      "Chave aleatória é a saída rápida quando não quer usar CPF/e-mail/celular — cadastra na hora, sem conflito."
+    ],
+    "requires_human": false
   }
 ]
