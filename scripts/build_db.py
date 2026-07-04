@@ -1,4 +1,4 @@
-"""Gera o banco de suporte do zero (1000 conversas rotuladas).
+"""Gera o banco do laboratório do zero (10 mil conversas rotuladas: 5k suporte + 5k produto).
 
 Uso:
     python scripts/build_db.py            # gera data/jota_support.db
@@ -15,8 +15,8 @@ from product_ops_jota.generate_support_data import generate
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n-support", type=int, default=1000, help="conversas de SUPORTE (Mundo 1, reativo)")
-    ap.add_argument("--n-product", type=int, default=0, help="conversas de PRODUTO (Mundo 2, proativo)")
+    ap.add_argument("--n-support", type=int, default=5000, help="conversas de SUPORTE (Mundo 1, reativo)")
+    ap.add_argument("--n-product", type=int, default=5000, help="conversas de PRODUTO (Mundo 2, proativo)")
     ap.add_argument("--out", default="data/jota_support.db", help="caminho do banco")
     args = ap.parse_args()
 

@@ -434,6 +434,8 @@ def policy():
             {"nome": "assist_floor", "grandeza": "capacidade da IA", "op": "≥", "valor": t.assist_floor,
              "efeito": "a IA assiste — humano no loop"},
         ],
+        "recalibracao": (json.loads((ROOT / "data" / "recalibracao.json").read_text("utf-8"))
+                         if (ROOT / "data" / "recalibracao.json").exists() else None),
         "referencia": {
             "certeza": [
                 {"nome": "evento correlacionado", "valor": NATURE_CONF_WITH_EVENT, "o_que": "o backend apitou: quase fato"},
@@ -739,6 +741,15 @@ def evals():
          "pega": "o raro: instabilidade, casos de borda, regressão de tom"},
     ]
     return {"scorecard": rows, "soak": soak, "estilos": estilos, "camadas": camadas}
+
+
+@app.get("/api/lab/promocao")
+def lab_promocao():
+    """A esteira de promoção (§8 mecanizado): clusters acima do limiar com destino
+    sugerido (regra de detecção · doc de KB · ticket de produto). Gerado por
+    scripts/promover_clusters.py sobre os 5k chamados; a página lê daqui."""
+    p = ROOT / "data" / "promocao.json"
+    return json.loads(p.read_text("utf-8")) if p.exists() else {"candidatos": []}
 
 
 @app.get("/api/lab/gaps")

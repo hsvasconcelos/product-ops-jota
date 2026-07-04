@@ -1,0 +1,34 @@
+{
+  "gerado_em": "2026-07-04T15:45:06",
+  "amostra": 5001,
+  "grid_testado": 1188,
+  "grid_elegivel": 144,
+  "baseline": {
+    "policy": {
+      "conf_floor": 0.5,
+      "roi_crit_floor": 2.0,
+      "roi_trust_floor": 0.2,
+      "handoff_ceiling": 0.4,
+      "resolve_floor": 0.5,
+      "assist_floor": 0.35
+    },
+    "contencao_pct": 55.3,
+    "precisao_contencao_pct": 74.4,
+    "contidos": 2768
+  },
+  "melhor": {
+    "policy": {
+      "conf_floor": 0.45,
+      "roi_crit_floor": 2.0,
+      "roi_trust_floor": 0.15,
+      "handoff_ceiling": 0.35,
+      "resolve_floor": 0.5,
+      "assist_floor": 0.3
+    },
+    "contencao_pct": 57.3,
+    "precisao_contencao_pct": 74.5,
+    "contidos": 2864
+  },
+  "ganho_real": true,
+  "leitura": "o grid achou policy com mais contenção SEM perder precisão nem contrato"
+}

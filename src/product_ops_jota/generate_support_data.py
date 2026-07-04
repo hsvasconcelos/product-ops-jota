@@ -223,6 +223,23 @@ REPEAT_PREFIX = ["ja falei isso", "como eu disse antes", "de novo a mesma pergun
                  "eu JA expliquei isso pro outro atendente", "voce nao leu o que eu escrevi?"]
 
 
+# Evento de CURA por tema (nomes de outcome.CURE_EVENTS — fonte única): emitido em
+# parte dos `resolved`, DEPOIS do fim da conversa. Janela: ≥45min após a última
+# mensagem (fora da correlação de detecção, que fecha em +30min) e ≤20h (dentro da
+# janela de 24h do derive_desfecho). É o system_confirmed do desfecho.
+from .outcome import CURE_EVENTS as _CURE
+from .friction_model import SupportTheme as _ST
+P_CURE = 0.45          # fração dos resolved com cura confirmada pelo backend
+
+
+def _cure_event_for(theme: str) -> str | None:
+    try:
+        opts = _CURE.get(_ST(theme))
+    except ValueError:
+        return None
+    return random.choice(opts) if opts else None
+
+
 def _now_minus(days_back: float) -> datetime:
     return datetime(2026, 6, 27, 12, 0, 0) - timedelta(days=days_back)
 
@@ -304,10 +321,16 @@ def generate(conn: sqlite3.Connection, n_support: int = 1000, n_product: int = 0
         # mensagens: monta a conversa (texto do cliente vindo do banco de frases,
         # no estilo da literacia do usuário)
         friction_key = random.choice(THEME_FRICTION.get(theme, [theme]))
-        _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
-                           agent_switch, context_lost, frustrated, crit,
-                           started, mostly_audio=(random.random() < 0.2),
-                           friction_key=friction_key, literacy=user_lit[uid])
+        fim = _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
+                                 agent_switch, context_lost, frustrated, crit,
+                                 started, mostly_audio=(random.random() < 0.2),
+                                 friction_key=friction_key, literacy=user_lit[uid])
+        # cura confirmada pelo backend (system_confirmed do desfecho)
+        cure = _cure_event_for(theme)
+        if outcome == "resolved" and cure and random.random() < P_CURE:
+            cure_at = (fim + timedelta(minutes=random.uniform(45, 1200))).isoformat()
+            cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
+                        (f"ec_{c:05d}", uid, None, cure, cure_at))
 
     # ── MUNDO 2 — conversas de PRODUTO (proativas, channel='jota') ────────────
     for c in range(n_product):
@@ -331,6 +354,11 @@ def generate(conn: sqlite3.Connection, n_support: int = 1000, n_product: int = 0
                     (cid, uid, "jota", started.isoformat(), theme, nature, crit, outcome,
                      0, handoff, 0, sent_start, sent_end))
         _generate_product_conversation(cur, cid, uid, user_seg[uid], theme, nature, started)
+        cure = _cure_event_for(theme)
+        if outcome == "resolved" and cure and random.random() < P_CURE:
+            cure_at = (started + timedelta(minutes=random.uniform(90, 1200))).isoformat()
+            cur.execute("INSERT INTO events VALUES (?,?,?,?,?)",
+                        (f"ecp_{c:05d}", uid, None, cure, cure_at))
 
     # ── Eventos de sistema SEM conversa (conversation_id = NULL) ──────────────
     # O cliente teve a falha e NÃO reclamou. Isso NÃO é uma natureza do suporte
@@ -534,3 +562,5 @@ def _generate_messages(cur, cid, theme, outcome, asked_human, handoff_done,
                                            "perdi meu tempo aqui", "..."]), gap_min=random.uniform(1, 30))
     elif outcome == "no_response":
         pass  # o atendimento nunca responde de volta — o silêncio que mais dói
+
+    return t

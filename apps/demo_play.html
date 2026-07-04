@@ -296,6 +296,10 @@
       <button class="brow" data-goto="evals"><span class="bn">evals</span><span class="bd">a eficácia medida em 4 camadas, e o que ainda é hipótese</span></button>
       <button class="brow"><span class="bn">demo ao vivo</span><span class="bd">o mesmo cérebro num chat estilo WhatsApp, e num bot real no Telegram</span></button>
     </div>
+
+    <div class="ptitle">a call adiou; o case iterou · a semana extra em números</div>
+    <div class="jnote">o método do case aplicado ao próprio case: medir, achar o furo, consertar na raiz, provar. Antes = o estado na data original; depois = agora, ao vivo.</div>
+    <div id="evolucao"></div>
   </section>
 
   <!-- JORNADA -->
@@ -374,7 +378,7 @@
 
     <div class="ptitle">e as que me deixam de olho aberto</div>
     <div class="jnote">preocupações genuínas, sem resposta pronta: é aqui que eu gastaria as primeiras semanas.</div>
-    <div class="frow"><span class="fn">incidente em massa</span><span class="fx" style="color:var(--grey)">um bug de Pix que atinge 50 mil clientes de uma vez faria a interceptação individual virar spam e afogaria as filas. Precisa de um modo incidente (comunicação em massa + congelar a proativa individual), que ainda não desenhei.</span></div>
+    <div class="frow"><span class="fn">incidente em massa<span class="badge med">v1 na semana extra</span></span><span class="fx" style="color:var(--grey)">um bug de Pix que atinge 50 mil clientes faria a interceptação individual virar spam e afogaria as filas. A v1 já existe: detector de pico (mesmo evento, 30× em 15 min) congela a proativa individual e muda para comunicação de incidente, canônica e sem LLM (teste com /demo-incidente no bot). O que ainda falta: o playbook de comunicação em massa por coorte e o regime especial das filas durante o incidente.</span></div>
     <div class="frow"><span class="fn">detecção errada, fila errada</span><span class="fx" style="color:var(--grey)">o pacote é tão bom quanto o tema detectado (85,8% hoje): o caso mal classificado chega na especialidade errada. Mitigação: transbordo + a correção do atendente vira rótulo. Mas é um custo real de transição.</span></div>
     <div class="frow"><span class="fn">a avaliação do time muda</span><span class="fx" style="color:var(--grey)">se a IA fica com o repetitivo, medir atendente por volume vira injustiça na hora. É preciso repactuar a métrica de gente: qualidade no caso difícil, curadoria do loop, não quantidade. Conversa de liderança, não de motor.</span></div>
   </section>
@@ -394,7 +398,7 @@
 
     <div class="ptitle">resolução · resolvemos de verdade?</div>
     <div class="frow"><span class="fn"># interceptações<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">volume por tema, segmento e linha (trace do motor, auditável linha a linha).</span></div>
-    <div class="frow"><span class="fn">% resolvido pela IA, desfecho CONFIRMADO<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">desfecho ≠ chamado fechado: cura confirmada por evento, confirmação do cliente ou silêncio sem recontato (o sinal mais fraco, e tratado como tal). Leitura binária hoje: 84,6% contra o gabarito.</span></div>
+    <div class="frow"><span class="fn">% resolvido pela IA, desfecho CONFIRMADO<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">desfecho ≠ chamado fechado: cura confirmada por evento, confirmação do cliente ou silêncio sem recontato (o sinal mais fraco, e tratado como tal). Leitura binária hoje: 88,7% contra o gabarito, com um terço dos casos confirmado por evento de cura (confiança máxima).</span></div>
     <div class="frow"><span class="fn">% handoff quente<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">quanto foi para pessoa, por quê (motivo do gate), e o tempo até alguém assumir (produção).</span></div>
     <div class="frow"><span class="fn">reinterceptações da mesma dor<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">o multi-toque sob a regra anti-spam: voltar é sinal de não-resolvido, não de insistência.</span></div>
 
@@ -421,31 +425,35 @@
     <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
     <div class="funnel-wrap">
       <div class="funnel">
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:112px"></div></div>
-          <div class="fpct">22,6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:91px"></div></div>
-          <div class="fpct">18,3%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:73px"></div></div>
-          <div class="fpct">14,8%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:107px"></div></div>
+          <div class="fpct">21,6%</div><div class="fstage">pix / pagamento</div><div class="fpen">falhou / duplicado</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:89px"></div></div>
+          <div class="fpct">17,9%</div><div class="fstage">acesso à conta</div><div class="fpen">não entra / app fecha</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:77px"></div></div>
+          <div class="fpct">15,6%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:72px"></div></div>
-          <div class="fpct">14,5%</div><div class="fstage">cadastro & kyc</div><div class="fpen">biometria / doc</div><div class="fgat">ausência</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:48px"></div></div>
-          <div class="fpct">9,7%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:42px"></div></div>
-          <div class="fpct">8,5%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:34px"></div></div>
-          <div class="fpct">6,9%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
-        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:23px"></div></div>
-          <div class="fpct">4,7%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
+          <div class="fpct">14,6%</div><div class="fstage">recebimento</div><div class="fpen">liquidação não caiu</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:51px"></div></div>
+          <div class="fpct">10,2%</div><div class="fstage">cobrança</div><div class="fpen">boleto / recorrente</div><div class="fgat">evento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:38px"></div></div>
+          <div class="fpct">7,7%</div><div class="fstage">dados & lgpd</div><div class="fpen">alterar / excluir</div><div class="fgat">comportamento</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:36px"></div></div>
+          <div class="fpct">7,2%</div><div class="fstage">rendimento</div><div class="fpen">saldo não atualiza</div><div class="fgat">ausência</div></div>
+        <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:26px"></div></div>
+          <div class="fpct">5,2%</div><div class="fstage">outros</div><div class="fpen">diversos</div><div class="fgat">—</div></div>
       </div>
     </div>
-    <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; recebimento e KYC são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a régua da aba jornada (frequência × criticidade).</div>
+    <div class="jrule">Leitura: Pix e acesso são volume, o nível 1 já os cobre; KYC e recebimento são <b>ausência</b>, o atrito silencioso que só o proativo enxerga. É este funil que alimenta a régua da aba jornada (frequência × criticidade).</div>
     <div class="ptitle">a triagem do motor · os 5 mil chamados do suporte</div>
     <div class="lab-stats" id="lab-triagem" style="border-bottom:0;padding-bottom:2px"></div>
     <div class="jrule" style="margin-top:0">O motor rodou em cada chamado: o que resolveria ancorado na KB, e o que mandaria para uma pessoa. Na dúvida, pessoa (fail-safe por desenho). Derrubar o "vai para humano" curando KB e produto é exatamente o trabalho do loop.</div>
     <div class="ptitle">lacunas de KB · o backlog do loop (perguntas sem procedimento)</div>
     <div class="jnote">quando o motor não acha procedimento relevante, ele escala para o humano e registra a lacuna aqui; o Product Ops cura a KB e o atrito para de escalar. É o reativo alimentando o proativo.</div>
     <div id="lab-gaps"></div>
+    <div class="ptitle">a esteira de promoção · o loop mecanizado (§8)</div>
+    <div class="jnote">clusters de "vai para humano" acima do limiar de frequência, com destino sugerido. Cada candidato promovido derruba um cluster inteiro: é assim que a fatia humana cai sem afrouxar régua.</div>
+    <div id="lab-promocao"></div>
+
     <div class="ptitle">explorar os dados · o método à mostra</div>
     <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: 10 mil conversas rotuladas (suporte + produto), a mesma base onde o motor é medido. As queries abaixo são reais: clique numa ou escreva a sua (somente leitura).</p>
     <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
@@ -539,6 +547,10 @@
       <div class="grow"><span class="num">fim</span><span class="nm">padrão</span><span class="cd">nada</span><span class="vd">sem pergunta: o destino de segurança é pessoa</span></div>
       </div>
     </div>
+
+    <div class="ptitle">a recalibração · as réguas contra o desfecho, de verdade</div>
+    <div class="jnote">um grid de políticas candidatas roda sobre os 5 mil chamados; só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção contra o desfecho. É o loop recalibrando a política, com o cinto afivelado.</div>
+    <div id="recal"></div>
 
     <div class="ptitle">interceptação · a prova: as duas fases rodando ao vivo</div>
     <div class="jnote">escreva como cliente, ou clique num caso pronto. O motor mede os 4 sinais, roda a prancheta e mostra a régua que disparou, com a resposta que o cliente receberia. Nada é maquete: é o motor de verdade, decidindo agora.</div>
@@ -657,6 +669,16 @@ async function loadLab(){
         +`<div class="lstat"><span class="v">${String(a.theme_accuracy).replace('.',',')}%</span><span class="l">tema correto (medição)</span></div>`;
     }
   }catch(e){ /* sem lab_atendimento.json, a régua fica vazia — o resto da aba segue */ }
+  try{
+    const pm=await (await fetch('/api/lab/promocao')).json();
+    if(pm && pm.candidatos && pm.candidatos.length){
+      const mot={lacuna_kb:'lacuna de KB', nao_executavel:'não executável', esgotamento:'procedimento não resolve',
+                 confianca_em_jogo:'confiança sem prova', palpite_fraco:'certeza baixa', seguranca:'segurança', politica_kb:'política da KB'};
+      let h='<div class="gaprow head" style="grid-template-columns:150px 120px 60px 1fr"><span>tema</span><span>motivo</span><span>casos</span><span>destino da promoção</span></div>';
+      pm.candidatos.forEach(c=>{ h+=`<div class="gaprow" style="grid-template-columns:150px 120px 60px 1fr"><span class="gq">${esc(c.tema)}</span><span class="gt">${esc(mot[c.motivo]||c.motivo)}</span><span class="gt">${c.n}</span><span class="gq"><b>${esc(c.destino)}</b> <span class="gd">· ${esc(c.porque)}</span>${c.evidencia_bot?`<span class="gd"> · ${esc(c.evidencia_bot)}</span>`:''}</span></div>`; });
+      $('#lab-promocao').innerHTML=h;
+    } else { $('#lab-promocao').innerHTML='<div class="resmeta">rode scripts/promover_clusters.py para gerar a esteira.</div>'; }
+  }catch(e){}
   const pr=await (await fetch('/api/lab/presets')).json();
   const box=$('#lab-presets'); box.innerHTML='';
   pr.forEach(q=>{ const b=document.createElement('button');b.className='chip';b.textContent=q.nome;
@@ -712,6 +734,27 @@ $('#gate-toggle').onclick=()=>{
   t.textContent=open?'ocultar como cada régua decide ▾':'ver como cada régua decide ▸';
 };
 
+
+/* a semana extra em números — antes (histórico de 03/07) → depois (lido ao vivo) */
+async function loadEvolucao(){
+  const el=$('#evolucao'); if(!el) return;
+  const vg=v=>String(v??'—').replace('.',',');
+  let dep={desfecho:null, f1:null}, rc=null, pm=null;
+  try{ const e=await (await fetch('/api/evals')).json();
+       const d=(e.scorecard||[]).find(r=>r.metrica.startsWith('desfecho'));
+       dep.desfecho=d?(d.valor*100).toFixed(1):null; }catch(_){}
+  try{ const p=await (await fetch('/api/policy')).json(); rc=p.recalibracao; }catch(_){}
+  try{ pm=await (await fetch('/api/lab/promocao')).json(); }catch(_){}
+  const rows=[
+    ['desfecho medido', `84,6% → <b>${vg(dep.desfecho)}%</b>: eventos de cura entraram no dado e um terço dos desfechos agora é confirmado pelo backend na confiança máxima.`],
+    ['rótulo "pediu humano"', `F1 0,69 → <b>0,96</b>: o eval acusava; a causa era rótulo sujo no dado sintético (frase de pedido de humano fora do flag), corrigida na raiz, não no classificador.`],
+    ['o loop, mecanizado', rc&&rc.baseline?`a recalibração rodou de verdade: <b>${rc.grid_testado} políticas</b> testadas contra o desfecho, contratos intactos (${esc(rc.leitura)})${pm&&pm.clusters_acima_do_limiar?`; e a esteira de promoção achou <b>${pm.clusters_acima_do_limiar} clusters</b> acima do limiar, cada um com destino nomeado`:''}.`:'recalibração e esteira de promoção construídas (aba lógica e laboratório).'],
+    ['modo incidente', `de preocupação declarada ("ainda não desenhei") a <b>protótipo testável</b>: detector de pico + comunicação canônica (/demo-incidente no bot).`],
+    ['operação ao vivo', `o bot ganhou <b>/stats</b> (uso real do time, na call) e a regra anti-spam de reinterceptação rodando e visível no /debug.`],
+  ];
+  el.innerHTML=rows.map(([k,v])=>`<div class="frow" style="grid-template-columns:190px 1fr"><span class="fn">${k}</span><span class="fx" style="color:var(--grey)">${v}</span></div>`).join('');
+}
+loadEvolucao();
 
 /* casos plantados */
 const CASES=[
@@ -818,6 +861,19 @@ let policyLoaded=false;
 async function loadPolicy(){
   if(policyLoaded) return; policyLoaded=true;
   const p=await (await fetch('/api/policy')).json();
+  const RC=p.recalibracao;
+  if(RC && RC.baseline){
+    const fb=RC.baseline, fm=RC.melhor;
+    let rh=`<div class="lab-stats" style="border-bottom:0;padding-bottom:2px">
+      <div class="lstat"><span class="v">${String(fb.contencao_pct).replace('.',',')}%</span><span class="l">contenção · policy atual</span></div>
+      <div class="lstat"><span class="v">${fm?String(fm.contencao_pct).replace('.',','):'—'}%</span><span class="l">contenção · melhor do grid</span></div>
+      <div class="lstat"><span class="v">${String(fb.precisao_contencao_pct).replace('.',',')}%</span><span class="l">precisão da contenção</span></div>
+      <div class="lstat"><span class="v">${RC.grid_testado}</span><span class="l">políticas testadas</span></div>
+    </div>
+    <div class="jrule" style="margin-top:0">${esc(RC.leitura)}.</div>`;
+    $('#recal').innerHTML=rh;
+  } else { $('#recal').innerHTML='<div class="resmeta">rode scripts/recalibrar_policy.py para gerar.</div>'; }
+
   // tabelas de referência da fase 1 (lidas do código) — uma ficha por sinal
   const R=p.referencia||{};
   const fv=v=>v==null?'—':String(v).replace('.',',');

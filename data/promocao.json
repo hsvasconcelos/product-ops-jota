@@ -1,0 +1,129 @@
+{
+  "amostra": 5001,
+  "nao_contidos": 2233,
+  "limiar_promocao": 30,
+  "clusters_acima_do_limiar": 12,
+  "candidatos": [
+    {
+      "tema": "account_access",
+      "motivo": "esgotamento",
+      "n": 416,
+      "pct_do_suporte": 8.3,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_03732",
+        "c_02001"
+      ]
+    },
+    {
+      "tema": "kyc",
+      "motivo": "esgotamento",
+      "n": 406,
+      "pct_do_suporte": 8.1,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_01941",
+        "c_03335"
+      ]
+    },
+    {
+      "tema": "pix",
+      "motivo": "esgotamento",
+      "n": 383,
+      "pct_do_suporte": 7.7,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_01425",
+        "c_00661"
+      ]
+    },
+    {
+      "tema": "yield_open_finance",
+      "motivo": "esgotamento",
+      "n": 157,
+      "pct_do_suporte": 3.1,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_02531",
+        "c_01983"
+      ]
+    },
+    {
+      "tema": "fala_tap",
+      "motivo": "esgotamento",
+      "n": 153,
+      "pct_do_suporte": 3.1,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_04653",
+        "c_04715"
+      ]
+    },
+    {
+      "tema": "boleto",
+      "motivo": "esgotamento",
+      "n": 141,
+      "pct_do_suporte": 2.8,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_00992",
+        "c_02109"
+      ]
+    },
+    {
+      "tema": "account_data",
+      "motivo": "politica_kb",
+      "n": 115,
+      "pct_do_suporte": 2.3,
+      "destino": "mantém humano (por desenho)",
+      "porque": "LGPD/privilégio é decisão de gente, por escolha",
+      "exemplos": [
+        "c_03449",
+        "c_01183"
+      ]
+    },
+    {
+      "tema": "other",
+      "motivo": "palpite_fraco",
+      "n": 113,
+      "pct_do_suporte": 2.3,
+      "destino": "regra de detecção",
+      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "exemplos": [
+        "c_00313",
+        "c_02921"
+      ]
+    },
+    {
+      "tema": "account_data",
+      "motivo": "esgotamento",
+      "n": 113,
+      "pct_do_suporte": 2.3,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_02690",
+        "c_02184"
+      ]
+    },
+    {
+      "tema": "other",
+      "motivo": "esgotamento",
+      "n": 68,
+      "pct_do_suporte": 1.4,
+      "destino": "revisão do doc de KB",
+      "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+      "exemplos": [
+        "c_03220",
+        "c_01638"
+      ]
+    }
+  ],
+  "leitura": "cada candidato promovido derruba um cluster INTEIRO do 'vai para humano' — é assim que a fatia humana cai sem afrouxar nenhuma régua"
+}

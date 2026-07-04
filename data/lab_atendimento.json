@@ -1,11 +1,11 @@
 {
   "total": 5001,
-  "theme_accuracy": 85.7,
+  "theme_accuracy": 85.2,
   "triagem": [
     {
       "balde": "IA resolve sozinha",
-      "n": 2842,
-      "pct": 56.8
+      "n": 2768,
+      "pct": 55.3
     },
     {
       "balde": "IA assiste o humano",
@@ -14,15 +14,15 @@
     },
     {
       "balde": "Vai pra humano",
-      "n": 2159,
-      "pct": 43.2
+      "n": 2233,
+      "pct": 44.7
     }
   ],
   "funnel": [
     {
       "acao": "ai_resolve",
-      "n": 2842,
-      "pct": 56.8
+      "n": 2768,
+      "pct": 55.3
     },
     {
       "acao": "ai_resolve_silent",
@@ -36,129 +36,111 @@
     },
     {
       "acao": "human_handoff",
-      "n": 1900,
-      "pct": 38.0
+      "n": 1952,
+      "pct": 39.0
     },
     {
       "acao": "no_intercept",
-      "n": 259,
-      "pct": 5.2
+      "n": 281,
+      "pct": 5.6
     }
   ],
   "resolubilidade": {
     "passam": {
-      "kb_existe": 4844,
-      "executavel": 4649,
+      "kb_existe": 4820,
+      "executavel": 4628,
       "reversivel": 5001
     },
     "gargalos": [
       {
         "motivo": "não executável pela IA — precisa de privilégio/decisão humana",
-        "n": 195,
-        "pct": 3.9
+        "n": 192,
+        "pct": 3.8
       },
       {
         "motivo": "sem procedimento na base — lacuna de conteúdo (acionável)",
-        "n": 157,
-        "pct": 3.1
+        "n": 181,
+        "pct": 3.6
       }
     ]
   },
   "by_theme": {
-    "pix": {
-      "ai_resolve": 748,
-      "human_handoff": 367,
-      "no_intercept": 32
-    },
     "account_access": {
-      "ai_resolve": 672,
-      "human_handoff": 386,
-      "no_intercept": 69
+      "human_handoff": 416,
+      "ai_resolve": 630,
+      "no_intercept": 68
+    },
+    "pix": {
+      "ai_resolve": 671,
+      "human_handoff": 383,
+      "no_intercept": 35
     },
     "kyc": {
-      "ai_resolve": 333,
-      "human_handoff": 392,
-      "no_intercept": 18
+      "ai_resolve": 376,
+      "human_handoff": 406,
+      "no_intercept": 14
     },
     "fala_tap": {
-      "ai_resolve": 394,
-      "human_handoff": 142,
-      "no_intercept": 15
-    },
-    "yield_open_finance": {
-      "ai_resolve": 305,
-      "human_handoff": 158,
-      "no_intercept": 28
+      "ai_resolve": 376,
+      "human_handoff": 153,
+      "no_intercept": 17
     },
     "boleto": {
-      "human_handoff": 133,
-      "ai_resolve": 317,
-      "no_intercept": 10
+      "ai_resolve": 372,
+      "human_handoff": 141,
+      "no_intercept": 5
+    },
+    "yield_open_finance": {
+      "ai_resolve": 282,
+      "no_intercept": 25,
+      "human_handoff": 157
     },
     "account_data": {
-      "ai_resolve": 73,
-      "human_handoff": 249,
-      "no_intercept": 3
+      "ai_resolve": 61,
+      "human_handoff": 228,
+      "no_intercept": 4
     },
     "other": {
-      "human_handoff": 73,
-      "no_intercept": 84
+      "no_intercept": 113,
+      "human_handoff": 68
     }
   },
   "custo_humano": {
-    "escalados": 718,
-    "turnos_medios": 13.8,
-    "context_lost_pct": 7.9,
-    "pediram_humano_pct": 31.8,
-    "turnos_medios_handoff": 13.7,
-    "pedidos_humano_ignorados": 241
+    "escalados": 678,
+    "turnos_medios": 13.7,
+    "context_lost_pct": 6.5,
+    "pediram_humano_pct": 34.2,
+    "turnos_medios_handoff": 13.5,
+    "pedidos_humano_ignorados": 215
   },
   "exemplos_handoff": [
     {
-      "conversation_id": "c_03458",
-      "tema": "pix",
+      "conversation_id": "c_04653",
+      "tema": "fala_tap",
       "natureza": "system_signaled",
-      "criticidade": 3.6,
-      "evidencia": "evento de sistema: pix.returned",
+      "criticidade": 4.68,
+      "evidencia": "evento de sistema: tap_to_pay.settlement_delayed",
       "sinais": [
+        "pediu humano",
+        "frustrado",
         "em loop"
       ],
-      "fila": "Pagamentos/Pix",
-      "prioridade": 0.39,
+      "fila": "Recebimento (PJ)",
+      "prioridade": 0.55,
       "in_hours": true,
-      "fila_nota": "em horário → entra na fila Pagamentos/Pix",
+      "fila_nota": "em horário → entra na fila Recebimento (PJ)",
       "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
       "gargalo": null,
       "resolubilidade": 1.0,
-      "turnos_cliente": 7,
-      "trecho": "Enviei um Pix e só depois percebi que a chave estava errada. Há alguma forma de recuperar o valor?"
+      "turnos_cliente": 11,
+      "trecho": "ja falei isso, quanto tempo demora para liberar o pagamento do fala tap"
     },
     {
-      "conversation_id": "c_01962",
-      "tema": "other",
-      "natureza": "behavior_inferred",
-      "criticidade": 1.2,
-      "evidencia": "padrões no texto: —",
-      "sinais": [
-        "pediu humano",
-        "em loop"
-      ],
-      "fila": "Geral",
-      "prioridade": 0.13,
-      "in_hours": true,
-      "fila_nota": "em horário → entra na fila Geral",
-      "motivo": "baixa capacidade da IA (0.06); humano com contexto",
-      "gargalo": "sem procedimento na base — lacuna de conteúdo (acionável)",
-      "resolubilidade": 0.113,
-      "turnos_cliente": 7,
-      "trecho": "tem como explicar onde o fala tap funciona?"
-    },
-    {
-      "conversation_id": "c_03682",
+      "conversation_id": "c_01941",
       "tema": "kyc",
-      "natureza": "behavior_inferred",
+      "natureza": "system_signaled",
       "criticidade": 3.12,
-      "evidencia": "padrões no texto: —",
+      "evidencia": "evento de sistema: kyc.failed",
       "sinais": [
         "em loop"
       ],
@@ -170,27 +152,45 @@
       "gargalo": null,
       "resolubilidade": 1.0,
       "turnos_cliente": 7,
-      "trecho": "pq minha conta ainda existe"
+      "trecho": "já tentei tudo que vocês mandaram e nada"
     },
     {
-      "conversation_id": "c_02529",
-      "tema": "fala_tap",
-      "natureza": "system_signaled",
+      "conversation_id": "c_03732",
+      "tema": "account_access",
+      "natureza": "behavior_inferred",
       "criticidade": 3.6,
-      "evidencia": "evento de sistema: tap_to_pay.settlement_delayed",
+      "evidencia": "padrões no texto: —",
       "sinais": [
-        "pediu humano",
         "em loop"
       ],
-      "fila": "Recebimento (PJ)",
+      "fila": "Acesso & Segurança",
       "prioridade": 0.39,
       "in_hours": true,
-      "fila_nota": "em horário → entra na fila Recebimento (PJ)",
+      "fila_nota": "em horário → entra na fila Acesso & Segurança",
       "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
       "gargalo": null,
       "resolubilidade": 1.0,
-      "turnos_cliente": 11,
-      "trecho": "Fiz uma venda pelo Fala Tap e o pagamento não caiu conforme esperado, gostaria de assistência."
+      "turnos_cliente": 7,
+      "trecho": "alguém pode resolver isso pelo amor de Deus"
+    },
+    {
+      "conversation_id": "c_00992",
+      "tema": "boleto",
+      "natureza": "system_signaled",
+      "criticidade": 3.6,
+      "evidencia": "evento de sistema: charge.duplicated",
+      "sinais": [
+        "em loop"
+      ],
+      "fila": "Cobranças/Boleto",
+      "prioridade": 0.39,
+      "in_hours": true,
+      "fila_nota": "em horário → entra na fila Cobranças/Boleto",
+      "motivo": "a IA tentou o procedimento e o cliente segue travado (loop); humano com contexto",
+      "gargalo": null,
+      "resolubilidade": 1.0,
+      "turnos_cliente": 7,
+      "trecho": "gente cadê o suporte com esse problema?"
     }
   ]
 }

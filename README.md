@@ -44,6 +44,7 @@ proativos, `/debug` para ver a engenharia e a saúde (modo RAG · LLM · KB).
 | `outcome.py` | desfecho: chamado fechado ≠ atrito resolvido (cura confirmada · confirmação do cliente · silêncio lido por quem falou por último) |
 | `handoff.py` | operação humana: pacote de contexto, fila por especialidade, ciência de horário, anti-reincidência |
 | `trace.py` | observabilidade: cada decisão vira uma linha auditável (JSONL) |
+| `incident.py` | modo incidente: pico do mesmo evento congela a proativa individual e muda para comunicação canônica |
 
 Princípios de engenharia: **determinístico onde decide, LLM só onde redige** ·
 *store facts, derive views* · *policy vs mechanism* (todo número vive em tabela
@@ -61,10 +62,13 @@ Quatro camadas: **contratos** (7 métricas com limiar; reprovou, não entra) ·
 ```
 
 Scorecard atual (contra gabarito curado; em produção a régua é o desfecho real):
-natureza 99,8% · tema 85,8% · Hit@3 100% · decisão 15/15 (zero divergências) ·
-desfecho binário 84,6%. Triagem do motor nos 5 mil chamados do laboratório:
-**IA resolve 56,8% · vai para humano 43,2%** — fail-safe por desenho; derrubar esse
-número curando KB e produto é o trabalho do loop.
+natureza 100% · tema 85,0% · Hit@3 100% · decisão 15/15 (zero divergências) ·
+desfecho binário 88,7% (um terço confirmado por evento de cura). Triagem do motor
+nos 5 mil chamados do laboratório: **IA resolve 55,3% · vai para humano 44,7%**,
+fail-safe por desenho — e o loop já roda de verdade: a recalibração da política
+contra o desfecho (`scripts/recalibrar_policy.py`) e a esteira de promoção de
+clusters (`scripts/promover_clusters.py`) provam como esse número cai sem afrouxar
+nenhuma régua.
 
 ## O dado (honestidade)
 

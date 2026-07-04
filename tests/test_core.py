@@ -171,6 +171,20 @@ def test_desfecho():
     assert r.desfecho == Desfecho.RESOLVIDO_ASSUMIDO and r.confianca < 0.6
 
 
+def test_modo_incidente():
+    """Pico do mesmo evento em janela curta = incidente; disperso ou pouco = não."""
+    from datetime import datetime
+    from product_ops_jota.incident import detect_incident, incident_message
+    now = datetime(2026, 7, 4, 12, 0, 0)
+    pico = [("pix.returned", f"2026-07-04T11:{50 + i % 9:02d}:00") for i in range(40)]
+    assert detect_incident(pico, now) == "pix.returned"
+    poucos = pico[:10]
+    assert detect_incident(poucos, now) is None
+    antigos = [("pix.returned", "2026-07-04T09:00:00")] * 40      # fora da janela
+    assert detect_incident(antigos, now) is None
+    assert "instabilidade" in incident_message("pix.returned")
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):

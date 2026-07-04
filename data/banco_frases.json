@@ -95,8 +95,6 @@
       "já faz um tempo e ninguém me ajuda",
       "tentei cancelar e não consegui",
       "pelo amor de deus o que faço agora",
-      "quero falar com uma pessoa de verdade",
-      "me mandem pra um atendente, tô desesperado",
       "não acredito que ninguém vai resolver isso",
       "parece que não tem solução, e agora?",
       "gente, por favor, tem que ter um jeito"
@@ -318,7 +316,6 @@
       "Estou sem paciência, por favor resolvam logo",
       "Continuo aguardando pela solução do estorno",
       "Esse erro está me causando problemas, preciso que resolvam",
-      "Por favor, entra em contato humano, estou farto disso",
       "Minha conta não pode ficar assim, resolvam já"
     ],
     "bot_bad": [
@@ -423,12 +420,10 @@
       "ainda n resolveu meu saldo sumido",
       "preciso de ajuda pra ver meu saldo conectado",
       "mais de uma semana e saldo nao aparece",
-      "kd o suporte humano p resolver isso logo",
       "continua nao atualizando desde q conectei",
       "tentei varias vezes e saldo nada de atualizar",
       "to frustado com essa atualização de saldo",
       "ja enviei mensagem e nada de resolver",
-      "quero falar com um humano ja tentei de tudo",
       "esse problema de saldo tá me tirando do sério"
     ],
     "bot_bad": [
@@ -482,7 +477,6 @@
       "eu já mandei essa dúvida antes",
       "não tá claro pra mim ainda",
       "falam sempre a mesma coisa",
-      "preciso falar com alguém que entende de cdi",
       "não compreendo, preciso de ajuda",
       "isso tá me confundindo mais"
     ],
@@ -536,7 +530,6 @@
       "to horas nisso e nada resolve",
       "será q ngm ai pra resolver?",
       "isso já ta fora do normal, preciso usar minha conta",
-      "precisava de um suporte humano aqui",
       "alguém pode me ajudar com esse app?",
       "por que nao ta funcionando ainda gente",
       "alguém pode resolver isso pelo amor de Deus"
@@ -591,7 +584,6 @@
       "já pedi pra mudar meu email",
       "essa conta tá errada preciso mudar",
       "mandei excluir e nada aconteceu",
-      "preciso falar com alguém urgente",
       "ninguém tá resolvendo meu problema",
       "não era pra reativar a conta",
       "não sei mais o que fazer"
@@ -648,8 +640,7 @@
       "qual é a lógica desse sistema?",
       "por favor, tem que ser mais claro",
       "não tá dando pra resolver sozinho isso",
-      "ninguém explica direito, frustante isso",
-      "quero atendimento humano, não dá assim"
+      "ninguém explica direito, frustante isso"
     ],
     "bot_bad": [
       "Para usar o Fala Tap, siga os passos no aplicativo.",

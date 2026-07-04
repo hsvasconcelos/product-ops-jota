@@ -33,10 +33,12 @@ from product_ops_jota.decision import (
 )
 from product_ops_jota.friction_model import InterceptionAction
 from product_ops_jota.handoff import build_context_pack
+from product_ops_jota.outcome import derive_desfecho
 from product_ops_jota.rag import Retriever
 
 DB = ROOT / "data" / "jota_support.db"
 OUT = ROOT / "data" / "lab_atendimento.json"
+CASOS = ROOT / "data" / "lab_casos.jsonl"   # 1 linha por chamado: sinais + ação + gargalo + desfecho
 
 ACTION_ORDER = [InterceptionAction.AI_RESOLVE, InterceptionAction.AI_RESOLVE_SILENT,
                 InterceptionAction.AI_ASSIST, InterceptionAction.HUMAN_HANDOFF,
@@ -79,6 +81,11 @@ def _stuck_batch(msgs, det) -> bool:
 def main():
     conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
     retriever = Retriever()              # tema SEMÂNTICO (o motor real); cai p/ keyword se sem deps
+    # próximo contato por usuário (sinal de recontato do desfecho)
+    nxt: dict[str, list[str]] = {}
+    for uid_, st_ in conn.execute("SELECT user_id, started_at FROM conversations ORDER BY started_at"):
+        nxt.setdefault(uid_, []).append(st_)
+    casos_f = open(CASOS, "w", encoding="utf-8")
 
     funnel = Counter()
     gargalos = Counter()                 # por que NÃO resolve sozinha
@@ -111,6 +118,21 @@ def main():
         dec = decide(inp)
         resol = derive_resolubilidade(det, doc)
 
+        # desfecho derivado (fechado ≠ resolvido) — pro recalibrador e pra promoção
+        evts_user = conn.execute("SELECT event_type, occurred_at FROM events WHERE user_id=?",
+                                 (c["uid"],)).fetchall()
+        seguinte = next((s_ for s_ in nxt.get(c["uid"], []) if s_ > c["started"]), None)
+        desf = derive_desfecho(c["msgs"], evts_user, theme, next_contact_at=seguinte)
+        casos_f.write(json.dumps({
+            "cid": c["cid"], "tema": theme.value, "natureza": det.predicted_nature.value,
+            "acao": dec.action.value, "gargalo": resol.gargalo,
+            "sinais": {"frustrado": det.frustrated, "em_loop": det.in_loop,
+                       "confuso": det.confused, "pediu_humano": det.asked_for_human,
+                       "seguranca": det.safety_concern, "stuck": stuck},
+            "inp": inp.model_dump(), "desfecho": desf.desfecho.value,
+            "resolvido": desf.resolvido, "fonte_desfecho": desf.sinal,
+        }, ensure_ascii=False) + "\n")
+
         funnel[dec.action.value] += 1
         f = resol.fatores
         resol_pass["kb_existe"] += f.kb_existe
@@ -135,6 +157,7 @@ def main():
             "FROM conversations c WHERE channel='support' AND outcome='escalated'").fetchone()
     ignored = g("SELECT SUM(asked_for_human)-SUM(human_handoff_done) FROM conversations WHERE channel='support'").fetchone()[0]
     conn.close()
+    casos_f.close()
 
     # ── triagem reativa: todo chamado precisa de desfecho → 3 baldes ─────────
     # (no_intercept aqui = o motor se RECUSA a agir sozinho s/ base/certeza → humano)

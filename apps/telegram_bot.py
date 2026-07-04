@@ -49,8 +49,9 @@ from product_ops_jota.decision import (                                    # noq
     decide, derive_decision_input, UserProfile,
 )
 from product_ops_jota.outcome import explicit_close_signal                 # noqa: E402
+from product_ops_jota.incident import detect_incident, incident_message   # noqa: E402
 from product_ops_jota.friction_model import InterceptionAction, SupportTheme as _T  # noqa: E402
-from product_ops_jota.handoff import build_context_pack                    # noqa: E402
+from product_ops_jota.handoff import build_context_pack, should_reintercept  # noqa: E402
 from product_ops_jota.trace import trace                                   # noqa: E402
 from product_ops_jota.rag import Retriever                                 # noqa: E402
 from copiloto import montar_sugestao                                       # noqa: E402  (fallback)
@@ -501,11 +502,50 @@ def handle_command(chat_id, cmd, name=""):
         send(chat_id, "_(demo do case · /debug mostra a engenharia · /reset zera)_\n\n"
                       "*Cenários proativos* (o Jota fala primeiro, a partir do evento):\n"
                       "/demo-kyc · /demo-estorno · /demo-falatap · /demo-boleto · "
-                      "/demo-openfinance · /demo-limbo · /demo-pix")
+                      "/demo-openfinance · /demo-limbo · /demo-pix · /demo-incidente")
         return
     if cmd == "/reset":
         SESSIONS[chat_id] = _new_session(name=name)
         send(chat_id, "🧹 Conversa reiniciada. Pode enviar um novo caso.")
+        return
+    if cmd == "/demo-incidente":
+        # MODO INCIDENTE: pico do MESMO evento em janela curta = atrito de TODOS, não de um.
+        # A proativa individual congela; a comunicação vira canônica (sem LLM — previsibilidade).
+        now = datetime.now()
+        events = [("pix.returned", (now - timedelta(minutes=(i % 40) * 0.25)).isoformat())
+                  for i in range(40)]
+        sess = _new_session("pf", events, "", now.isoformat(), name=name)
+        sess["incident_pending"] = True
+        SESSIONS[chat_id] = sess
+        send(chat_id, "🚨 <b>Pico detectado:</b> <code>pix.returned ×40 em 10 min</code> "
+                      "(limiar: 30 em 15 min) → <b>modo incidente</b>", html=True)
+        send(chat_id, "_(o cliente abre o chat — e em vez de 40 mil interceptações individuais, "
+                      "recebe a comunicação de incidente)_")
+        return
+    if cmd == "/meuid":
+        send(chat_id, f"Seu chat_id: `{chat_id}`\n_(configure TELEGRAM_ADMIN_CHAT com este valor para liberar o /stats)_")
+        return
+    if cmd == "/stats":
+        # visão de operação do bot — SÓ pro admin (o time do Jota usa o bot como cliente)
+        if str(chat_id) != os.environ.get("TELEGRAM_ADMIN_CHAT", ""):
+            send(chat_id, "Não conheci esse comando. /ajuda pra ver os atalhos.")
+            return
+        from product_ops_jota.trace import load as trace_load, summarize
+        s = summarize()
+        if not s.get("n"):
+            send(chat_id, "📊 Sem interações registradas desde o último deploy.")
+            return
+        acoes = "\n".join(f"  · {a}: {n}" for a, n in s["acoes"].items())
+        temas = " · ".join(f"{t} {n}" for t, n in list(s["temas"].items())[:6])
+        fechos = [r.get("desfecho") for r in trace_load() if r.get("desfecho")]
+        gaps = KB_GAPS.read_text("utf-8").count("\n") if KB_GAPS.exists() else 0
+        send(chat_id,
+             f"📊 *Operação do bot* (desde o último deploy — o container zera a cada redeploy)\n\n"
+             f"*{s['n']} interações* · contido pela IA {s['pct_contido']}% · humano {s['pct_humano']}%\n"
+             f"*Ações:*\n{acoes}\n"
+             f"*Temas:* {temas}\n"
+             f"*Desfechos explícitos:* {fechos.count('positivo')} resolvidos · {fechos.count('desistiu')} desistências\n"
+             f"*Guardrail:* {s.get('guardrail') or '—'} · *Lacunas de KB registradas:* {gaps}")
         return
     if cmd == "/debug":
         if chat_id in DEBUG:
@@ -525,6 +565,8 @@ def handle_command(chat_id, cmd, name=""):
         # tema correto sem sinal-fantasma de emoção (que vinha do texto de cliente injetado).
         # Arma o cenário e ESPERA o cliente abrir o chat (jornada real).
         sess = _new_session(seg, events, FACTS.get(sid, ""), c["started_at"], name=name)
+        # multi-toque: o histórico de interceptações por tema sobrevive ao re-arme
+        sess["last_intercept"] = (SESSIONS.get(chat_id) or {}).get("last_intercept", {})
         if sid == "ex_kyc_limbo":                       # limbo = AUSÊNCIA: vigia o evento esperado
             sess["expected_events"] = [("onboarding.completed", 60)]
         # PROATIVO só com SINAL (evento ou ausência vigiada). Cenário sem evento é REATIVO:
@@ -654,6 +696,11 @@ def _deliver_proactive(chat_id, sess, text):
     sess["history"].append({"role": "user", "content": text})
     typing(chat_id)
     det, docs, dec, inp, kb_gap = analisar(sess)
+    # multi-toque (anti-spam): a regra de não insistir na MESMA dor em 24h roda de verdade;
+    # na demo ela não bloqueia (o re-arme manual equivale a "escalou"), mas fica visível no /debug.
+    li = sess.setdefault("last_intercept", {})
+    _ok_re, _re_reason = should_reintercept(det.predicted_theme, li.get(det.predicted_theme.value), datetime.now())
+    li[det.predicted_theme.value] = datetime.now()
     # no proativo o EVENTO conta o contexto: enriquece a busca com os FACTS pra pegar o doc CERTO
     # (ex.: duplicidade → KB-ESTORNO-001, não KB-BOLETO-001), aí o opener fica grounded e passa.
     facts = FACTS.get(sid, "")
@@ -692,6 +739,7 @@ def _deliver_proactive(chat_id, sess, text):
            "fonte": doc.id if doc else None, "guardrail": guardrail, "cliente_msg": text[:200]})
     if chat_id in DEBUG:
         send(chat_id, _brain_text(det, docs, dec, inp, guardrail, kb_gap), html=True)
+        send(chat_id, f"🔁 <b>reinterceptação</b>: {_esc(_re_reason)}", html=True)
 
 
 def handle_message(chat_id, text, name=""):
@@ -699,6 +747,20 @@ def handle_message(chat_id, text, name=""):
     SESSIONS[chat_id] = sess
     if name and not sess.get("name"):
         sess["name"] = name
+    if sess.pop("incident_pending", False):    # modo incidente: comunicação canônica, sem LLM
+        et = detect_incident(sess["events"], datetime.now())
+        if not sess.get("greeted"):
+            sess["greeted"] = True
+            send(chat_id, _saudacao_curta(sess.get("name", "")))
+        send(chat_id, incident_message(et or "pix.returned"))
+        trace({"kind": "incidente", "evento_pico": et, "acao": "incident_broadcast",
+               "cliente_msg": text[:200]})
+        if chat_id in DEBUG:
+            send(chat_id, "🚨 <b>modo incidente</b>: pico do mesmo evento cruzou o limiar → a "
+                          "interceptação individual do tema CONGELA (spam de 40 mil proativas) e a "
+                          "comunicação vira canônica, sem LLM: em incidente, previsibilidade "
+                          "vale mais que prosa. Caso a caso volta quando o pico cessa.", html=True)
+        return
     if sess.get("proactive_pending"):          # cenário /demo-* armado → entrega proativa
         _deliver_proactive(chat_id, sess, text)
         return
