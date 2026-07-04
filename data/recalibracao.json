@@ -1,22 +1,27 @@
 {
-  "gerado_em": "2026-07-04T16:11:06",
+  "gerado_em": "2026-07-04T17:03:42",
+  "primeiro_toque": {
+    "contencao_pct": 90.2,
+    "teto_estrutural_pct": 96.2,
+    "nota": "mesmos 5 mil atritos, sem o esgotamento herdado do acervo (stuck=False); o teto desconta o que é humano por política (LGPD/privilégio)"
+  },
   "amostra": 5001,
   "treino": 2501,
   "teste": 2500,
   "grid_testado": 1188,
-  "grid_elegivel": 144,
+  "grid_elegivel": 96,
   "baseline": {
     "policy": {
-      "conf_floor": 0.5,
+      "conf_floor": 0.45,
       "roi_crit_floor": 2.0,
-      "roi_trust_floor": 0.2,
-      "handoff_ceiling": 0.4,
+      "roi_trust_floor": 0.15,
+      "handoff_ceiling": 0.35,
       "resolve_floor": 0.5,
-      "assist_floor": 0.35
+      "assist_floor": 0.3
     },
-    "contencao_pct": 56.0,
-    "precisao_contencao_pct": 73.8,
-    "contidos": 1399
+    "contencao_pct": 58.3,
+    "precisao_contencao_pct": 73.9,
+    "contidos": 1457
   },
   "melhor": {
     "policy": {
@@ -30,12 +35,12 @@
     "treino": {
       "contencao_pct": 56.4,
       "precisao_contencao_pct": 75.1,
-      "contidos": 1410
+      "contidos": 1411
     },
-    "contencao_pct": 58.2,
+    "contencao_pct": 58.3,
     "precisao_contencao_pct": 73.9,
-    "contidos": 1454
+    "contidos": 1457
   },
-  "ganho_real": true,
-  "leitura": "o grid escolheu no treino e o ganho SE SUSTENTOU no teste (casos nunca vistos), sem perder precisão nem contrato"
+  "ganho_real": false,
+  "leitura": "no teste (casos nunca vistos) o ganho do grid não se sustentou — a policy atual fica; resultado honesto é isto"
 }

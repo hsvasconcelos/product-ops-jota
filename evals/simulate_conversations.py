@@ -38,12 +38,16 @@ OUT = ROOT / "data" / "sim_conversations.json"
 # sub-tipo (resolve/assiste/observar) não muda a experiência — o eixo é IA vs humano.
 H, R = "human", "ai"
 SCENARIOS = [
+    # a ESCADA entra no meio: A falha 2x → caminho B (doc alternativo) → B falha → pessoa.
+    # O roteiro tem uma falha a mais que a versão pré-escada, pra validar a escada inteira.
     {"id": "acesso_esgota", "seg": "pf", "expect": H,
      "turns": ["nao consigo acessar minha conta", "no app", "fica tela branca",
-               "fiz isso e nao funcionou", "continua sem funcionar"]},
+               "fiz isso e nao funcionou", "continua sem funcionar",
+               "tentei esse outro caminho tambem e nada, continua igual"]},
     {"id": "acesso_baixa_literacia", "seg": "pf", "expect": H,
      "turns": ["moço nao consigo entrar na minha conta", "no aplicativo", "abre e fecha sozinho",
-               "ja fiz oq vc falo e nao deu certo", "seque sem funciona, ja tentei tudo"]},
+               "ja fiz oq vc falo e nao deu certo", "seque sem funciona, ja tentei tudo",
+               "fiz do outro jeito q vc falo tambem e nada"]},
     {"id": "acesso_resolve_1a", "seg": "pf", "expect": R,
      "turns": ["meu app ta meio travado quando abro", "no app"]},
     {"id": "pix_errado", "seg": "pf", "expect": R,

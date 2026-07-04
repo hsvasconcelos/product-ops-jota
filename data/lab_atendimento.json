@@ -1,28 +1,28 @@
 {
   "total": 5001,
-  "theme_accuracy": 85.2,
+  "theme_accuracy": 85.1,
   "triagem": [
     {
       "balde": "IA resolve sozinha",
-      "n": 2768,
-      "pct": 55.3
+      "n": 2771,
+      "pct": 55.4
     },
     {
       "balde": "IA assiste o humano",
-      "n": 0,
-      "pct": 0.0
+      "n": 97,
+      "pct": 1.9
     },
     {
       "balde": "Vai pra humano",
-      "n": 2233,
-      "pct": 44.7
+      "n": 2133,
+      "pct": 42.7
     }
   ],
   "funnel": [
     {
       "acao": "ai_resolve",
-      "n": 2768,
-      "pct": 55.3
+      "n": 2771,
+      "pct": 55.4
     },
     {
       "acao": "ai_resolve_silent",
@@ -31,36 +31,36 @@
     },
     {
       "acao": "ai_assist",
-      "n": 0,
-      "pct": 0.0
+      "n": 97,
+      "pct": 1.9
     },
     {
       "acao": "human_handoff",
-      "n": 1952,
-      "pct": 39.0
+      "n": 1985,
+      "pct": 39.7
     },
     {
       "acao": "no_intercept",
-      "n": 281,
-      "pct": 5.6
+      "n": 148,
+      "pct": 3.0
     }
   ],
   "resolubilidade": {
     "passam": {
-      "kb_existe": 4820,
-      "executavel": 4628,
+      "kb_existe": 4824,
+      "executavel": 4635,
       "reversivel": 5001
     },
     "gargalos": [
       {
         "motivo": "não executável pela IA — precisa de privilégio/decisão humana",
-        "n": 192,
+        "n": 189,
         "pct": 3.8
       },
       {
         "motivo": "sem procedimento na base — lacuna de conteúdo (acionável)",
-        "n": 181,
-        "pct": 3.6
+        "n": 177,
+        "pct": 3.5
       }
     ]
   },
@@ -68,41 +68,48 @@
     "account_access": {
       "human_handoff": 416,
       "ai_resolve": 630,
-      "no_intercept": 68
+      "ai_assist": 44,
+      "no_intercept": 22
     },
     "pix": {
       "ai_resolve": 671,
       "human_handoff": 383,
-      "no_intercept": 35
+      "no_intercept": 16,
+      "ai_assist": 19
     },
     "kyc": {
       "ai_resolve": 376,
       "human_handoff": 406,
-      "no_intercept": 14
+      "ai_assist": 6,
+      "no_intercept": 7
     },
     "fala_tap": {
-      "ai_resolve": 376,
-      "human_handoff": 153,
-      "no_intercept": 17
+      "ai_resolve": 377,
+      "human_handoff": 155,
+      "ai_assist": 13,
+      "no_intercept": 10
     },
     "boleto": {
       "ai_resolve": 372,
       "human_handoff": 141,
-      "no_intercept": 5
+      "no_intercept": 3,
+      "ai_assist": 2
     },
     "yield_open_finance": {
       "ai_resolve": 282,
-      "no_intercept": 25,
-      "human_handoff": 157
+      "ai_assist": 10,
+      "human_handoff": 157,
+      "no_intercept": 13
     },
     "account_data": {
-      "ai_resolve": 61,
-      "human_handoff": 228,
-      "no_intercept": 4
+      "ai_resolve": 63,
+      "human_handoff": 226,
+      "ai_assist": 3,
+      "no_intercept": 1
     },
     "other": {
-      "no_intercept": 113,
-      "human_handoff": 68
+      "no_intercept": 76,
+      "human_handoff": 101
     }
   },
   "custo_humano": {

@@ -81,6 +81,7 @@ THEME_PRIORITY = [
 # Doc da KB → tema, p/ classificação SEMÂNTICA (o tema do doc mais relevante à
 # conversa). Âncora = procedimentos da KB (não as frases do banco) → eval honesto.
 DOC_THEME_PREFIX = {
+    "KB-LIMITES": SupportTheme.PIX, "KB-TARIFAS": SupportTheme.FALA_TAP,
     "KB-PIX": SupportTheme.PIX, "KB-KYC": SupportTheme.KYC,
     "KB-FALATAP": SupportTheme.FALA_TAP, "KB-BOLETO": SupportTheme.BOLETO,
     "KB-ESTORNO": SupportTheme.BOLETO, "KB-CONECTA": SupportTheme.YIELD_OPEN_FINANCE,
@@ -267,11 +268,13 @@ def classify_theme(customer_text_norm: str) -> tuple[SupportTheme, float, list[s
 THEME_ANCHORS: dict[SupportTheme, list[str]] = {
     SupportTheme.PIX: ["não consigo fazer um pix", "a chave pix não funciona ou não é encontrada",
                        "erro ao enviar transferência pix", "mandei um pix para a pessoa errada",
-                       "cadê meu limite de pix parcelado"],
+                       "cadê meu limite de pix parcelado", "qual o limite do meu pix por dia",
+                       "quero aumentar meu limite de pix", "onde acho o comprovante do pix"],
     SupportTheme.KYC: ["não consigo abrir minha conta", "a selfie/biometria não passou na verificação",
                        "minha conta não foi liberada na abertura", "travou no cadastro de abertura de conta"],
     SupportTheme.FALA_TAP: ["vendi pela maquininha e o dinheiro não caiu", "recebimento da venda no fala tap travado",
-                            "a venda aprovou mas o valor não veio", "meu dinheiro da maquininha está bloqueado"],
+                            "a venda aprovou mas o valor não veio", "meu dinheiro da maquininha está bloqueado",
+                            "qual a taxa da maquininha", "quanto o jota cobra por venda"],
     SupportTheme.BOLETO: ["fui cobrado duas vezes, quero estorno", "cobrança em duplicidade no meu cartão",
                           "preciso estornar um pagamento", "boleto agendado não foi pago", "paguei e continua em aberto"],
     SupportTheme.ACCOUNT_ACCESS: ["não consigo acessar o aplicativo", "o app fecha sozinho ao abrir",

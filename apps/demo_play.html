@@ -391,9 +391,13 @@
     <div class="ptitle" style="margin-top:0">o norte · a métrica da tese</div>
     <div class="contrast"><b>Carga humana por 1.000 clientes.</b> Se o loop funciona, a base cresce de 300 mil para 1 milhão e esta linha fica plana. É o número que prova "escalar o cuidado sem escalar a operação".</div>
 
+    <div class="ptitle">a escada da contenção · o mesmo motor, três universos</div>
+    <div class="lab-stats" id="kpi-escada" style="border-bottom:0;padding-bottom:2px"></div>
+    <div class="jrule" style="margin-top:0">Leitura honesta da escada: a <b>triagem do acervo</b> herda o esgotamento do atendimento lento de hoje (piso conservador); o <b>primeiro toque</b> é o mesmo atrito quando a proativa chega antes do desgaste; a <b>conversa conduzida</b> é a IA operando de ponta a ponta (julgada por juiz). O teto estrutural desconta o que é humano por política, de propósito.</div>
+
     <div class="ptitle">antecipação · agimos antes do grito?</div>
     <div class="frow"><span class="fn">% interceptado antes do chamado<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">quanto do atrito foi tratado no proativo vs caiu no reativo. É a % que faz o reativo encolher.</span></div>
-    <div class="frow"><span class="fn">tempo sinal → ação<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">do evento/padrão detectado à intervenção: milissegundos no motor, contra ~33h de SLA do baseline reativo (ReclameAqui).</span></div>
+    <div class="frow"><span class="fn">tempo sinal → ação<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">do evento/padrão detectado à intervenção. O motor decide em milissegundos; o baseline reativo leva ~33h até a primeira resposta — medidas de coisas diferentes, mas é a ordem de grandeza do gargalo que a proatividade ataca.</span></div>
     <div class="frow"><span class="fn">cobertura por natureza<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">evento, comportamento e ausência. A fatia de AUSÊNCIA é o diferencial: ninguém reclama dela.</span></div>
 
     <div class="ptitle">resolução · resolvemos de verdade?</div>
@@ -422,7 +426,7 @@
     <div class="ptitle" style="margin-top:0">a base · cenários criados para simular a base do jota</div>
     <div class="lab-stats" id="lab-overview"></div>
     <div class="ptitle">onde a jornada quebra · o que o laboratório mediu</div>
-    <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte).</div>
+    <div class="jnote">altura = frequência do atrito por tema no laboratório (5 mil chamados de suporte). A etiqueta sob cada barra é o modo de detecção predominante daquele TIPO de atrito (conceitual, do mapa de detecção), não uma contagem.</div>
     <div class="funnel-wrap">
       <div class="funnel">
         <div class="fcol"><div class="fbarwrap"><div class="fbar" style="height:107px"></div></div>
@@ -549,7 +553,7 @@
     </div>
 
     <div class="ptitle">a recalibração · as réguas contra o desfecho, de verdade</div>
-    <div class="jnote">um grid de políticas candidatas é escolhido na METADE de treino e reportado na metade de TESTE (casos nunca vistos na escolha); só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção. Precisão da contenção = % dos casos contidos cuja conversa terminou resolvida segundo o desfecho; como nessas conversas quem atendeu foi o suporte de hoje (não a IA), o número é um piso conservador. É o loop recalibrando a política, com o cinto afivelado.</div>
+    <div class="jnote">um grid de políticas candidatas é escolhido na METADE de treino e reportado na metade de TESTE (casos nunca vistos na escolha); só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção. Precisão da contenção = % dos casos contidos cuja conversa terminou resolvida segundo o desfecho; como nessas conversas quem atendeu foi o suporte de hoje (não a IA), o número é um piso conservador. É o loop recalibrando a política, com o cinto afivelado — e a política sugerida pelo grid FOI adotada como padrão do motor (auditoria em data/recalibracao.json; a anterior vive no histórico do git).</div>
     <div id="recal"></div>
 
     <div class="ptitle">interceptação · a prova: as duas fases rodando ao vivo</div>
@@ -617,6 +621,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     if(b.dataset.tab==='logica'){ loadPolicy(); seedIntercept(); }
     if(b.dataset.tab==='lab'){ loadLab(); loadGaps(); }
     if(b.dataset.tab==='time') loadTime();
+    if(b.dataset.tab==='kpis') loadKpis();
     if(b.dataset.tab==='evals') loadEvals();
   };
 });
@@ -737,6 +742,26 @@ $('#gate-toggle').onclick=()=>{
 };
 
 
+/* kpis: a escada da contenção — acervo (lab) · 1º toque (recalibração) · conduzida (soak) */
+let kpisLoaded=false;
+async function loadKpis(){
+  if(kpisLoaded) return; kpisLoaded=true;
+  const vg=v=>String(v??'—').replace('.',',');
+  let acervo=null, pt=null, teto=null, soak=null;
+  try{ const a=await (await fetch('/api/lab/atendimento')).json();
+       const t=(a.triagem||[]).find(x=>x.balde==='IA resolve sozinha'); acervo=t?t.pct:null;
+       const t2=(a.triagem||[]).find(x=>x.balde==='IA assiste o humano'); if(t2&&acervo!=null) acervo=Math.round((acervo+t2.pct)*10)/10; }catch(_){}
+  try{ const p=await (await fetch('/api/policy')).json();
+       if(p.recalibracao&&p.recalibracao.primeiro_toque){ pt=p.recalibracao.primeiro_toque.contencao_pct; teto=p.recalibracao.primeiro_toque.teto_estrutural_pct; } }catch(_){}
+  try{ const e=await (await fetch('/api/evals')).json(); if(e.soak) soak=e.soak.desfecho; }catch(_){}
+  $('#kpi-escada').innerHTML=[
+    ['triagem do acervo', acervo, 'mundo velho, esgotamento herdado'],
+    ['primeiro toque', pt, 'mesmos atritos, proativa chegou antes'],
+    ['conversa conduzida', soak, 'IA de ponta a ponta (juiz)'],
+    ['teto estrutural', teto, 'o resto é humano por política'],
+  ].map(([l,v,d])=>`<div class="lstat"><span class="v">${vg(v)}%</span><span class="l">${l}</span><span class="d">${d}</span></div>`).join('');
+}
+
 /* aba time: os números de dor humana vêm da API (nunca ficam velhos) */
 let timeLoaded=false;
 async function loadTime(){
@@ -766,6 +791,7 @@ async function loadEvolucao(){
     ['desfecho medido', `84,6% → <b>${vg(dep.desfecho)}%</b>: eventos de cura entraram no dado e um terço dos desfechos agora é confirmado pelo backend na confiança máxima.`],
     ['rótulo "pediu humano"', `F1 0,69 → <b>0,96</b>: o eval acusava; a causa era rótulo sujo no dado sintético (frase de pedido de humano fora do flag), corrigida na raiz, não no classificador.`],
     ['o loop, mecanizado', rc&&rc.baseline?`a recalibração rodou de verdade: <b>${rc.grid_testado} políticas</b> testadas contra o desfecho, contratos intactos (${esc(rc.leitura)})${pm&&pm.clusters_acima_do_limiar?`; e a esteira de promoção achou <b>${pm.clusters_acima_do_limiar} clusters</b> acima do limiar, cada um com destino nomeado`:''}.`:'recalibração e esteira de promoção construídas (aba lógica e laboratório).'],
+    ['a meta operacional', rc&&rc.primeiro_toque?`contenção no <b>primeiro toque</b>: <b>${vg(rc.primeiro_toque.contencao_pct)}%</b> com a política recalibrada ADOTADA; a esteira foi executada (2 docs novos + 6 revisados com caminho B) e o bot ganhou a escada de segunda tentativa antes de escalar.`:'política recalibrada adotada; esteira executada; escada de segunda tentativa no bot.'],
     ['modo incidente', `de preocupação declarada ("ainda não desenhei") a <b>protótipo testável</b>: detector de pico + comunicação canônica (/demo-incidente no bot).`],
     ['operação ao vivo', `o bot ganhou <b>/stats</b> (uso real do time, na call) e a regra anti-spam de reinterceptação rodando e visível no /debug.`],
   ];

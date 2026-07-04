@@ -1,8 +1,8 @@
 {
   "amostra": 5001,
-  "nao_contidos": 2233,
+  "nao_contidos": 2133,
   "limiar_promocao": 30,
-  "clusters_acima_do_limiar": 12,
+  "clusters_acima_do_limiar": 11,
   "candidatos": [
     {
       "tema": "account_access",
@@ -55,7 +55,7 @@
     {
       "tema": "fala_tap",
       "motivo": "esgotamento",
-      "n": 153,
+      "n": 155,
       "pct_do_suporte": 3.1,
       "destino": "revisão do doc de KB",
       "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
@@ -79,25 +79,13 @@
     {
       "tema": "account_data",
       "motivo": "politica_kb",
-      "n": 115,
+      "n": 113,
       "pct_do_suporte": 2.3,
       "destino": "mantém humano (por desenho)",
       "porque": "LGPD/privilégio é decisão de gente, por escolha",
       "exemplos": [
         "c_03449",
         "c_01183"
-      ]
-    },
-    {
-      "tema": "other",
-      "motivo": "palpite_fraco",
-      "n": 113,
-      "pct_do_suporte": 2.3,
-      "destino": "regra de detecção",
-      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
-      "exemplos": [
-        "c_00313",
-        "c_02921"
       ]
     },
     {
@@ -114,9 +102,21 @@
     },
     {
       "tema": "other",
+      "motivo": "palpite_fraco",
+      "n": 76,
+      "pct_do_suporte": 1.5,
+      "destino": "regra de detecção",
+      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "exemplos": [
+        "c_00313",
+        "c_02921"
+      ]
+    },
+    {
+      "tema": "other",
       "motivo": "esgotamento",
-      "n": 68,
-      "pct_do_suporte": 1.4,
+      "n": 66,
+      "pct_do_suporte": 1.3,
       "destino": "revisão do doc de KB",
       "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
       "exemplos": [
@@ -125,28 +125,17 @@
       ]
     },
     {
-      "tema": "account_access",
-      "motivo": "palpite_fraco",
-      "n": 68,
-      "pct_do_suporte": 1.4,
-      "destino": "regra de detecção",
-      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
-      "exemplos": [
-        "c_04388",
-        "c_00802"
-      ]
-    },
-    {
-      "tema": "pix",
-      "motivo": "palpite_fraco",
+      "tema": "other",
+      "motivo": "lacuna_kb",
       "n": 35,
       "pct_do_suporte": 0.7,
-      "destino": "regra de detecção",
-      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "destino": "doc de KB",
+      "porque": "não há procedimento que responda: escrever o doc cura o cluster inteiro",
       "exemplos": [
-        "c_04774",
-        "c_03563"
-      ]
+        "c_01730",
+        "c_00010"
+      ],
+      "evidencia_bot": "31 lacunas registradas pelo bot no tema (ex.: “quero fazer um empréstimo pessoal”)"
     }
   ],
   "leitura": "cada candidato PROMOVÍVEL derruba um cluster inteiro do 'vai para humano'; os marcados 'por desenho' ficam com gente de propósito — derrubá-los seria errar"

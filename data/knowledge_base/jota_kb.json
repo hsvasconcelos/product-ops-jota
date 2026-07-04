@@ -22,7 +22,8 @@
       "Confirme com o destinatário qual é a chave Pix ATIVA dele (pode ser diferente do CPF).",
       "Peça para ele verificar as chaves cadastradas no banco onde quer receber.",
       "Como alternativa, ele pode te enviar um QR Code de cobrança — aí não precisa de chave.",
-      "Para receber você mesmo, veja suas chaves cadastradas no Jota e cadastre uma nova se precisar."
+      "Para receber você mesmo, veja suas chaves cadastradas no Jota e cadastre uma nova se precisar.",
+      "Se a chave continuar dando erro: peça ao destinatário um QR Code do banco dele (o QR sempre funciona, mesmo sem chave cadastrada) ou use os dados de agência e conta."
     ],
     "requires_human": false,
     "hints": "A chave Pix dá erro, a chave não é reconhecida, chave não encontrada, erro na chave de destino, não consigo enviar Pix pra essa chave."
@@ -49,7 +50,8 @@
       "Procure um ambiente bem iluminado, sem luz forte atrás de você.",
       "Tire óculos, boné ou máscara e mantenha o rosto centralizado.",
       "Toque em 'Tentar novamente' para refazer a verificação.",
-      "Se falhar 3 vezes, um atendente do time de onboarding pode validar manualmente."
+      "Se falhar 3 vezes, um atendente do time de onboarding pode validar manualmente.",
+      "Se a selfie continuar falhando após 2 tentativas: envie os documentos pela esteira alternativa em Perfil > Verificação > Enviar documentos, que segue para análise manual em até 1 dia útil."
     ],
     "requires_human": false
   },
@@ -62,7 +64,8 @@
       "Peça 'reconectar meu banco' e escolha a instituição.",
       "Você será levado ao app do banco para autorizar novamente.",
       "Defina a duração da conexão para evitar nova expiração.",
-      "Os saldos voltam a atualizar em seguida."
+      "Os saldos voltam a atualizar em seguida.",
+      "Se após renovar o consentimento o saldo ainda não atualizar: desconecte a instituição e refaça a conexão do zero; a primeira sincronização completa pode levar algumas horas."
     ],
     "requires_human": false
   },
@@ -140,7 +143,8 @@
       "Confirme no histórico que a venda está como APROVADA (e o horário da aprovação).",
       "Verifique o plano de recebimento do lojista: D0 (na hora) ou D1 (próximo dia útil).",
       "Se for D1 e a venda foi hoje (ou fim de semana), tranquilize: o valor está garantido desde a aprovação e cai no próximo dia útil — não é erro.",
-      "Se já passou o prazo do plano sem crédito, aí sim acione o suporte com o ID da venda para investigar a liquidação."
+      "Se já passou o prazo do plano sem crédito, aí sim acione o suporte com o ID da venda para investigar a liquidação.",
+      "Se o prazo do seu plano já passou e o valor não caiu: confira em Fala Tap > Vendas se a venda está aprovada e qual o plano dela; o crédito segue o plano vigente na hora da venda."
     ],
     "requires_human": false
   },
@@ -166,7 +170,8 @@
       "No Android, abra Configuracoes > Sistema > Opcoes do desenvolvedor e DESATIVE 'Nao manter atividades' (ou desligue o Modo desenvolvedor inteiro). Essa e a causa nº1.",
       "Atualize o app para a ultima versao na Play Store / App Store.",
       "Se persistir, limpe o cache do app (Configuracoes do app > Armazenamento > Limpar cache) ou reinstale — seus dados e saldo nao se perdem.",
-      "Reinicie o aparelho e abra o app de novo. Se ainda fechar, um atendente verifica logs do dispositivo com voce."
+      "Reinicie o aparelho e abra o app de novo. Se ainda fechar, um atendente verifica logs do dispositivo com voce.",
+      "Se nada disso resolver: use o Jota aqui pelo WhatsApp normalmente (saldo, Pix, extrato) enquanto o time técnico investiga o app pelo seu relato."
     ],
     "requires_human": false
   },
@@ -179,7 +184,8 @@
       "Confirmar as duas cobranças idênticas (mesmo valor, destino e dia).",
       "Estornar automaticamente a cobrança duplicada — a original permanece.",
       "Avisar o cliente de forma proativa do estorno e do prazo de até 1 dia útil.",
-      "Acompanhar o crédito de volta na conta de origem e confirmar quando cair."
+      "Acompanhar o crédito de volta na conta de origem e confirmar quando cair.",
+      "Se o estorno automático não aparecer em 1 dia útil: me envie o comprovante das duas cobranças (data e valor idênticos) que eu registro para a análise prioritária."
     ],
     "requires_human": false,
     "hints": "Fui cobrado duas vezes no mesmo boleto, cobrança dobrada, debitaram o boleto em dobro, paguei o boleto e cobraram de novo, duas cobranças iguais do mesmo boleto ou pagamento — tudo isso é cobrança em duplicidade."
@@ -212,5 +218,31 @@
     ],
     "requires_human": false,
     "hints": "Não consigo cadastrar minha chave Pix, como registrar/criar uma chave (CPF, e-mail, celular ou aleatória) na minha conta."
+  },
+  {
+    "id": "KB-LIMITES-001",
+    "title": "Limites do Pix: consultar e ajustar",
+    "category": "limites_pix",
+    "hints": "qual o limite do meu pix, limite por dia, limite noturno, quero aumentar meu limite, pix acima do limite não vai",
+    "content": "Os limites de Pix são personalizados por perfil e diferentes para o dia (6h às 20h) e a noite (20h às 6h), por segurança. O cliente consulta e ajusta os próprios limites no app; reduções valem na hora e pedidos de aumento passam por análise de segurança em até 24 horas.",
+    "steps": [
+      "No app do Jota: Perfil > Pix > Meus limites mostra o limite atual de dia e de noite.",
+      "Para ajustar, toque em Alterar limite e informe o valor; reduções valem na hora.",
+      "Pedidos de aumento passam por análise de segurança e são respondidos em até 24 horas.",
+      "Por segurança, o limite noturno é mais baixo; programe transferências maiores para o período do dia."
+    ]
+  },
+  {
+    "id": "KB-TARIFAS-001",
+    "title": "Tarifas e taxas: conta, Pix e Fala Tap",
+    "category": "tarifas",
+    "hints": "qual a taxa da maquininha, quanto o jota cobra, tem tarifa, taxa do pix, taxa por venda, mensalidade da conta",
+    "content": "A conta do Jota é gratuita: sem mensalidade e sem tarifa de manutenção. Pix é gratuito para pessoas físicas. No Fala Tap (recebimento por aproximação), a taxa depende do plano de recebimento: quanto mais rápido o crédito, maior a taxa; o percentual exato do seu plano aparece no app antes de cada venda.",
+    "steps": [
+      "Conta e Pix de pessoa física: gratuitos.",
+      "Fala Tap: consulte a taxa do seu plano no app em Fala Tap > Meu plano de recebimento.",
+      "A taxa varia com o prazo do crédito (quanto mais rápido cai, maior a taxa).",
+      "Para pagar menos taxa, troque o plano de recebimento no app; vale para as próximas vendas."
+    ]
   }
 ]

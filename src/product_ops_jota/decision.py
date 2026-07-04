@@ -33,12 +33,18 @@ from product_ops_jota.friction_model import (
 
 # ─────────────── Limiares como política versionável (não mágica) ────────────
 class PolicyThresholds(BaseModel):
-    conf_floor: float = 0.50                # abaixo disto: não age (palpite fraco)
+    """Valores ADOTADOS da recalibração contra o desfecho (04/07): o grid escolheu
+    na metade de treino, o ganho se sustentou na metade de teste (contenção e
+    precisão subiram) e os 15 cenários-contrato ficaram exatos. A leitura da
+    mudança: age com um pouco menos de certeza (0,50→0,45), mas escala MAIS cedo
+    quando há confiança em jogo sem prova (0,40→0,35). data/recalibracao.json
+    guarda a auditoria; a policy anterior vive no histórico do git."""
+    conf_floor: float = 0.45                # abaixo disto: não age (palpite fraco)
     roi_crit_floor: float = 2.0             # criticidade trivial...
-    roi_trust_floor: float = 0.20           # ...e trust baixo → não incomoda
-    handoff_ceiling: float = 0.40           # trust em jogo que a IA não prova → humano
+    roi_trust_floor: float = 0.15           # ...e trust baixo → não incomoda
+    handoff_ceiling: float = 0.35           # trust em jogo que a IA não prova → humano
     resolve_floor: float = 0.50             # capacidade suficiente p/ resolver sozinho
-    assist_floor: float = 0.35              # capacidade parcial → assiste
+    assist_floor: float = 0.30              # capacidade parcial → assiste
 
 
 DEFAULT_THRESHOLDS = PolicyThresholds()

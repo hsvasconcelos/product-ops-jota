@@ -62,13 +62,17 @@ Quatro camadas: **contratos** (7 métricas com limiar; reprovou, não entra) ·
 ```
 
 Scorecard atual (contra gabarito curado; em produção a régua é o desfecho real):
-natureza 100% · tema 85,0% · Hit@3 100% · decisão 15/15 (zero divergências) ·
-desfecho binário 88,7% (um terço confirmado por evento de cura). Triagem do motor
-nos 5 mil chamados do laboratório: **IA resolve 55,3% · vai para humano 44,7%**,
-fail-safe por desenho — e o loop já roda de verdade: a recalibração da política
-contra o desfecho (`scripts/recalibrar_policy.py`) e a esteira de promoção de
-clusters (`scripts/promover_clusters.py`) provam como esse número cai sem afrouxar
-nenhuma régua.
+natureza 100% · tema 85,0% · Hit@3 100% (P@1 100%) · decisão 15/15 (zero
+divergências) · desfecho binário 88,7% · criticidade derivada com erro médio
+0,75 (escala 1–5). E a **escada da contenção**, o mesmo motor em três universos:
+triagem do acervo do mundo velho **57,3%** (piso honesto: herda o esgotamento do
+suporte lento de hoje) · **primeiro toque 90,2%** (mesmos atritos, a proativa
+chega antes do desgaste) · conversa conduzida de ponta a ponta **98,1%** (juiz).
+Teto estrutural: 96,2% no acervo (o resto é humano por política, de propósito).
+O loop roda de verdade: a política vigente FOI recalibrada contra o desfecho com
+holdout (`scripts/recalibrar_policy.py`), a esteira de promoção
+(`scripts/promover_clusters.py`) apontou os docs e eles foram escritos, e o bot
+tenta um caminho B antes de escalar por esgotamento.
 
 ## O dado (honestidade)
 

@@ -44,7 +44,7 @@ if _envf.exists():
             _k, _v = _l.split("=", 1)
             os.environ.setdefault(_k, _v)
 
-from product_ops_jota.classifier import classify_conversation, is_crisis, prefer_theme  # noqa: E402
+from product_ops_jota.classifier import classify_conversation, doc_theme, is_crisis, prefer_theme  # noqa: E402
 from product_ops_jota.classifier import _normalize as _norm_txt                # noqa: E402
 from product_ops_jota.decision import (                                    # noqa: E402
     decide, derive_decision_input, UserProfile,
@@ -281,7 +281,7 @@ def relevance_judge(customer_text: str, doc) -> bool:
         return True
 
 
-def gerar(history, theme, seg, doc, disappointed=False, opener=False, fatos="", kb_ok=True) -> str:
+def gerar(history, theme, seg, doc, disappointed=False, opener=False, fatos="", kb_ok=True, caminho_b=False) -> str:
     # quando a IA resolve, tira passos de escalação/jargão do procedimento (a decisão
     # de chamar humano é do gate, não do texto — e jargão assusta o leigo).
     if doc is not None:
@@ -289,7 +289,12 @@ def gerar(history, theme, seg, doc, disappointed=False, opener=False, fatos="", 
                                                if not any(w in s.lower() for w in _ESC)]})
     if LLM is not None and doc is not None:
         try:
-            msgs = [{"role": "system", "content": _system_prompt(theme, seg, doc, disappointed, opener, fatos)}]
+            sp = _system_prompt(theme, seg, doc, disappointed, opener, fatos)
+            if caminho_b:
+                sp += ("\nATENÇÃO: a sugestão anterior NÃO resolveu o problema do cliente. Reconheça isso "
+                       "em UMA frase direta (sem se desculpar demais) e proponha o procedimento abaixo como "
+                       "um caminho ALTERNATIVO — deixe claro que é um plano B diferente do anterior.")
+            msgs = [{"role": "system", "content": sp}]
             if opener:
                 msgs.append({"role": "user", "content": "(abra a conversa proativamente agora)"})
             else:
@@ -367,6 +372,8 @@ def analisar(sess):
     if sess.get("last_theme") != det.predicted_theme.value:
         sess["stuck_signals"] = 0                       # tema novo → zera a contagem de falhas
         sess["acesso_clarify_asked"] = False            # atrito novo → pode perguntar de novo
+        sess["retry_b_usado"] = False                   # escada de tentativas zera com o tema
+        sess["docs_usados"] = set()
     sess["last_theme"] = det.predicted_theme.value
     # sinal de "fix falhou": fast path keyword (in_loop); se não pegou e já houve tentativa,
     # pergunta ao LLM (robusto a fraseado oblíquo, o furo que o eval-LLM expôs).
@@ -382,6 +389,20 @@ def analisar(sess):
     # esgotamento = o CLIENTE sinalizou falha (não conversa longa!): 2 "não funcionou",
     # ou 1 + emoção. Conversa produtiva e longa NÃO escala — só falha repetida.
     stuck = sig >= 2 or (sig >= 1 and (det.frustrated or det.disappointed))
+    # ESCADA DE TENTATIVAS: esgotou, MAS existe um caminho B do mesmo tema ainda não
+    # tentado? Tenta o B (reconhecendo a falha) ANTES de escalar — uma vez só; se o B
+    # também falhar, o próximo sinal vai pra pessoa. Segurança nunca entra na escada.
+    sess["caminho_b"] = False
+    if stuck and not det.safety_concern and not sess.get("retry_b_usado"):
+        usados = sess.setdefault("docs_usados", set())
+        alt = next((d for d in docs if doc_theme(d.id) == det.predicted_theme
+                    and d.id not in usados and (doc is None or d.id != doc.id)), None)
+        if alt is not None and kb_relevant:
+            doc, docs = alt, [alt] + [d for d in docs if d.id != alt.id]
+            sess["retry_b_usado"] = True
+            sess["caminho_b"] = True
+            sess["stuck_signals"] = 1        # mantém 1 strike: falhou de novo → pessoa
+            stuck = False
     inp = derive_decision_input(det, sess["profile"], txt, base, doc=doc, stuck=stuck, kb_relevant=kb_relevant)
     # streak é incrementado em handle_message SÓ quando entrega um fix real (pergunta de
     # esclarecimento não conta) — senão o esgotamento dispara cedo demais.
@@ -678,7 +699,8 @@ def run_turn(sess, text):
             sess["history"].append({"role": "assistant", "content": reply})
         else:
             reply = gerar(sess["history"], det.predicted_theme, seg=sess["segment"],
-                          doc=doc, disappointed=det.disappointed, kb_ok=not kb_gap)
+                          doc=doc, disappointed=det.disappointed, kb_ok=not kb_gap,
+                          caminho_b=sess.get("caminho_b", False))
             # GUARDRAIL de saída: se a resposta do LLM não estiver ancorada, NÃO envia — troca pelo
             # procedimento determinístico da KB (grounded por construção). Confiança é o produto.
             ok, _why = guardrail_check(reply, doc)
@@ -698,13 +720,15 @@ def run_turn(sess, text):
     # ("consegui, obrigado" / "esquece"), o sinal vai pro trace — é o label de produção
     # que recalibra a policy (o loop do diagrama). Só log; não muda o comportamento.
     fecho = explicit_close_signal(text)
+    if doc is not None:
+        sess.setdefault("docs_usados", set()).add(doc.id)
     trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
            "confianca": inp.detection_confidence, "criticidade": inp.criticality,
            "trust": inp.trust_risk, "resolubilidade": inp.resolvability,
            "capacidade": dec.ai_capability, "pressao": dec.handoff_pressure,
            "acao": dec.action.value, "prioridade": dec.priority, "motivo": dec.reason,
            "fonte": doc.id if doc else None, "kind": kind, "guardrail": guardrail,
-           "desfecho": fecho, "cliente_msg": text[:200]})
+           "desfecho": fecho, "caminho_b": sess.get("caminho_b", False), "cliente_msg": text[:200]})
     return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply,
             "kind": kind, "guardrail": guardrail, "kb_gap": kb_gap}
 

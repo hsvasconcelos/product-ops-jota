@@ -127,8 +127,24 @@ def main():
     m_teste = avaliar(teste, PolicyThresholds(**best[2])) if best else None
     venceu = bool(m_teste) and m_teste["contencao_pct"] > base_teste["contencao_pct"] \
         and m_teste["precisao_contencao_pct"] + 1e-9 >= base_teste["precisao_contencao_pct"]
+    # PRIMEIRO TOQUE do mundo novo: os MESMOS atritos, cliente recém-chegado — o
+    # esgotamento do acervo é herança do atendimento lento do mundo velho e não
+    # existe no primeiro contato. É o número operacional da proatividade.
+    def _pt(inp):
+        d = inp.model_dump(); d["stuck"] = False
+        return DecisionInput(**d)
+    cont_pt = sum(1 for inp, _ in casos if decide(_pt(inp), DEFAULT_THRESHOLDS).action in CONTIDO)
+    politica = sum(1 for inp, _ in casos if inp.requires_human)
+    primeiro_toque = {
+        "contencao_pct": round(100.0 * cont_pt / len(casos), 1),
+        "teto_estrutural_pct": round(100.0 * (1 - politica / len(casos)), 1),
+        "nota": "mesmos 5 mil atritos, sem o esgotamento herdado do acervo (stuck=False); "
+                "o teto desconta o que é humano por política (LGPD/privilégio)",
+    }
+
     out = {
         "gerado_em": datetime.now().isoformat(timespec="seconds"),
+        "primeiro_toque": primeiro_toque,
         "amostra": len(casos), "treino": len(treino), "teste": len(teste),
         "grid_testado": testados,
         "grid_elegivel": elegiveis,
