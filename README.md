@@ -46,6 +46,13 @@ proativos, `/debug` para ver a engenharia e a saúde (modo RAG · LLM · KB).
 | `trace.py` | observabilidade: cada decisão vira uma linha auditável (JSONL) |
 | `incident.py` | modo incidente: pico do mesmo evento congela a proativa individual e muda para comunicação canônica |
 
+O loop **fecha o circuito**: o bot emite telemetria viva (`traces.jsonl`, `kb_gaps.jsonl`);
+`scripts/loop_continuo.py` a lê, roda recalibração + esteira de promoção + detecção proposta,
+e escreve um **boletim de aprendizado** (`data/aprendizado.json`). O workflow
+`.github/workflows/loop.yml` roda isso toda madrugada e **abre um PR** com a proposta —
+nada é aplicado sem o gate de eval e o sign-off humano. É o "aprende" do diagrama como
+daemon governado (aba laboratório · melhoria contínua).
+
 Princípios de engenharia: **determinístico onde decide, LLM só onde redige** ·
 *store facts, derive views* · *policy vs mechanism* (todo número vive em tabela
 nomeada e recalibrável) · *fail-safe* (na dúvida, pessoa).

@@ -1,0 +1,1 @@
+{"cid": "sim_105216", "tema": "boleto", "acao": "ai_resolve", "gargalo": null, "inp": {"criticality": 3.0, "trust_risk": 0.62, "resolvability": 1.0, "detection_confidence": 0.75, "safety_flag": false, "stuck": false, "requires_human": false}, "resolvido": true, "fonte": "real"}

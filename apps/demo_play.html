@@ -458,6 +458,10 @@
     <div class="jnote">clusters de "vai para humano" acima do limiar de frequência, com destino sugerido. Cada candidato promovível derruba um cluster inteiro; os marcados "por desenho" ficam com gente de propósito. É assim que a fatia humana cai sem afrouxar régua.</div>
     <div id="lab-promocao"></div>
 
+    <div class="ptitle">melhoria contínua · o loop rodando sozinho (governado)</div>
+    <div class="jnote">o "aprende" do diagrama virou um job: toda madrugada ele lê a telemetria do bot, roda a recalibração + a esteira + a detecção, e abre um PR com o que aprendeu. Nada muda sozinho — o gate de eval valida e o humano aplica. Isto aqui é o último boletim.</div>
+    <div id="lab-aprendizado"></div>
+
     <div class="ptitle">explorar os dados · o método à mostra</div>
     <p class="hl-sub" style="margin:0 0 12px">O atendimento é o laboratório: 10 mil conversas rotuladas (suporte + produto), a mesma base onde o motor é medido. As queries abaixo são reais: clique numa ou escreva a sua (somente leitura).</p>
     <div class="row" style="margin-bottom:9px"><span class="chiplabel">queries</span><div class="chips" id="lab-presets"></div></div>
@@ -686,6 +690,24 @@ async function loadLab(){
       $('#lab-promocao').innerHTML=h;
     } else { $('#lab-promocao').innerHTML='<div class="resmeta">rode scripts/promover_clusters.py para gerar a esteira.</div>'; }
   }catch(e){}
+  try{
+    const ap=await (await fetch('/api/lab/aprendizado')).json();
+    if(ap && ap.gerado_em){
+      const pol=ap.policy||{}, est=ap.esteira||{}, det=ap.deteccao||{}, ft=ap.fonte||{};
+      const propTxt = pol.proposta ? `propõe contenção ${String(pol.contencao_proposta).replace('.',',')}%`
+                                   : 'policy atual no ótimo do grid (sem proposta)';
+      $('#lab-aprendizado').innerHTML=`<div class="lab-stats" style="border-bottom:0;padding-bottom:2px">
+          <div class="lstat"><span class="v">${ft.conversas_reais??'—'}</span><span class="l">conversas reais no circuito</span></div>
+          <div class="lstat"><span class="v">${est.clusters_promoviveis??'—'}</span><span class="l">clusters promovíveis</span></div>
+          <div class="lstat"><span class="v">${(det.docs_faltando||[]).length}</span><span class="l">docs de KB propostos</span></div>
+          <div class="lstat"><span class="v">${(det.ancoras_propostas||[]).length}</span><span class="l">âncoras de detecção propostas</span></div>
+          <div class="lstat"><span class="v">${ap.contratos_verdes?'✓':'✗'}</span><span class="l">contratos verdes</span></div>
+        </div>
+        <div class="frow"><span class="fn">policy</span><span class="fx" style="color:var(--grey)">${esc(pol.leitura||'')} <span class="fo">gate: ${esc(pol.gate||'')}</span></span></div>
+        <div class="frow"><span class="fn">detecção proposta</span><span class="fx" style="color:var(--grey)">${(det.ancoras_propostas||[]).slice(0,3).map(a=>`“${esc(a.frase)}”`).join(' · ')||'—'} <span class="fo">gate: ${esc(det.gate||'')}</span></span></div>
+        <div class="jrule" style="margin-top:8px"><b>Governança:</b> ${esc(ap.governanca||'')} <span class="fo">${esc(ft.nota||'')}</span></div>`;
+    } else { $('#lab-aprendizado').innerHTML='<div class="resmeta">rode scripts/loop_continuo.py para gerar o boletim.</div>'; }
+  }catch(e){}
   const pr=await (await fetch('/api/lab/presets')).json();
   const box=$('#lab-presets'); box.innerHTML='';
   pr.forEach(q=>{ const b=document.createElement('button');b.className='chip';b.textContent=q.nome;
@@ -792,6 +814,8 @@ async function loadEvolucao(){
     ['rótulo "pediu humano"', `F1 0,69 → <b>0,96</b>: o eval acusava; a causa era rótulo sujo no dado sintético (frase de pedido de humano fora do flag), corrigida na raiz, não no classificador.`],
     ['o loop, mecanizado', rc&&rc.baseline?`a recalibração rodou de verdade: <b>${rc.grid_testado} políticas</b> testadas contra o desfecho, contratos intactos (${esc(rc.leitura)})${pm&&pm.clusters_acima_do_limiar?`; e a esteira de promoção achou <b>${pm.clusters_acima_do_limiar} clusters</b> acima do limiar, cada um com destino nomeado`:''}.`:'recalibração e esteira de promoção construídas (aba lógica e laboratório).'],
     ['a meta operacional', rc&&rc.primeiro_toque?`contenção no <b>primeiro toque</b>: <b>${vg(rc.primeiro_toque.contencao_pct)}%</b> com a política recalibrada ADOTADA; a esteira foi executada (2 docs novos + 6 revisados com caminho B) e o bot ganhou a escada de segunda tentativa antes de escalar.`:'política recalibrada adotada; esteira executada; escada de segunda tentativa no bot.'],
+    ['o loop fechou', `o "aprende" do diagrama virou <b>daemon governado</b>: um job lê a telemetria viva do bot, roda recalibração + esteira + detecção proposta e abre um PR com o que aprendeu — nada muda sem o gate de eval e o sign-off humano (aba laboratório · melhoria contínua).`],
+    ['blindagem', `fuzzing de ~48k invariantes no CI + duas rodadas de banca adversarial (cliente e engenheiro) que fecharam 1 bug alto e 8 médios, cada um virando teste de regressão.`],
     ['modo incidente', `de preocupação declarada ("ainda não desenhei") a <b>protótipo testável</b>: detector de pico + comunicação canônica (/demo-incidente no bot).`],
     ['operação ao vivo', `o bot ganhou <b>/stats</b> (uso real do time, na call) e a regra anti-spam de reinterceptação rodando e visível no /debug.`],
   ];

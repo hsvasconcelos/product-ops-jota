@@ -47,7 +47,7 @@ if _envf.exists():
 from product_ops_jota.classifier import classify_conversation, doc_theme, is_crisis, prefer_theme  # noqa: E402
 from product_ops_jota.classifier import _normalize as _norm_txt                # noqa: E402
 from product_ops_jota.decision import (                                    # noqa: E402
-    decide, derive_decision_input, UserProfile,
+    decide, derive_decision_input, derive_resolubilidade, UserProfile,
 )
 from product_ops_jota.outcome import explicit_close_signal                 # noqa: E402
 from product_ops_jota.incident import detect_incident, incident_message   # noqa: E402
@@ -686,6 +686,7 @@ def _acesso_shortcircuit(text, det, sess):
 
 
 def run_turn(sess, text):
+    sess.setdefault("sessao_id", f"sim_{id(sess) % 1000000:06d}")
     """O CÉREBRO de um turno, sem Telegram: detecta → decide → redige/handoff → atualiza
     o esgotamento. Reusado pelo bot (handle_message) E pelo simulador de conversas (eval)."""
     sess["history"].append({"role": "user", "content": text})
@@ -757,13 +758,19 @@ def run_turn(sess, text):
     fecho = explicit_close_signal(text)
     if doc is not None:
         sess.setdefault("docs_usados", set()).add(doc.id)
+    # gargalo da resolubilidade (por que não resolve sozinho) — o loop usa pra clusterizar
+    _resol = derive_resolubilidade(det, doc, not kb_gap)
     trace({"tema": det.predicted_theme.value, "natureza": det.predicted_nature.value,
            "confianca": inp.detection_confidence, "criticidade": inp.criticality,
            "trust": inp.trust_risk, "resolubilidade": inp.resolvability,
            "capacidade": dec.ai_capability, "pressao": dec.handoff_pressure,
            "acao": dec.action.value, "prioridade": dec.priority, "motivo": dec.reason,
            "fonte": doc.id if doc else None, "kind": kind, "guardrail": guardrail,
-           "desfecho": fecho, "caminho_b": sess.get("caminho_b", False), "cliente_msg": text[:200]})
+           "desfecho": fecho, "caminho_b": sess.get("caminho_b", False),
+           # campos que fecham o circuito com o loop offline (recalibração/promoção):
+           "sessao_id": sess.get("sessao_id"), "gargalo": _resol.gargalo, "kb_gap": kb_gap,
+           "safety_flag": inp.safety_flag, "stuck": inp.stuck, "requires_human": inp.requires_human,
+           "cliente_msg": text[:200]})
     return {"det": det, "docs": docs, "dec": dec, "inp": inp, "reply": reply,
             "kind": kind, "guardrail": guardrail, "kb_gap": kb_gap}
 
@@ -823,6 +830,8 @@ def _deliver_proactive(chat_id, sess, text):
 
 def handle_message(chat_id, text, name=""):
     sess = SESSIONS.get(chat_id) or _new_session(name=name)
+    import hashlib
+    sess.setdefault("sessao_id", hashlib.sha1(str(chat_id).encode()).hexdigest()[:10])
     SESSIONS[chat_id] = sess
     if name and not sess.get("name"):
         sess["name"] = name

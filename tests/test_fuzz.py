@@ -184,6 +184,41 @@ def test_escada_do_bot():
     print("  escada: doc único, crise e tema/privilégio respeitados")
 
 
+def test_derive_from_traces():
+    """O circuito fechado: traces viram casos com resolvido robusto, sem quebrar
+    com telemetria suja (sem sessao_id, campos faltando, blocos vazios)."""
+    from product_ops_jota.outcome import derive_from_traces
+    # dois turnos do mesmo tema+sessão, fecho positivo → resolvido
+    rows = [
+        {"sessao_id": "s1", "tema": "boleto", "acao": "ai_resolve", "ts": "2026-07-04T10:00:00",
+         "desfecho": None, "criticidade": 3.0, "trust": 0.6, "resolubilidade": 1.0, "confianca": 0.75},
+        {"sessao_id": "s1", "tema": "boleto", "acao": "ai_resolve", "ts": "2026-07-04T10:05:00",
+         "desfecho": "positivo", "criticidade": 3.0, "trust": 0.6, "resolubilidade": 1.0, "confianca": 0.75},
+    ]
+    r = derive_from_traces(rows)
+    assert r["conversas"] == 1 and r["casos"][0]["resolvido"] is True
+    # desistência explícita → não resolvido
+    rows2 = [{"sessao_id": "s2", "tema": "pix", "acao": "ai_resolve", "ts": "2026-07-04T11:00:00",
+              "desfecho": "desistiu", "criticidade": 2.0, "trust": 0.3, "resolubilidade": 0.5, "confianca": 0.6}]
+    assert derive_from_traces(rows2)["casos"][0]["resolvido"] is False
+    # handoff → conta como não-contido (desfecho é do humano)
+    rows3 = [{"sessao_id": "s3", "tema": "account_data", "acao": "human_handoff", "ts": "2026-07-04T12:00:00",
+              "criticidade": 2.0, "trust": 0.1, "resolubilidade": 0.45, "confianca": 0.75}]
+    assert derive_from_traces(rows3)["casos"][0]["resolvido"] is False
+    # telemetria suja: sem sessao_id (ignora), campos faltando (não quebra)
+    sujo = [{"acao": "ai_resolve", "ts": "x"}, {"sessao_id": "s4", "tema": "pix", "acao": "no_intercept"}]
+    r = derive_from_traces(sujo)
+    assert r is not None
+    # o schema do caso tem tudo que o adaptador/loop exige
+    caso = r["casos"][0] if r["casos"] else derive_from_traces(rows)["casos"][0]
+    for k in ("sessao_id", "tema", "acao", "gargalo", "resolvido", "inp", "kb_gap"):
+        assert k in caso, f"falta {k}"
+    for k in ("criticality", "trust_risk", "resolvability", "detection_confidence",
+              "safety_flag", "stuck", "requires_human"):
+        assert k in caso["inp"], f"falta inp.{k}"
+    print("  derive_from_traces: agrupamento, fecho, handoff, sujeira e schema do loop")
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):

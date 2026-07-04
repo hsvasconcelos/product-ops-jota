@@ -106,6 +106,61 @@ def explicit_close_signal(text: str) -> str | None:
     return None
 
 
+def derive_from_traces(rows: list[dict]) -> dict:
+    """Desfecho AO VIVO a partir dos traces do bot (fecha o circuito com o loop).
+    Agrupa por sessao_id, ordena por ts, e para cada conversa deriva `resolvido`:
+      · fecho explícito do cliente no trace (desfecho == 'positivo'/'desistiu'), o mais forte;
+      · recontato: o MESMO sessao_id abre outra conversa do mesmo tema depois → não resolveu;
+      · silêncio: sem fecho e sem recontato → assumido resolvido (fraco), a não ser que a
+        ação tenha sido humano (aí o desfecho é do humano, fora do nosso escopo).
+    Devolve {conversas, por_sessao: {sid: [casos...]}} onde cada caso tem os campos que o
+    adaptador do loop precisa. Reusa a MESMA lógica de precedência do derive_desfecho.
+    """
+    by_sid: dict[str, list[dict]] = {}
+    for r in rows:
+        sid = r.get("sessao_id")
+        if sid and r.get("acao") in ("ai_resolve", "ai_resolve_silent", "ai_assist", "human_handoff", "no_intercept"):
+            by_sid.setdefault(sid, []).append(r)
+    casos = []
+    for sid, turns in by_sid.items():
+        turns.sort(key=lambda r: r.get("ts", ""))
+        # segmenta em conversas por MUDANÇA de tema (proxy de episódio, como no lab)
+        i = 0
+        while i < len(turns):
+            tema = turns[i].get("tema")
+            j = i
+            while j < len(turns) and turns[j].get("tema") == tema:
+                j += 1
+            bloco = turns[i:j]
+            ultimo = bloco[-1]
+            # fecho explícito em qualquer turno do bloco tem precedência
+            fechos = [t.get("desfecho") for t in bloco if t.get("desfecho")]
+            if "desistiu" in fechos:
+                resolvido = False
+            elif "positivo" in fechos:
+                resolvido = True
+            elif ultimo.get("acao") == "human_handoff":
+                resolvido = False        # foi pra humano: desfecho é do humano, conta como não-contido
+            else:
+                # recontato do mesmo tema depois deste bloco?
+                recontato = j < len(turns)  # há outro bloco (tema diferente) na sequência não conta;
+                resolvido = not recontato    # sem recontato → assumido (fraco)
+            casos.append({
+                "sessao_id": sid, "tema": tema, "acao": ultimo.get("acao"),
+                "gargalo": ultimo.get("gargalo"), "resolvido": bool(resolvido),
+                "inp": {"criticality": ultimo.get("criticidade", 1.0),
+                        "trust_risk": ultimo.get("trust", 0.0),
+                        "resolvability": ultimo.get("resolubilidade", 0.0),
+                        "detection_confidence": ultimo.get("confianca", 0.0),
+                        "safety_flag": ultimo.get("safety_flag", False),
+                        "stuck": ultimo.get("stuck", False),
+                        "requires_human": ultimo.get("requires_human", False)},
+                "kb_gap": ultimo.get("kb_gap", False),
+            })
+            i = j
+    return {"conversas": len(casos), "casos": casos}
+
+
 def derive_desfecho(messages, events, theme: SupportTheme,
                     next_contact_at: str | None = None) -> DesfechoResult:
     """Deriva o desfecho de uma conversa FECHADA, só do bruto (sem gold).

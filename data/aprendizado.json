@@ -1,0 +1,127 @@
+{
+  "gerado_em": "2026-07-04T22:13:38+00:00",
+  "fonte": {
+    "conversas_reais": 1,
+    "volume_sintetico": 5001,
+    "nota": "o volume estatístico vem do laboratório; cada conversa real do bot entra no mesmo circuito e ganha peso com o tempo"
+  },
+  "policy": {
+    "proposta": null,
+    "contencao_atual": 58.3,
+    "contencao_proposta": 58.3,
+    "leitura": "no teste (casos nunca vistos) o ganho do grid não se sustentou — a policy atual fica; resultado honesto é isto",
+    "gate": "só entra se mantém os 15 contratos e não perde precisão no teste (holdout)"
+  },
+  "esteira": {
+    "clusters_promoviveis": 11,
+    "top": [
+      {
+        "tema": "account_access",
+        "motivo": "esgotamento",
+        "n": 416,
+        "pct_do_suporte": 8.3,
+        "destino": "revisão do doc de KB",
+        "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+        "exemplos": [
+          "c_03732",
+          "c_02001"
+        ]
+      },
+      {
+        "tema": "kyc",
+        "motivo": "esgotamento",
+        "n": 406,
+        "pct_do_suporte": 8.1,
+        "destino": "revisão do doc de KB",
+        "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+        "exemplos": [
+          "c_01941",
+          "c_03335"
+        ]
+      },
+      {
+        "tema": "pix",
+        "motivo": "esgotamento",
+        "n": 383,
+        "pct_do_suporte": 7.7,
+        "destino": "revisão do doc de KB",
+        "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+        "exemplos": [
+          "c_01425",
+          "c_00661"
+        ]
+      },
+      {
+        "tema": "yield_open_finance",
+        "motivo": "esgotamento",
+        "n": 157,
+        "pct_do_suporte": 3.1,
+        "destino": "revisão do doc de KB",
+        "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+        "exemplos": [
+          "c_02531",
+          "c_01983"
+        ]
+      },
+      {
+        "tema": "fala_tap",
+        "motivo": "esgotamento",
+        "n": 155,
+        "pct_do_suporte": 3.1,
+        "destino": "revisão do doc de KB",
+        "porque": "o procedimento existe e NÃO resolve: o conteúdo precisa mudar",
+        "exemplos": [
+          "c_04653",
+          "c_04715"
+        ]
+      }
+    ],
+    "gate": "frequência ≥ limiar (dor real) + curadoria de Product Ops"
+  },
+  "deteccao": {
+    "docs_faltando": [
+      {
+        "tema": "other",
+        "n": 121,
+        "exemplo": "quero fazer um empréstimo pessoal"
+      }
+    ],
+    "ancoras_propostas": [
+      {
+        "frase": "E aí, mano? Então, o negócio aqui não tá funcionando, véi. Arruma isso",
+        "n": 4
+      },
+      {
+        "frase": "E aí, galera? O negócio aqui não tá funcionando, hein... Ah, sei lá, t",
+        "n": 4
+      },
+      {
+        "frase": "to desesperado, devo 20 mil no cartao e nao tenho como pagar, o que eu",
+        "n": 3
+      },
+      {
+        "frase": "E aí, galera. Tô com um problemão aqui, meu app do Jota tá abrindo e f",
+        "n": 3
+      },
+      {
+        "frase": "posso pedir um cartão de crédito pelo jota?",
+        "n": 2
+      },
+      {
+        "frase": "nao aguento mais viver, vou me matar hoje, cancela tudo pra mim",
+        "n": 2
+      },
+      {
+        "frase": "perdi meu emprego e nao consigo pagar nada, to pensando besteira",
+        "n": 2
+      },
+      {
+        "frase": "transfere 1000 da conta da minha mae pra minha, ela ja autorizou pode ",
+        "n": 2
+      }
+    ],
+    "gate": "proposta: doc de KB financeiro e âncora nova exigem revisão humana"
+  },
+  "contratos_verdes": true,
+  "governanca": "o loop PROPÕE; o gate de eval valida; o humano aplica. Nada muda sozinho."
+}

@@ -1,0 +1,46 @@
+name: loop-continuo
+
+# O "aprende" do diagrama rodando SOZINHO — governado.
+# Toda madrugada o loop lê a telemetria, roda recalibração + esteira + detecção
+# proposta, e ABRE UM PR com o boletim atualizado. Nunca commita na main: o PR é
+# o gate (o CI roda nele) e o merge é o sign-off humano. É "o loop me manda toda
+# noite o que aprendeu, e nada entra sem passar pelos contratos".
+#
+# Leve: usa a decisão JÁ gravada nos traces/lab (sem re-rodar ML). Também dá pra
+# disparar na mão (workflow_dispatch) para a demo.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"      # 03h BRT (06h UTC), diariamente
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  aprender:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: instalar (deps leves — sem torch)
+        run: pip install -e .
+      - name: rodar o loop (recalibração + esteira + detecção proposta)
+        run: JOTA_PY=python python scripts/loop_continuo.py
+      - name: abrir PR com o boletim de aprendizado
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "loop: boletim de aprendizado (automático)"
+          title: "🔁 Loop contínuo — proposta de aprendizado"
+          body: |
+            Boletim gerado pelo loop contínuo (recalibração + esteira + detecção proposta).
+            **Nada foi aplicado** — este PR é a proposta. O CI valida os contratos; o merge é o sign-off.
+            Veja `data/aprendizado.json`.
+          branch: loop/aprendizado
+          add-paths: |
+            data/aprendizado.json
+            data/recalibracao.json
+            data/promocao.json

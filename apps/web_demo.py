@@ -745,6 +745,15 @@ def evals():
     return {"scorecard": rows, "soak": soak, "estilos": estilos, "camadas": camadas}
 
 
+@app.get("/api/lab/aprendizado")
+def lab_aprendizado():
+    """O boletim do loop fechado (data/aprendizado.json): o que o daemon aprendeu e
+    PROPÔS na última rodada — policy, esteira, detecção — cada um com seu gate. Nada
+    aplicado: proposta aguardando sign-off. Gerado por scripts/loop_continuo.py."""
+    p = ROOT / "data" / "aprendizado.json"
+    return json.loads(p.read_text("utf-8")) if p.exists() else {}
+
+
 @app.get("/api/lab/promocao")
 def lab_promocao():
     """A esteira de promoção (§8 mecanizado): clusters acima do limiar com destino
