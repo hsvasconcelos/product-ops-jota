@@ -354,7 +354,7 @@
     <div class="jrule">Atendimento humano das 9h às 20h. Fora do horário a IA segue 24/7; o que precisa de pessoa fica registrado e volta com prioridade na abertura do turno. Dentro do horário, o caso cai na fila da especialidade, ordenado pela prioridade do motor (criticidade domina, confiança em jogo empurra). Cada fila tem SLA próprio pelo risco do tema, e transborda para a fila geral quando lota: o pacote de contexto viaja junto, então quem pegar atende sem recomeçar do zero.</div>
 
     <div class="ptitle">a escada de adoção · o time confia antes de a IA agir sozinha</div>
-    <div class="frow"><span class="fn">estágio 1 · copiloto<span class="badge med">construído</span></span><span class="fx" style="color:var(--grey)">a IA sugere resposta e passo a passo ancorados; o atendente decide e edita. Cada edição vira rótulo que recalibra a policy.</span></div>
+    <div class="frow"><span class="fn">estágio 1 · copiloto<span class="badge med">construído</span></span><span class="fx" style="color:var(--grey)">a IA sugere resposta e passo a passo ancorados; o atendente decide e edita. Cada edição vira rótulo que recalibra a política.</span></div>
     <div class="frow"><span class="fn">estágio 2 · supervisão</span><span class="fx" style="color:var(--grey)">a IA resolve o comum sozinha; o time revisa por amostragem e fica com os casos de propósito (segurança, LGPD, confiança em jogo).</span></div>
     <div class="frow"><span class="fn">estágio 3 · autonomia c/ guardrail</span><span class="fx" style="color:var(--grey)">a IA age no que a KB cobre, com guardrail de saída e desfecho medido; o humano vira especialista e curador do loop.</span></div>
 
@@ -397,18 +397,18 @@
 
     <div class="ptitle">antecipação · agimos antes do grito?</div>
     <div class="frow"><span class="fn">% interceptado antes do chamado<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">quanto do atrito foi tratado no proativo vs caiu no reativo. É a % que faz o reativo encolher.</span></div>
-    <div class="frow"><span class="fn">tempo sinal → ação<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">do evento/padrão detectado à intervenção. O motor decide em milissegundos; o baseline reativo leva ~33h até a primeira resposta — medidas de coisas diferentes, mas é a ordem de grandeza do gargalo que a proatividade ataca.</span></div>
+    <div class="frow"><span class="fn">tempo sinal → ação<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">do evento/padrão detectado à intervenção. O motor decide em milissegundos; o baseline reativo leva ~33h até a primeira resposta. São medidas de coisas diferentes, mas é a ordem de grandeza do gargalo que a proatividade ataca.</span></div>
     <div class="frow"><span class="fn">cobertura por natureza<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">evento, comportamento e ausência. A fatia de AUSÊNCIA é o diferencial: ninguém reclama dela.</span></div>
 
     <div class="ptitle">resolução · resolvemos de verdade?</div>
     <div class="frow"><span class="fn"># interceptações<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">volume por tema, segmento e linha (trace do motor, auditável linha a linha).</span></div>
-    <div class="frow"><span class="fn">% resolvido pela IA, desfecho CONFIRMADO<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">desfecho ≠ chamado fechado: cura confirmada por evento, confirmação do cliente ou silêncio sem recontato (o sinal mais fraco, e tratado como tal). Leitura binária hoje: 88,7% contra o gabarito, com um terço dos casos confirmado por evento de cura (confiança máxima).</span></div>
+    <div class="frow"><span class="fn">% resolvido pela IA, desfecho CONFIRMADO<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">desfecho ≠ chamado fechado: cura confirmada por evento, confirmação do cliente ou silêncio sem recontato (o sinal mais fraco, e tratado como tal). Leitura binária hoje: <span id="kpi-desf">88,6</span>% contra o gabarito, com um terço dos casos confirmado por evento de cura (confiança máxima).</span></div>
     <div class="frow"><span class="fn">% handoff quente<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">quanto foi para pessoa, por quê (motivo do gate), e o tempo até alguém assumir (produção).</span></div>
     <div class="frow"><span class="fn">reinterceptações da mesma dor<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">o multi-toque sob a regra anti-spam: voltar é sinal de não-resolvido, não de insistência.</span></div>
 
     <div class="ptitle">confiança · guardrails de qualidade (não podem piorar)</div>
-    <div class="frow"><span class="fn">grounding<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">respostas ancoradas, sem inventar sobre dinheiro: 98,8% limpo no soak de 1.440 conversas; bloqueios do guardrail acompanhados por semana.</span></div>
-    <div class="frow"><span class="fn">tom / acolhimento<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">4,85/5 no juiz de conversas; em produção vira CSAT pós-intervenção.</span></div>
+    <div class="frow"><span class="fn">grounding<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">respostas ancoradas, sem inventar sobre dinheiro: <span id="kpi-gr">99,5</span>% limpo no soak de <span id="kpi-nconv">207</span> conversas; bloqueios do guardrail acompanhados por semana.</span></div>
+    <div class="frow"><span class="fn">tom / acolhimento<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)"><span id="kpi-tom">4,86</span>/5 no juiz de conversas; em produção vira CSAT pós-intervenção.</span></div>
     <div class="frow"><span class="fn">deixado no vácuo<span class="badge med">medido</span></span><span class="fx" style="color:var(--grey)">cliente com a última palavra e sem resposta. Métrica que só pode cair; hoje é visível no desfecho.</span></div>
     <div class="frow"><span class="fn">reclamações públicas<span class="badge prod">produção</span></span><span class="fx" style="color:var(--grey)">ReclameAqui e afins: o termômetro externo da confiança, olhado por coorte.</span></div>
 
@@ -459,7 +459,7 @@
     <div id="lab-promocao"></div>
 
     <div class="ptitle">melhoria contínua · o loop rodando sozinho (governado)</div>
-    <div class="jnote">o "aprende" do diagrama virou um job: toda madrugada ele lê a telemetria do bot, roda a recalibração + a esteira + a detecção, e abre um PR com o que aprendeu. Nada muda sozinho — o gate de eval valida e o humano aplica. Isto aqui é o último boletim.</div>
+    <div class="jnote">o "aprende" do diagrama virou um job: toda madrugada ele lê a telemetria do bot, roda a recalibração + a esteira + a detecção, e abre um PR com o que aprendeu. Nada muda sozinho: o gate de eval valida e o humano aplica. Isto aqui é o último boletim.</div>
     <div id="lab-aprendizado"></div>
 
     <div class="ptitle">explorar os dados · o método à mostra</div>
@@ -557,7 +557,8 @@
     </div>
 
     <div class="ptitle">a recalibração · as réguas contra o desfecho, de verdade</div>
-    <div class="jnote">um grid de políticas candidatas é escolhido na METADE de treino e reportado na metade de TESTE (casos nunca vistos na escolha); só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção. Precisão da contenção = % dos casos contidos cuja conversa terminou resolvida segundo o desfecho; como nessas conversas quem atendeu foi o suporte de hoje (não a IA), o número é um piso conservador. É o loop recalibrando a política, com o cinto afivelado — e a política sugerida pelo grid FOI adotada como padrão do motor (auditoria em data/recalibracao.json; a anterior vive no histórico do git).</div>
+    <div class="jnote">um grid de políticas candidatas é escolhido na metade de treino e reportado na metade de teste (casos nunca vistos na escolha). Só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção. É o loop recalibrando a política, com o cinto afivelado, e a política que o grid sugere já foi adotada como padrão do motor.</div>
+    <div class="jnote">precisão da contenção = dos casos que a IA conteria, quantos a conversa terminou resolvida. Como quem atendeu essas conversas foi o suporte de hoje, e não a IA, é um piso conservador.</div>
     <div id="recal"></div>
 
     <div class="ptitle">interceptação · a prova: as duas fases rodando ao vivo</div>
@@ -604,7 +605,7 @@
 
     <div class="ptitle">o que os evals pegaram · antes → depois (bugs reais, com fix atribuível)</div>
     <div class="frow"><span class="fn">cliente-LLM + juiz<span class="badge med">segurança</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"viciado em apostas, me bloqueia pra eu não gastar" passava batido pelo gate de palavra exata</span><span class="k">fix</span><span class="t">radical largo: em segurança, o falso alarme é o lado seguro</span><span class="k">prova</span><span class="t"><b>10/10 desfechos</b> no eval de agente; o gate dispara sempre</span></span></span></div>
-    <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro</span><span class="k">fix</span><span class="t">regra de identidade no prompt + guardrail de saída</span><span class="k">prova</span><span class="t">grounding <b>9/10 → 15/15</b> no scripted · <b>98,8%</b> no soak</span></span></span></div>
+    <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro</span><span class="k">fix</span><span class="t">regra de identidade no prompt + guardrail de saída</span><span class="k">prova</span><span class="t">grounding <b>9/10 → 15/15</b> no scripted · <b>99,5%</b> no soak</span></span></span></div>
     <div class="frow"><span class="fn">uso real no Telegram<span class="badge med">retrieval</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"não consigo acessar meu wpp" respondia com o doc de Open Finance ("acessar" confunde com "reconectar")</span><span class="k">fix</span><span class="t">o RAG passou a respeitar o tema detectado</span><span class="k">prova</span><span class="t">virou <b>teste de regressão no CI</b>: não volta sem acusar</span></span></span></div>
     <div class="frow"><span class="fn">auditoria adversária<span class="badge med">retrieval</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"quanto rende?" puxava o doc errado do próprio tema (~40 queries livres acharam o padrão)</span><span class="k">fix</span><span class="t">na raiz: query crua + gate determinístico de relevância</span><span class="k">prova</span><span class="t">P@1 <b>85,7% → 92,9%</b></span></span></span></div>
     <div class="frow"><span class="fn">soak overnight<span class="badge med">esgotamento</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">fraseado oblíquo de falha ("não fluiu", "segue igual") não contava como travado; o cliente ficava em loop</span><span class="k">fix</span><span class="t">sinal determinístico + juiz só no resíduo ambíguo</span><span class="k">prova</span><span class="t"><b>10/10 desfechos</b> no eval</span></span></span></div>
@@ -695,7 +696,7 @@ async function loadLab(){
     if(ap && ap.gerado_em){
       const pol=ap.policy||{}, est=ap.esteira||{}, det=ap.deteccao||{}, ft=ap.fonte||{};
       const propTxt = pol.proposta ? `propõe contenção ${String(pol.contencao_proposta).replace('.',',')}%`
-                                   : 'policy atual no ótimo do grid (sem proposta)';
+                                   : 'política atual no ótimo do grid (sem proposta)';
       $('#lab-aprendizado').innerHTML=`<div class="lab-stats" style="border-bottom:0;padding-bottom:2px">
           <div class="lstat"><span class="v">${ft.conversas_reais??'—'}</span><span class="l">conversas reais no circuito</span></div>
           <div class="lstat"><span class="v">${est.clusters_promoviveis??'—'}</span><span class="l">clusters promovíveis</span></div>
@@ -703,7 +704,7 @@ async function loadLab(){
           <div class="lstat"><span class="v">${(det.ancoras_propostas||[]).length}</span><span class="l">âncoras de detecção propostas</span></div>
           <div class="lstat"><span class="v">${ap.contratos_verdes?'✓':'✗'}</span><span class="l">contratos verdes</span></div>
         </div>
-        <div class="frow"><span class="fn">policy</span><span class="fx" style="color:var(--grey)">${esc(pol.leitura||'')} <span class="fo">gate: ${esc(pol.gate||'')}</span></span></div>
+        <div class="frow"><span class="fn">política</span><span class="fx" style="color:var(--grey)">${esc(pol.leitura||'')} <span class="fo">gate: ${esc(pol.gate||'')}</span></span></div>
         <div class="frow"><span class="fn">detecção proposta</span><span class="fx" style="color:var(--grey)">${(det.ancoras_propostas||[]).slice(0,3).map(a=>`“${esc(a.frase)}”`).join(' · ')||'—'} <span class="fo">gate: ${esc(det.gate||'')}</span></span></div>
         <div class="jrule" style="margin-top:8px"><b>Governança:</b> ${esc(ap.governanca||'')} <span class="fo">${esc(ft.nota||'')}</span></div>`;
     } else { $('#lab-aprendizado').innerHTML='<div class="resmeta">rode scripts/loop_continuo.py para gerar o boletim.</div>'; }
@@ -775,7 +776,14 @@ async function loadKpis(){
        const t2=(a.triagem||[]).find(x=>x.balde==='IA assiste o humano'); if(t2&&acervo!=null) acervo=Math.round((acervo+t2.pct)*10)/10; }catch(_){}
   try{ const p=await (await fetch('/api/policy')).json();
        if(p.recalibracao&&p.recalibracao.primeiro_toque){ pt=p.recalibracao.primeiro_toque.contencao_pct; teto=p.recalibracao.primeiro_toque.teto_estrutural_pct; } }catch(_){}
-  try{ const e=await (await fetch('/api/evals')).json(); if(e.soak) soak=e.soak.desfecho; }catch(_){}
+  try{ const e=await (await fetch('/api/evals')).json();
+       if(e.soak){ soak=e.soak.desfecho;
+         const set=(id,v)=>{const el=$('#'+id); if(el&&v!=null) el.textContent=String(v).replace('.',',');};
+         set('kpi-gr', e.soak.grounding); set('kpi-nconv', e.soak.conversas); set('kpi-tom', e.soak.tom);
+       }
+       const df=(e.scorecard||[]).find(r=>r.metrica.startsWith('desfecho'));
+       if(df){ const el=$('#kpi-desf'); if(el) el.textContent=(df.valor*100).toFixed(1).replace('.',','); }
+     }catch(_){}
   $('#kpi-escada').innerHTML=[
     ['triagem do acervo', acervo, 'mundo velho, esgotamento herdado'],
     ['primeiro toque', pt, 'mesmos atritos, proativa chegou antes'],
@@ -932,8 +940,8 @@ async function loadPolicy(){
   if(RC && RC.baseline){
     const fb=RC.baseline, fm=RC.melhor;
     let rh=`<div class="lab-stats" style="border-bottom:0;padding-bottom:2px">
-      <div class="lstat"><span class="v">${String(fb.contencao_pct).replace('.',',')}%</span><span class="l">contenção · policy atual</span></div>
-      <div class="lstat"><span class="v">${fm?String(fm.contencao_pct).replace('.',','):'—'}%</span><span class="l">contenção · melhor do grid</span></div>
+      <div class="lstat"><span class="v">${String(fb.contencao_pct).replace('.',',')}%</span><span class="l">contenção · atual (teste do holdout)</span></div>
+      <div class="lstat"><span class="v">${fm?String(fm.contencao_pct).replace('.',','):'—'}%</span><span class="l">contenção · melhor do grid (teste)</span></div>
       <div class="lstat"><span class="v">${String(fb.precisao_contencao_pct).replace('.',',')}%</span><span class="l">precisão da contenção</span></div>
       <div class="lstat"><span class="v">${RC.grid_testado}</span><span class="l">políticas testadas</span></div>
     </div>
