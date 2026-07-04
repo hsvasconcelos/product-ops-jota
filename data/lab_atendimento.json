@@ -4,7 +4,7 @@
   "triagem": [
     {
       "balde": "IA resolve sozinha",
-      "n": 2771,
+      "n": 2772,
       "pct": 55.4
     },
     {
@@ -14,14 +14,14 @@
     },
     {
       "balde": "Vai pra humano",
-      "n": 2133,
-      "pct": 42.7
+      "n": 2132,
+      "pct": 42.6
     }
   ],
   "funnel": [
     {
       "acao": "ai_resolve",
-      "n": 2771,
+      "n": 2772,
       "pct": 55.4
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "acao": "human_handoff",
-      "n": 1985,
+      "n": 1984,
       "pct": 39.7
     },
     {
@@ -48,13 +48,13 @@
   "resolubilidade": {
     "passam": {
       "kb_existe": 4824,
-      "executavel": 4635,
+      "executavel": 4636,
       "reversivel": 5001
     },
     "gargalos": [
       {
         "motivo": "não executável pela IA — precisa de privilégio/decisão humana",
-        "n": 189,
+        "n": 188,
         "pct": 3.8
       },
       {
@@ -102,8 +102,8 @@
       "no_intercept": 13
     },
     "account_data": {
-      "ai_resolve": 63,
-      "human_handoff": 226,
+      "ai_resolve": 64,
+      "human_handoff": 225,
       "ai_assist": 3,
       "no_intercept": 1
     },

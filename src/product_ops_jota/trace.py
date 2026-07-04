@@ -47,17 +47,20 @@ def summarize(path: Path = TRACE_PATH) -> dict:
     n = len(rows)
     if not n:
         return {"n": 0}
+    DECISOES = {"ai_resolve", "ai_resolve_silent", "ai_assist", "human_handoff", "no_intercept"}
+    rows_dec = [r for r in rows if r.get("acao") in DECISOES]
     acoes = Counter(r.get("acao") for r in rows)
-    temas = Counter(r.get("tema") for r in rows)
+    temas = Counter(r.get("tema") for r in rows if r.get("tema"))
     fontes = Counter(r.get("fonte") for r in rows if r.get("fonte"))
     confs = [r["confianca"] for r in rows if isinstance(r.get("confianca"), (int, float))]
     guard = Counter(r.get("guardrail") for r in rows if r.get("guardrail"))
     humano = acoes.get("human_handoff", 0)
+    nd = max(1, len(rows_dec))                              # contenção só sobre DECISÕES do motor
     return {
         "n": n,
         "acoes": dict(acoes.most_common()),
-        "pct_contido": round(100 * (n - humano) / n, 1),   # IA resolveu/assistiu
-        "pct_humano": round(100 * humano / n, 1),
+        "pct_contido": round(100 * (len(rows_dec) - humano) / nd, 1),
+        "pct_humano": round(100 * humano / nd, 1),
         "temas": dict(temas.most_common()),
         "fontes_top": dict(fontes.most_common(5)),
         "conf_media": round(sum(confs) / len(confs), 3) if confs else None,

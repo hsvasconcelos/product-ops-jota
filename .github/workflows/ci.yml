@@ -21,3 +21,5 @@ jobs:
         run: pip install -e .
       - name: guarda de regressão (schema + policy de decisão + handoff)
         run: python tests/test_core.py
+      - name: fuzzing de invariantes (segurança, monotonicidade, bordas, escada)
+        run: python tests/test_fuzz.py

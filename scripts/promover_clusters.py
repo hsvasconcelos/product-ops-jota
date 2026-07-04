@@ -38,6 +38,7 @@ DESTINO = {
     "seguranca": ("mantém humano (por desenho)", "vulnerabilidade não se automatiza: o humano é o produto aqui"),
     "politica_kb": ("mantém humano (por desenho)", "LGPD/privilégio é decisão de gente, por escolha"),
     "palpite_fraco": ("regra de detecção", "o motor não teve certeza: novas âncoras/eventos aumentam a certeza"),
+    "trivial_roi": ("mantém observação (por desenho)", "trivial e de baixo risco: interceptar custaria mais do que entrega (gate de ROI)"),
 }
 
 
@@ -58,7 +59,11 @@ def motivo_do_caso(r: dict) -> str | None:
     if inp.get("requires_human"):
         return "politica_kb"
     if r["acao"] == "no_intercept":
-        return "palpite_fraco"
+        # dois gates distintos produzem no_intercept — destinos diferentes:
+        # certeza baixa (gate 1) pede detecção melhor; trivial (gate 2) é ROI de propósito.
+        if inp.get("detection_confidence", 1.0) < 0.45:
+            return "palpite_fraco"
+        return "trivial_roi"
     if garg.startswith("sem procedimento"):
         return "lacuna_kb"
     if garg.startswith("não executável"):

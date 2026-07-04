@@ -85,8 +85,12 @@ def _norm(t: str) -> str:
     return "".join(c for c in t if not unicodedata.combining(c)).lower()
 
 
-def _parse(ts: str) -> datetime:
-    return datetime.fromisoformat(ts)
+def _parse(ts: str) -> datetime | None:
+    """Timestamp de produção é dado sujo: inválido vira None, nunca exceção."""
+    try:
+        return datetime.fromisoformat(ts)
+    except (ValueError, TypeError):
+        return None
 
 
 def explicit_close_signal(text: str) -> str | None:
@@ -117,11 +121,19 @@ def derive_desfecho(messages, events, theme: SupportTheme,
                               confianca=CONF_BY_SOURCE["sem_resposta"], sinal="sem_resposta",
                               detalhe="o atendimento nunca respondeu — o silêncio que mais dói")
 
-    # 1) cura confirmada pelo sistema: evento de cura APÓS a última intervenção
+    # 1) cura confirmada pelo sistema: evento de cura APÓS a última intervenção.
+    # Timestamps sujos são ignorados (nunca derrubam a leitura do desfecho).
+    # A cura só vale ATÉ o próximo contato do usuário: se ele voltou, o evento
+    # posterior pertence ao episódio novo (evita cura cruzada entre conversas —
+    # achado do review adversarial round 2).
     last_reply_at = _parse(replied[-1][2])
+    nc = _parse(next_contact_at) if next_contact_at is not None else None
     for et, oa in events:
-        if et in CURE_EVENTS.get(theme, []) and \
-                last_reply_at <= _parse(oa) <= last_reply_at + CONFIRM_WINDOW:
+        ts = _parse(oa)
+        if last_reply_at is not None and ts is not None and \
+                et in CURE_EVENTS.get(theme, []) and \
+                (nc is None or ts < nc) and \
+                last_reply_at <= ts <= last_reply_at + CONFIRM_WINDOW:
             return DesfechoResult(desfecho=Desfecho.RESOLVIDO_CONFIRMADO,
                                   confianca=CONF_BY_SOURCE["system_confirmed"],
                                   sinal="system_confirmed",
@@ -141,8 +153,8 @@ def derive_desfecho(messages, events, theme: SupportTheme,
                                   detalhe=f"cliente desistiu: “{customer[-1][1][:60]}”")
 
     # 3) recontato: voltou (nova conversa) dentro da janela → NÃO resolveu (re-interceptar)
-    if next_contact_at is not None:
-        gap = _parse(next_contact_at) - last_reply_at
+    if nc is not None and last_reply_at is not None:
+        gap = nc - last_reply_at
         if timedelta(0) <= gap <= RECONTACT_WINDOW:
             h = int(gap.total_seconds() // 3600)
             return DesfechoResult(desfecho=Desfecho.NAO_RESOLVIDO,

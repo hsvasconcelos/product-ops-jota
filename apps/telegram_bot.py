@@ -116,6 +116,13 @@ ACTION_LABEL = {
 retriever = Retriever()
 SESSIONS: dict[int, dict] = {}    # chat_id → sessão (in-memory; ponytail: ok p/ demo)
 DEBUG: set[int] = set()           # chat_ids com /debug ligado
+MAX_SESSIONS = 5000               # bot público: poda a mais antiga (higiene de memória, sem rate-limit)
+
+
+def _remember(chat_id: int, sess: dict) -> None:
+    if chat_id not in SESSIONS and len(SESSIONS) >= MAX_SESSIONS:
+        del SESSIONS[next(iter(SESSIONS))]     # dict mantém ordem de inserção → a mais antiga sai
+    SESSIONS[chat_id] = sess
 
 
 # ─── LLM grounded (OpenAI) + fallback determinístico ─────────────────────────
@@ -149,6 +156,8 @@ JOTA_VOICE = (
     "escalonamento, que é do SISTEMA, não sua, e sem quem/quando deixa o cliente no vácuo. "
     "Se você NÃO tem um passo concreto novo, NÃO invente 'análise': faça UMA pergunta objetiva pra "
     "entender melhor. NUNCA repita a mesma dica que já deu. Seu papel é ajudar com o que está ancorado.\n"
+    "Se o cliente escrever em OUTRO IDIOMA (inglês, espanhol...), responda NO IDIOMA dele. "
+    "O Jota NUNCA envia nem pede senha por mensagem — se o assunto for senha, diga isso explicitamente.\n"
     "O JOTA É A CONTA/BANCO DO CLIENTE (conta de pagamento no WhatsApp). NUNCA mande o cliente "
     "'procurar o banco dele' como se o Jota fosse outra coisa — aqui, o banco dele é o Jota. Para um "
     "Pix enviado pela conta Jota, oriente pelo caminho do PRÓPRIO Jota, sem terceirizar pro 'seu banco'.\n"
@@ -377,7 +386,11 @@ def analisar(sess):
     sess["last_theme"] = det.predicted_theme.value
     # sinal de "fix falhou": fast path keyword (in_loop); se não pegou e já houve tentativa,
     # pergunta ao LLM (robusto a fraseado oblíquo, o furo que o eval-LLM expôs).
-    signaled = det.in_loop
+    # "já tentei" na ABERTURA descreve o passado do cliente, não a IA falhando:
+    # o sinal de esgotamento só conta depois de o atendimento ter sugerido algo
+    # (mesma régua do lote — achado do review adversarial round 2).
+    ja_respondi = any(h["role"] == "assistant" for h in sess["history"][:-1])
+    signaled = det.in_loop and ja_respondi
     if not signaled:
         prior_bot = next((h["content"] for h in reversed(sess["history"][:-1])
                           if h["role"] == "assistant"), None)
@@ -396,7 +409,13 @@ def analisar(sess):
     if stuck and not det.safety_concern and not sess.get("retry_b_usado"):
         usados = sess.setdefault("docs_usados", set())
         alt = next((d for d in docs if doc_theme(d.id) == det.predicted_theme
+                    and not d.requires_human
                     and d.id not in usados and (doc is None or d.id != doc.id)), None)
+        # o B passa pelo MESMO gate de relevância do A (senão a escada vira vazamento)
+        if alt is not None:
+            sim_b = retriever.doc_similarity(txt, alt)
+            if sim_b is not None and sim_b < RELEVANCE_FLOOR:
+                alt = None
         if alt is not None and kb_relevant:
             doc, docs = alt, [alt] + [d for d in docs if d.id != alt.id]
             sess["retry_b_usado"] = True
@@ -513,6 +532,11 @@ def _saudacao_curta(name):
 
 
 # caminho alternativo por tema, oferecido no handoff (não deixa o cliente na mão enquanto espera)
+# LUTO/perda — não muda a decisão (vai a humano pelos gates normais), muda o TOM:
+# condolência primeiro, script depois. Achado da banca simulada round 2.
+LUTO_PATTERNS = ("faleceu", "faleceu", "morreu", "obito", "óbito", "perdi meu pai", "perdi minha mae",
+                 "perdi meu filho", "perdi minha filha", "meu marido morreu", "minha esposa morreu")
+
 WORKAROUND = {
     _T.ACCOUNT_ACCESS: "enquanto isso, dá pra ver seu saldo e usar o Jota *aqui no WhatsApp* mesmo",
 }
@@ -600,7 +624,7 @@ def handle_command(chat_id, cmd, name=""):
         proativo = bool(events) or sid == "ex_kyc_limbo"
         if proativo:
             sess["proactive_pending"] = sid
-        SESSIONS[chat_id] = sess
+        _remember(chat_id, sess)
         counts: dict = {}
         for et, _ in events:
             counts[et] = counts.get(et, 0) + 1
@@ -668,6 +692,7 @@ def run_turn(sess, text):
     det, docs, dec, inp, kb_gap = analisar(sess)
     doc = docs[0] if docs else None
     guardrail = None
+    kind = None
     if dec.action == InterceptionAction.HUMAN_HANDOFF and det.safety_concern and is_crisis(_norm_txt(text)):
         # MODO CRISE: risco de vida nao recebe script de ticket. Acolhe, entrega o
         # recurso de emergencia e conecta gente com prioridade maxima, sem falar de horario.
@@ -677,6 +702,14 @@ def run_turn(sess, text):
                  "Sobre a sua conta: ja estou te conectando com uma *pessoa do nosso time* com "
                  "*prioridade maxima*, e ela te chama aqui neste mesmo numero o quanto antes. "
                  "Voce nao precisa resolver nada disso sozinho agora.")
+        kind = "handoff"
+    elif dec.action == InterceptionAction.HUMAN_HANDOFF and any(p in _norm_txt(text) for p in LUTO_PATTERNS):
+        # LUTO: condolência genuína antes de qualquer logística; sem emoji de festa, sem pressa.
+        reply = ("Sinto muito pela sua perda. 💙\n\n"
+                 "Vou te conectar agora com uma *pessoa do nosso time* para cuidar disso com o "
+                 "cuidado que esse momento pede — ela continua com você aqui neste número, e você "
+                 "não vai precisar repetir nada. Se preferir resolver em outro momento, também está "
+                 "tudo bem: fica registrado e retomamos quando você quiser.")
         kind = "handoff"
     elif dec.action == InterceptionAction.HUMAN_HANDOFF:
         em_horario = 9 <= datetime.now().hour < 20
@@ -690,6 +723,8 @@ def run_turn(sess, text):
         if work:
             reply += f"\n\nE {work}, sem precisar esperar. 😉"
         kind = "handoff"
+    if kind == "handoff":
+        sess["history"].append({"role": "assistant", "content": reply})
     else:
         # ACESSO ambíguo: deflete WhatsApp-em-si / pergunta antes de despejar (1º toque).
         sc = _acesso_shortcircuit(text, det, sess)

@@ -34,12 +34,13 @@
     "category": "usabilidade",
     "content": "Todo Pix gera um comprovante com o identificador de ponta a ponta (E2E), documento oficial para rastreamento e contestação.",
     "steps": [
-      "Abra o histórico de transações.",
-      "Toque na transação de Pix desejada.",
-      "Toque em 'Compartilhar comprovante' para baixar em PDF.",
-      "O ID E2E fica no rodapé e é o que o suporte usa para rastrear."
+      "Pelo WhatsApp: peça aqui mesmo 'comprovante do meu último Pix' que eu envio o PDF na conversa.",
+      "Pelo app: Extrato > toque na transação de Pix > Compartilhar comprovante (baixa em PDF).",
+      "O ID de ponta a ponta (E2E) fica no rodapé do comprovante e é o que o suporte usa para rastrear.",
+      "Para uma transação antiga, me diga a data e o valor aproximado que eu localizo para você."
     ],
-    "requires_human": false
+    "requires_human": false,
+    "hints": "onde acho o comprovante do pix, cade o comprovante, preciso do recibo do pix, segunda via do comprovante"
   },
   {
     "id": "KB-KYC-001",

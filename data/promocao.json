@@ -1,6 +1,6 @@
 {
   "amostra": 5001,
-  "nao_contidos": 2133,
+  "nao_contidos": 2132,
   "limiar_promocao": 30,
   "clusters_acima_do_limiar": 11,
   "candidatos": [
@@ -78,18 +78,6 @@
     },
     {
       "tema": "account_data",
-      "motivo": "politica_kb",
-      "n": 113,
-      "pct_do_suporte": 2.3,
-      "destino": "mantém humano (por desenho)",
-      "porque": "LGPD/privilégio é decisão de gente, por escolha",
-      "exemplos": [
-        "c_03449",
-        "c_01183"
-      ]
-    },
-    {
-      "tema": "account_data",
       "motivo": "esgotamento",
       "n": 113,
       "pct_do_suporte": 2.3,
@@ -101,15 +89,15 @@
       ]
     },
     {
-      "tema": "other",
-      "motivo": "palpite_fraco",
-      "n": 76,
-      "pct_do_suporte": 1.5,
-      "destino": "regra de detecção",
-      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "tema": "account_data",
+      "motivo": "politica_kb",
+      "n": 112,
+      "pct_do_suporte": 2.2,
+      "destino": "mantém humano (por desenho)",
+      "porque": "LGPD/privilégio é decisão de gente, por escolha",
       "exemplos": [
-        "c_00313",
-        "c_02921"
+        "c_03449",
+        "c_01183"
       ]
     },
     {
@@ -126,6 +114,18 @@
     },
     {
       "tema": "other",
+      "motivo": "trivial_roi",
+      "n": 47,
+      "pct_do_suporte": 0.9,
+      "destino": "mantém observação (por desenho)",
+      "porque": "trivial e de baixo risco: interceptar custaria mais do que entrega (gate de ROI)",
+      "exemplos": [
+        "c_02921",
+        "c_00305"
+      ]
+    },
+    {
+      "tema": "other",
       "motivo": "lacuna_kb",
       "n": 35,
       "pct_do_suporte": 0.7,
@@ -135,7 +135,7 @@
         "c_01730",
         "c_00010"
       ],
-      "evidencia_bot": "31 lacunas registradas pelo bot no tema (ex.: “quero fazer um empréstimo pessoal”)"
+      "evidencia_bot": "47 lacunas registradas pelo bot no tema (ex.: “quero fazer um empréstimo pessoal”)"
     }
   ],
   "leitura": "cada candidato PROMOVÍVEL derruba um cluster inteiro do 'vai para humano'; os marcados 'por desenho' ficam com gente de propósito — derrubá-los seria errar"

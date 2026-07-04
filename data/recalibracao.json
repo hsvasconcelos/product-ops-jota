@@ -1,7 +1,7 @@
 {
-  "gerado_em": "2026-07-04T17:03:42",
+  "gerado_em": "2026-07-04T18:06:47",
   "primeiro_toque": {
-    "contencao_pct": 90.2,
+    "contencao_pct": 90.3,
     "teto_estrutural_pct": 96.2,
     "nota": "mesmos 5 mil atritos, sem o esgotamento herdado do acervo (stuck=False); o teto desconta o que é humano por política (LGPD/privilégio)"
   },
@@ -9,7 +9,7 @@
   "treino": 2501,
   "teste": 2500,
   "grid_testado": 1188,
-  "grid_elegivel": 96,
+  "grid_elegivel": 144,
   "baseline": {
     "policy": {
       "conf_floor": 0.45,
@@ -33,9 +33,9 @@
       "assist_floor": 0.3
     },
     "treino": {
-      "contencao_pct": 56.4,
+      "contencao_pct": 56.5,
       "precisao_contencao_pct": 75.1,
-      "contidos": 1411
+      "contidos": 1412
     },
     "contencao_pct": 58.3,
     "precisao_contencao_pct": 73.9,
