@@ -171,6 +171,18 @@ def test_desfecho():
     assert r.desfecho == Desfecho.RESOLVIDO_ASSUMIDO and r.confianca < 0.6
 
 
+def test_gate_de_crise():
+    """Risco de vida dispara o gate de segurança — o léxico de crise é largo de
+    propósito (regressão do achado da banca simulada: 'vou me matar' passava)."""
+    from product_ops_jota.classifier import classify_conversation
+    for frase in ("vou me jogar da ponte agora, ninguem me ajuda",
+                  "to pensando besteira, perdi tudo",
+                  "nao aguento mais viver, vou me matar hoje"):
+        det = classify_conversation([("customer", frase, "2026-07-04T10:00:00")], [],
+                                    "2026-07-04T10:00:00")
+        assert det.safety_concern, frase
+
+
 def test_modo_incidente():
     """Pico do mesmo evento em janela curta = incidente; disperso ou pouco = não."""
     from datetime import datetime

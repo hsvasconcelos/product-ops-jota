@@ -156,6 +156,14 @@ COLD_FRUSTRATION_PATTERNS = ["triste", "tristeza", "que pena", "decepcionad", "d
 # stems propositalmente LARGOS: em segurança, falso-positivo (escalar à toa) é o lado
 # seguro; falso-negativo (não ver um vulnerável) é o custo alto. Validado pelo eval-LLM,
 # que pegou "viciado em apostas, não consigo parar de gastar" passando batido no keyword exato.
+# CRISE (risco de vida) — separado da ludopatia porque a RESPOSTA é diferente
+# (acolhimento + CVV 188 + prioridade máxima, sem script de horário comercial).
+# Stems LARGOS de propósito: em risco de vida, o falso positivo é o único lado seguro.
+CRISIS_PATTERNS = ["me matar", "vou me jogar", "me jogar da ponte", "suicid", "autoexterm",
+                   "tirar minha vida", "acabar com a minha vida", "acabar com minha vida",
+                   "nao aguento mais viver", "nao quero mais viver", "sem vontade de viver",
+                   "pensando besteira", "fazer besteira", "vou fazer uma besteira",
+                   "me cortar", "me machucar de proposito", "queria sumir", "quero sumir de vez"]
 VULNERABILITY_PATTERNS = ["viciad", "vicio", "ludopat", "aposta", "apostei", "apostando",
                           "jogo do tigrinho", "nao consigo parar de gastar", "nao consigo parar de jogar",
                           "nao consigo parar de apostar", "parar de gastar", "parar de jogar",
@@ -354,6 +362,12 @@ def detect_absence(expected_event: str, events, since: datetime, window_minutes:
                   valor=expected_event, limiar=float(window_minutes))
 
 
+def is_crisis(text_norm: str) -> bool:
+    """Linguagem de crise (risco de vida) no texto JÁ normalizado. Dispara o gate de
+    segurança E muda a resposta para o modo crise (CVV 188, sem script frio)."""
+    return any(p in text_norm for p in CRISIS_PATTERNS)
+
+
 def classify_conversation(messages, events, started_at,
                           expected_events: list[tuple[str, int]] | None = None,
                           retriever=None, judge=None) -> ClassifierOutput:
@@ -423,7 +437,7 @@ def classify_conversation(messages, events, started_at,
     signals.append(Signal(tipo="desanimo", rotulo="frustração fria (decepção/desânimo) — calibra o TOM, não o gate",
                           deterministico=False, disparou=disap >= DISAPPOINTMENT_FLOOR,
                           valor=float(disap), limiar=float(DISAPPOINTMENT_FLOOR)))
-    safety = any(p in customer_norm for p in VULNERABILITY_PATTERNS)
+    safety = any(p in customer_norm for p in VULNERABILITY_PATTERNS) or is_crisis(customer_norm)
     signals.append(Signal(tipo="seguranca", rotulo="vulnerabilidade (ludopatia/autoexclusão) — IA se recusa, humano de propósito",
                           deterministico=True, disparou=safety))
     signals.append(Signal(tipo="llm_judge", rotulo="tema ambíguo → resolvido por LLM-as-judge (resíduo)",

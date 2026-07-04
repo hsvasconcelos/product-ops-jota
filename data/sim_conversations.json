@@ -30,7 +30,7 @@
     "turns_usados": 2,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Entendi, mas só pra confirmar: é um **Android** ou **iPhone**? As dicas mudam um pouquinho. 😉"
+    "ultima": "Certo! Vamos tentar algumas coisas. Primeiro, você pode me dizer se está usando um **Android** ou um **iPhone**?"
   },
   {
     "id": "pix_errado",
@@ -41,7 +41,7 @@
     "turns_usados": 3,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Beleza! Como o dinheiro saiu da sua conta Jota, vamos seguir esses passos:\n\n1. Puxe o *comprovante do Pix* aqui no Jota para ver o *nome* e o *banco do destinatário*.\n2. Peça a *devolução voluntária* ao recebedor: entre em contato diretamente ou o Jota pode ajudar a acionar pelo banco de destino.\n\nQualquer dúvida, estou por aqui! 😊"
+    "ultima": "Perfeito, aconteceu na sua conta do Jota. Vamos puxar o comprovante pra confirmar o **nome e banco do destinatário**, e assim você pode pedir a devolução voluntária diretamente pra ele.\n\nSe precisar de suporte nessa parte, o Jota está aqui pra ajudar a acionar o banco de destino! 😉\n\nSe precisar de mais alguma coisa, é só avisar!"
   },
   {
     "id": "pix_chave_invalida",
@@ -52,7 +52,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Entendi! Vamos resolver isso juntos. \n\n1. *Confirme* se a chave Pix que você está usando está correta. \n2. Pergunte ao *destinatário* qual é a chave ATIVA dele, pois pode ser diferente do número que você tem.\n3. Se precisar, peça para ele te enviar um *QR Code* de cobrança. Assim, você não precisa da chave.\n\nSe precisar de mais alguma ajuda, estou aqui! 😊"
+    "ultima": "Entendi! Vamos resolver isso. 😊 \n\n1. Primeiro, confirme com o destinatário qual é a **chave Pix ativa** dele.\n2. Peça para ele verificar as chaves cadastradas no banco onde quer receber o valor.\n3. Se preferir, o destinatário pode te enviar um **QR Code** de cobrança, o que dispensa o uso da chave.\n\nTenta isso e me fala se deu certo!"
   },
   {
     "id": "ludopatia_seguranca",
@@ -85,7 +85,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Vamos resolver isso rapidinho! 🌟 Primeiro, me confirma se as duas cobranças têm o *mesmo valor*, *mesmo destino* e foram feitas no *mesmo dia*? Assim, posso te orientar melhor."
+    "ultima": "Se foi uma cobrança duplicada com *mesmo valor*, *mesmo destino* e em um intervalo curto, o estorno é automático. O valor deve voltar para a sua conta de origem em até *1 dia útil*. 🕒 Pode acompanhar o crédito de volta na sua conta! Se precisar, estou por aqui. 😊"
   },
   {
     "id": "falatap_nao_caiu",
@@ -96,7 +96,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Vou te ajudar com isso! Primeiro, vamos confirmar alguns pontos: 🚀\n\n1. Verifique no histórico se a venda está como *APROVADA*.\n2. Veja qual é o seu plano de recebimento: *D0* (na hora) ou *D1* (próximo dia útil).\n\nMe conta o resultado? 😊"
+    "ultima": "Vamos dar uma olhada nisso! Primeiro, preciso que você confirme se a venda está como **APROVADA** no seu histórico. Pode verificar isso pra mim? 😊"
   },
   {
     "id": "open_finance_saldo",
@@ -107,7 +107,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Opa! Parece que pode ser um problema de reconexão. Vamos tentar resolver rapidinho. \n\n1. Peça para *reconectar seu banco*.\n2. Escolha a instituição certa.\n3. Autorize novamente no app do banco.\n4. Defina a duração da conexão.\n\nDepois disso, os saldos devem voltar a atualizar normalmente! 😊"
+    "ultima": "Parece que o consentimento de **Open Finance** pode ter expirado ou a conexão foi interrompida. Vou te ajudar a resolver isso rapidinho! 😉\n\n1. Peça **'reconectar meu banco'**.\n2. Escolha a instituição que deseja reconectar.\n3. Você será levado ao app do banco para autorizar novamente.\n4. Defina a duração da conexão para evitar nova expiração.\n\nOs saldos devem voltar a atualizar em seguida. Se precisar de mais alguma coisa, estou por aqui!"
   },
   {
     "id": "rendimento_duvida",
@@ -118,7 +118,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Oi! O saldo na conta Jota rende *100% do CDI* automaticamente desde o primeiro real. 📈\n\nO rendimento é calculado por *dia útil* sobre o saldo mantido. Os impostos (*IR + PIS + COFINS*) já são retidos na fonte, então o valor mostrado é aproximado.\n\nSe precisar, posso fazer uma projeção para um período específico. 😊"
+    "ultima": "O saldo no *Jota* rende *100% do CDI* automaticamente desde o primeiro real! 😄 \n\nAlguns pontos importantes:\n1. O rendimento é calculado por *dia útil*.\n2. O saldo precisa ficar na conta para render — saídas reduzem a base.\n3. Os impostos já saem retidos; o valor que você vê é aproximado.\n\nSe quiser, posso fazer uma projeção para um período específico. 🚀"
   },
   {
     "id": "confusao_canal_falatap",
@@ -129,7 +129,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "O Fala Tap é usado para receber pagamentos por aproximação no celular. Você está procurando acessar ele aqui no WhatsApp ou teve outro tipo de dúvida? 🤔"
+    "ultima": "O Fala Tap é uma função de recebimento por aproximação usando o celular. Ele não está diretamente no WhatsApp. Se você tiver mais alguma dúvida sobre como usá-lo ou sobre o prazo de crédito, me avisa, tá bom? 😊"
   },
   {
     "id": "kyc_selfie",
@@ -140,7 +140,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Vamos tentar resolver isso! 😊 \n\n1. Garanta que está em um local bem iluminado, sem luz forte atrás de você.\n2. Remova qualquer objeto como **óculos**, **boné** ou **máscara** que possa cobrir o rosto.\n3. Mantenha o rosto **centralizado** na câmera.\n4. Toque em '**Tentar novamente**' para refazer a verificação.\n\nSe não passar, me avise!"
+    "ultima": "A verificação de identidade pode dar uma dor de cabeça às vezes. Vamos tentar de novo com algumas dicas: \n\n1. Procure um ambiente bem iluminado, mas sem luz forte atrás de você.\n2. Tire óculos, boné ou máscara e mantenha o rosto centralizado na câmera.\n3. Toque em *\"Tentar novamente\"* para refazer a verificação. 📸\n\nSe seguir esses passos e ainda tiver problemas, me avisa!"
   },
   {
     "id": "frustracao_fria_resolve",
@@ -151,7 +151,7 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Poxa, sinto muito por isso! Vamos dar um jeito! \n\nAqui estão alguns passos que podem te ajudar: \n\n1. **Confirme** com o destinatário qual é a **chave Pix ativa** dele. Pode ser diferente do CPF! 😉\n2. Peça pra ele **verificar as chaves cadastradas** no banco onde quer receber.\n3. Como alternativa, ele pode te **enviar um QR Code** de cobrança — aí não precisa de chave.\n\nVocê lembra à quem está enviando ou se tem o QR Code? Qualquer dúvida, estou aqui para ajudar!"
+    "ultima": "Poxa, entendo como isso pode ser frustrante. Vamos resolver isso juntos! 😊\n\n1. Primeiro, confirme com o destinatário qual é a **chave Pix ativa** dele — às vezes, pode ser diferente do CPF.\n2. Peça para ele verificar as chaves cadastradas no banco onde quer receber.\n\nComo alternativa, ele pode te enviar um **QR Code de cobrança**, assim não precisa de chave. Posso ajudar com mais alguma coisa?"
   },
   {
     "id": "nubank_externo",
@@ -162,6 +162,6 @@
     "turns_usados": 1,
     "grounding_ok": true,
     "grounding_viol": [],
-    "ultima": "Entendi! Você está tendo dificuldade em fazer um Pix do Nubank para sua conta Jota, certo? ⚡\n\n1. **Confirme os dados da chave Pix** que você está usando para a transferência (CPF, e-mail ou celular).\n2. Certifique-se de que **tem saldo suficiente** no Nubank para a transferência.\n3. Verifique se está **usando o horário de funcionamento do Pix**, geralmente 24/7, mas pode ter exceções.\n\nSe tudo estiver certo do seu lado e mesmo assim não funcionar, pode ser um problema temporário. Tente novamente mais tarde. Se puder dar mais detalhes, estou aqui para ajudar! 💬"
+    "ultima": "Vamos resolver isso! Quando você tenta transferir do Nubank pro Jota, aparece alguma mensagem de erro específica? Me conta mais pra eu poder ajudar melhor. 😊"
   }
 ]
