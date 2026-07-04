@@ -47,7 +47,8 @@ THRESHOLDS = {
     "rag_mrr": 0.70,
     "decisao_acuracia": 0.95,
     "decisao_divergencias": 0,     # exato: zero divergências com o julgamento de produto
-    "desfecho_binario": 0.80,      # resolvido × não-resolvido vs gabarito (fechado ≠ resolvido)
+    "desfecho_binario": 0.80,
+    "criticidade_mae": 1.0,        # erro médio da criticidade derivada vs gold (1–5); menor = melhor
 }
 
 
@@ -71,6 +72,22 @@ def run(sample: int | None):
     rows = decision_coletar()
     dec_acc = sum(1 for _, exp, got, _ in rows if exp == got) / len(rows)
     divergencias = [(cid, exp, got) for cid, exp, got, _ in rows if exp != got]
+
+    # 3.5) CRITICIDADE derivada vs gold (o caminho ponta-a-ponta da derivação):
+    # MAE entre a criticidade que o motor DERIVA do bruto e a do gabarito.
+    crit_mae = None
+    lc = ROOT / "data" / "lab_casos.jsonl"
+    if lc.exists():
+        conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+        gold = dict(conn.execute("SELECT conversation_id, gold_criticality FROM conversations"))
+        conn.close()
+        errs = []
+        for line in lc.read_text("utf-8").splitlines():
+            r = json.loads(line)
+            if r["cid"] in gold:
+                errs.append(abs(r["inp"]["criticality"] - gold[r["cid"]]))
+        if errs:
+            crit_mae = round(sum(errs) / len(errs), 3)
 
     # 4) DESFECHO (chamado fechado ≠ atrito resolvido) — binário resolvido × não-resolvido
     conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
@@ -97,6 +114,7 @@ def run(sample: int | None):
             "decisao_divergencias": len(divergencias),
             "desfecho_binario": round(out_bin, 4),
             "desfecho_amostra": n_out,
+            "criticidade_mae": crit_mae,
         },
         "divergencias": divergencias,
     }
@@ -104,7 +122,7 @@ def run(sample: int | None):
 
 def _pass(key, val) -> bool:
     thr = THRESHOLDS[key]
-    return val <= thr if key == "decisao_divergencias" else val >= thr
+    return val <= thr if key in ("decisao_divergencias", "criticidade_mae") else val >= thr
 
 
 def render(res):
@@ -119,6 +137,9 @@ def render(res):
         ("Desfecho · resolvido×não", "desfecho_binario", m["desfecho_binario"],
          f"fechado ≠ resolvido · {m['desfecho_amostra']} conversas"),
     ]
+    if m.get("criticidade_mae") is not None:
+        scorecard.append(("Criticidade · erro médio", "criticidade_mae", m["criticidade_mae"],
+                          "derivada do bruto vs gold (escala 1–5)"))
     t = Table(box=SIMPLE_HEAVY, expand=True, title="SCORECARD — qualidade do motor (com limiares de regressão)")
     t.add_column("Métrica"); t.add_column("Valor", justify="right")
     t.add_column("Limiar", justify="right", style="dim"); t.add_column("", justify="center")
@@ -128,9 +149,10 @@ def render(res):
         ok = _pass(key, val)
         all_pass = all_pass and ok
         is_int = key == "decisao_divergencias"
-        vtxt = str(val) if is_int else f"{val*100:.1f}%"
+        is_abs = key == "criticidade_mae"
+        vtxt = str(val) if (is_int or is_abs) else f"{val*100:.1f}%"
         thr = THRESHOLDS[key]
-        ttxt = ("=" if is_int else "≥") + (str(thr) if is_int else f"{thr*100:.0f}%")
+        ttxt = ("=" if is_int else "≤" if is_abs else "≥") + (str(thr) if (is_int or is_abs) else f"{thr*100:.0f}%")
         t.add_row(nome, Text(vtxt, style="bold " + ("green" if ok else "red")),
                   ttxt, Text("✓" if ok else "✗", style="green" if ok else "bold red"), desc)
     console.print(Panel("Um comando → um scorecard. Cada linha é um contrato; vermelho = regrediu.",

@@ -123,7 +123,31 @@
         "c_03220",
         "c_01638"
       ]
+    },
+    {
+      "tema": "account_access",
+      "motivo": "palpite_fraco",
+      "n": 68,
+      "pct_do_suporte": 1.4,
+      "destino": "regra de detecção",
+      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "exemplos": [
+        "c_04388",
+        "c_00802"
+      ]
+    },
+    {
+      "tema": "pix",
+      "motivo": "palpite_fraco",
+      "n": 35,
+      "pct_do_suporte": 0.7,
+      "destino": "regra de detecção",
+      "porque": "o motor não teve certeza: novas âncoras/eventos aumentam a certeza",
+      "exemplos": [
+        "c_04774",
+        "c_03563"
+      ]
     }
   ],
-  "leitura": "cada candidato promovido derruba um cluster INTEIRO do 'vai para humano' — é assim que a fatia humana cai sem afrouxar nenhuma régua"
+  "leitura": "cada candidato PROMOVÍVEL derruba um cluster inteiro do 'vai para humano'; os marcados 'por desenho' ficam com gente de propósito — derrubá-los seria errar"
 }

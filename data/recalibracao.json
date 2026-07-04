@@ -1,6 +1,8 @@
 {
-  "gerado_em": "2026-07-04T15:45:06",
+  "gerado_em": "2026-07-04T16:11:06",
   "amostra": 5001,
+  "treino": 2501,
+  "teste": 2500,
   "grid_testado": 1188,
   "grid_elegivel": 144,
   "baseline": {
@@ -12,9 +14,9 @@
       "resolve_floor": 0.5,
       "assist_floor": 0.35
     },
-    "contencao_pct": 55.3,
-    "precisao_contencao_pct": 74.4,
-    "contidos": 2768
+    "contencao_pct": 56.0,
+    "precisao_contencao_pct": 73.8,
+    "contidos": 1399
   },
   "melhor": {
     "policy": {
@@ -25,10 +27,15 @@
       "resolve_floor": 0.5,
       "assist_floor": 0.3
     },
-    "contencao_pct": 57.3,
-    "precisao_contencao_pct": 74.5,
-    "contidos": 2864
+    "treino": {
+      "contencao_pct": 56.4,
+      "precisao_contencao_pct": 75.1,
+      "contidos": 1410
+    },
+    "contencao_pct": 58.2,
+    "precisao_contencao_pct": 73.9,
+    "contidos": 1454
   },
   "ganho_real": true,
-  "leitura": "o grid achou policy com mais contenção SEM perder precisão nem contrato"
+  "leitura": "o grid escolheu no treino e o ganho SE SUSTENTOU no teste (casos nunca vistos), sem perder precisão nem contrato"
 }

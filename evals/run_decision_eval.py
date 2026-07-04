@@ -43,15 +43,14 @@ console = Console()
 
 
 def coletar():
-    """(id, esperado, decidido, reason) para cada cenário do gabarito + herói."""
+    """(id, esperado, decidido, reason) para cada cenário do CONTRATO — que vive
+    inteiro em decision_golden.json (os casos-herói são linhas HERO-*, derivadas
+    do friction_model; nada de gabarito espalhado em código)."""
     rows = []
     for s in json.loads(GOLDEN.read_text(encoding="utf-8")):
         d = decide(DecisionInput(criticality=s["criticality"], trust_risk=s["trust_risk"],
                                  resolvability=s["resolvability"], detection_confidence=s["detection_confidence"]))
         rows.append((s["id"], s["expected_action"], d.action.value, d.reason))
-    for c in HERO_CASES:
-        d = decide_for_case(c, HERO_RESOLVABILITY[c.case_id])
-        rows.append((f"hero:{c.case_id}", c.baseline_action.value, d.action.value, d.reason))
     return rows
 
 
@@ -95,7 +94,7 @@ def main():
 
     console.print(Panel(
         f"Roteador (decision.py) avaliado em [bold]{len(rows)}[/bold] cenários "
-        f"({len(rows)-len(HERO_CASES)} do gabarito curado + {len(HERO_CASES)} casos-herói).\n"
+        f"(contrato completo em decision_golden.json, casos-herói inclusos).\n"
         "Gabarito = julgamento de produto, independente dos limiares. Guarda de regressão da policy.",
         title="EVAL · roteamento de interceptação vs gabarito", border_style="cyan", box=ROUNDED))
 

@@ -694,6 +694,8 @@ def evals():
         {"metrica": "decisão · divergências", "valor": m.get("decisao_divergencias"), "limiar": 0, "fmt": "int", "invert": True, "o_que": "contrato exato: recalibração que muda um cenário curado acusa aqui"},
         {"metrica": "desfecho · resolvido×não", "valor": m.get("desfecho_binario"), "limiar": 0.80, "fmt": "pct",
          "o_que": f"derivado do bruto em {m.get('desfecho_amostra','')} conversas fechadas · binário vs gabarito"},
+        {"metrica": "criticidade · erro médio", "valor": m.get("criticidade_mae"), "limiar": 1.0, "fmt": "abs",
+         "invert": True, "o_que": "a criticidade DERIVADA do bruto vs gold, escala 1 a 5 (menor = melhor)"},
     ]
     for row in rows:
         v = row["valor"]

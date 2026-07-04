@@ -13,7 +13,8 @@
     "decisao_cenarios": 15,
     "decisao_divergencias": 0,
     "desfecho_binario": 0.8867,
-    "desfecho_amostra": 8536
+    "desfecho_amostra": 8536,
+    "criticidade_mae": 0.754
   },
   "divergencias": []
 }

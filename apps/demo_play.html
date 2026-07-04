@@ -341,7 +341,7 @@
       o que a IA já fez: reconheceu o pedido e explicou que a exclusão é conduzida por uma pessoa<br>
       fila: <b>Cadastro &amp; LGPD</b> · prioridade 0.18 · fora do horário → registrado, retorno prioritário no próximo turno
     </div>
-    <div class="jrule">Nunca um encaminhamento frio: vai junto o que foi detectado, o que a IA já tentou e por que escalou. No baseline do laboratório, <b>7,9%</b> das conversas perderam contexto na troca de atendente e <b>241 pedidos de humano foram ignorados</b>. É exatamente isso que o pacote ataca.</div>
+    <div class="jrule">Nunca um encaminhamento frio: vai junto o que foi detectado, o que a IA já tentou e por que escalou. No baseline do laboratório, <b><span id="t-ctx">…</span>%</b> das conversas perderam contexto na troca de atendente e <b><span id="t-ign">…</span> pedidos de humano foram ignorados</b>. É exatamente isso que o pacote ataca.</div>
 
     <div class="ptitle">filas por especialidade · com ciência de horário</div>
     <div class="frow"><span class="fn">pix / pagamentos</span><span class="fx" style="color:var(--grey)">fila Pagamentos/Pix</span></div>
@@ -379,7 +379,7 @@
     <div class="ptitle">e as que me deixam de olho aberto</div>
     <div class="jnote">preocupações genuínas, sem resposta pronta: é aqui que eu gastaria as primeiras semanas.</div>
     <div class="frow"><span class="fn">incidente em massa<span class="badge med">v1 na semana extra</span></span><span class="fx" style="color:var(--grey)">um bug de Pix que atinge 50 mil clientes faria a interceptação individual virar spam e afogaria as filas. A v1 já existe: detector de pico (mesmo evento, 30× em 15 min) congela a proativa individual e muda para comunicação de incidente, canônica e sem LLM (teste com /demo-incidente no bot). O que ainda falta: o playbook de comunicação em massa por coorte e o regime especial das filas durante o incidente.</span></div>
-    <div class="frow"><span class="fn">detecção errada, fila errada</span><span class="fx" style="color:var(--grey)">o pacote é tão bom quanto o tema detectado (85,8% hoje): o caso mal classificado chega na especialidade errada. Mitigação: transbordo + a correção do atendente vira rótulo. Mas é um custo real de transição.</span></div>
+    <div class="frow"><span class="fn">detecção errada, fila errada</span><span class="fx" style="color:var(--grey)">o pacote é tão bom quanto o tema detectado (<span id="t-tema">…</span>% hoje): o caso mal classificado chega na especialidade errada. Mitigação: transbordo + a correção do atendente vira rótulo. Mas é um custo real de transição.</span></div>
     <div class="frow"><span class="fn">a avaliação do time muda</span><span class="fx" style="color:var(--grey)">se a IA fica com o repetitivo, medir atendente por volume vira injustiça na hora. É preciso repactuar a métrica de gente: qualidade no caso difícil, curadoria do loop, não quantidade. Conversa de liderança, não de motor.</span></div>
   </section>
 
@@ -451,7 +451,7 @@
     <div class="jnote">quando o motor não acha procedimento relevante, ele escala para o humano e registra a lacuna aqui; o Product Ops cura a KB e o atrito para de escalar. É o reativo alimentando o proativo.</div>
     <div id="lab-gaps"></div>
     <div class="ptitle">a esteira de promoção · o loop mecanizado (§8)</div>
-    <div class="jnote">clusters de "vai para humano" acima do limiar de frequência, com destino sugerido. Cada candidato promovido derruba um cluster inteiro: é assim que a fatia humana cai sem afrouxar régua.</div>
+    <div class="jnote">clusters de "vai para humano" acima do limiar de frequência, com destino sugerido. Cada candidato promovível derruba um cluster inteiro; os marcados "por desenho" ficam com gente de propósito. É assim que a fatia humana cai sem afrouxar régua.</div>
     <div id="lab-promocao"></div>
 
     <div class="ptitle">explorar os dados · o método à mostra</div>
@@ -549,7 +549,7 @@
     </div>
 
     <div class="ptitle">a recalibração · as réguas contra o desfecho, de verdade</div>
-    <div class="jnote">um grid de políticas candidatas roda sobre os 5 mil chamados; só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção contra o desfecho. É o loop recalibrando a política, com o cinto afivelado.</div>
+    <div class="jnote">um grid de políticas candidatas é escolhido na METADE de treino e reportado na metade de TESTE (casos nunca vistos na escolha); só é elegível quem mantém os 15 cenários-contrato exatos e não perde precisão de contenção. Precisão da contenção = % dos casos contidos cuja conversa terminou resolvida segundo o desfecho; como nessas conversas quem atendeu foi o suporte de hoje (não a IA), o número é um piso conservador. É o loop recalibrando a política, com o cinto afivelado.</div>
     <div id="recal"></div>
 
     <div class="ptitle">interceptação · a prova: as duas fases rodando ao vivo</div>
@@ -584,8 +584,9 @@
     <p class="hl-sub">Cada peça tem prova contra gabarito; cada mudança repassa por todas no CI. O que o eval já pegou de erro meu está listado abaixo: funcionou.</p>
     <div class="contrast" style="margin:-4px 0 22px"><b>Isso roda sozinho.</b> A cada mudança enviada ao repositório, o CI (GitHub Actions) executa a suíte inteira e aprova ou reprova a mudança. Reprovada, não entra. Todas as mudanças deste case foram aprovadas.</div>
     <div class="ptitle" style="margin-top:4px">scorecard · contratos com limiar de regressão</div>
+    <div class="jnote">honestidade do método: a base é sintética, então parte dos acertos é verdadeira por construção (ex.: eventos de cura usam os nomes que o desfecho procura). O que os contratos medem aqui é o MECANISMO (janelas, precedência, réguas) e a regressão dele; a taxa de produção só existe com tráfego real, e a régua lá vira o desfecho.</div>
     <div id="evals-scorecard"></div>
-    <div class="ptitle">soak overnight · volume real (persona × atrito × estilo)</div>
+    <div class="ptitle">soak overnight · a IA conduzindo a conversa do início (persona × atrito × estilo)</div>
     <div class="lab-stats" id="evals-soak" style="border-bottom:0;padding-bottom:2px"></div>
     <div class="jnote" id="soak-styles-note" style="display:none">acerto (desfecho certo e resposta ancorada) por estilo de cliente · escala 0 a 100%. A leitura: o motor não escorrega quando o fraseado muda.</div>
     <div id="soak-styles"></div>
@@ -615,6 +616,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+b.dataset.tab));
     if(b.dataset.tab==='logica'){ loadPolicy(); seedIntercept(); }
     if(b.dataset.tab==='lab'){ loadLab(); loadGaps(); }
+    if(b.dataset.tab==='time') loadTime();
     if(b.dataset.tab==='evals') loadEvals();
   };
 });
@@ -633,7 +635,7 @@ let evalsLoaded=false;
 async function loadEvals(){
   if(evalsLoaded) return; evalsLoaded=true;
   const e=await (await fetch('/api/evals')).json();
-  const fmt=(v,f)=> v==null?'—':(f==='pct'?(v*100).toFixed(1).replace('.',',')+'%':String(v));
+  const fmt=(v,f)=> v==null?'—':(f==='pct'?(v*100).toFixed(1).replace('.',',')+'%':String(v).replace('.',','));
   let h='<div class="scrow head"><span>métrica</span><span class="vl">valor</span><span class="lm">limiar</span><span class="st">status</span></div>';
   e.scorecard.forEach(s=>{
     const lim=(s.fmt==='pct'?(s.limiar*100).toFixed(0)+'%':s.limiar);
@@ -642,7 +644,7 @@ async function loadEvals(){
       <span class="st ${s.ok?'':'fail'}">${s.ok?'ok':'▸ abaixo'}</span></div>`;
   });
   $('#evals-scorecard').innerHTML=h;
-  if(e.soak){ $('#evals-soak').innerHTML=[['conversas',String(e.soak.conversas||'—')],['desfecho',String(e.soak.desfecho||'—').replace('.',',')+'%'],['grounding',String(e.soak.grounding||'—').replace('.',',')+'%'],['tom',String(e.soak.tom||'—').replace('.',',')+'/5']]
+  if(e.soak){ $('#evals-soak').innerHTML=[['conversas',String(e.soak.conversas||'—')],['desfecho certo (juiz)',String(e.soak.desfecho||'—').replace('.',',')+'%'],['grounding',String(e.soak.grounding||'—').replace('.',',')+'%'],['tom',String(e.soak.tom||'—').replace('.',',')+'/5']]
      .map(([l,v])=>`<div class="lstat"><span class="v">${v}</span><span class="l">${l}</span></div>`).join(''); }
   if(e.estilos&&e.estilos.length){
     $('#soak-styles-note').style.display='block';
@@ -664,8 +666,8 @@ async function loadLab(){
     const a=await (await fetch('/api/lab/atendimento')).json();
     if(a && a.triagem){
       const lbl={'IA resolve sozinha':'IA resolve sozinha','IA assiste o humano':'IA assiste','Vai pra humano':'vai para humano'};
-      $('#lab-triagem').innerHTML=a.triagem.filter(t=>t.n>0).map(t=>
-        `<div class="lstat"><span class="v">${String(t.pct).replace('.',',')}%</span><span class="l">${esc(lbl[t.balde]||t.balde)}</span></div>`).join('')
+      $('#lab-triagem').innerHTML=a.triagem.map(t=>
+        `<div class="lstat"><span class="v">${String(t.pct).replace('.',',')}%</span><span class="l">${esc(lbl[t.balde]||t.balde)}</span>${t.n===0?`<span class="d">faixa vazia hoje: ou resolve com confiança, ou pessoa</span>`:``}</div>`).join('')
         +`<div class="lstat"><span class="v">${String(a.theme_accuracy).replace('.',',')}%</span><span class="l">tema correto (medição)</span></div>`;
     }
   }catch(e){ /* sem lab_atendimento.json, a régua fica vazia — o resto da aba segue */ }
@@ -734,6 +736,21 @@ $('#gate-toggle').onclick=()=>{
   t.textContent=open?'ocultar como cada régua decide ▾':'ver como cada régua decide ▸';
 };
 
+
+/* aba time: os números de dor humana vêm da API (nunca ficam velhos) */
+let timeLoaded=false;
+async function loadTime(){
+  if(timeLoaded) return; timeLoaded=true;
+  try{
+    const a=await (await fetch('/api/lab/atendimento')).json();
+    if(a&&a.custo_humano){
+      const set=(id,v)=>{const el=$('#'+id); if(el&&v!=null) el.textContent=String(v).replace('.',',');};
+      set('t-ctx', a.custo_humano.context_lost_pct);
+      set('t-ign', a.custo_humano.pedidos_humano_ignorados);
+      set('t-tema', a.theme_accuracy);
+    }
+  }catch(e){}
+}
 
 /* a semana extra em números — antes (histórico de 03/07) → depois (lido ao vivo) */
 async function loadEvolucao(){

@@ -13,8 +13,11 @@ o desfecho real". Este script FAZ isso, com os contratos como cinto:
           conter mais só vale se continuar resolvendo de verdade);
        c) os gates de segurança/esgotamento/política nem entram no grid
           (não são thresholds: são recusas por desenho).
-  4. Entre os elegíveis, vence o de MAIOR contenção. Se ninguém superar a
-     policy atual, o resultado honesto é "a atual já está no ótimo do grid".
+  4. HOLDOUT: o grid escolhe no conjunto de TREINO (metade dos casos) e o
+     resultado reportado é o do conjunto de TESTE (a outra metade, nunca vista
+     na escolha) — sem isso, "venceu no grid" seria overfit de manual.
+  5. Entre os elegíveis, vence o de MAIOR contenção no treino. Se no teste o
+     ganho não se sustentar, o resultado honesto é exatamente esse.
 
 Saída: data/recalibracao.json (a página lê de lá — nada de número copiado).
 
@@ -64,14 +67,7 @@ def golden_ok(t: PolicyThresholds) -> bool:
                                  detection_confidence=s["detection_confidence"]), t)
         if d.action.value != s["expected_action"]:
             return False
-    from product_ops_jota.friction_model import HERO_CASES
-    from product_ops_jota.decision import decide_for_case
-    resolv = {"pix_key_loop": 0.85, "kyc_failed_onboarding": 0.45, "fala_tap_receipt_anxiety": 0.90}
-    esperado = {"pix_key_loop": InterceptionAction.AI_RESOLVE,
-                "kyc_failed_onboarding": InterceptionAction.AI_ASSIST,
-                "fala_tap_receipt_anxiety": InterceptionAction.AI_RESOLVE}
-    return all(decide_for_case(c, resolv[c.case_id], t).action == esperado[c.case_id]
-               for c in HERO_CASES)
+    return True   # o contrato vive INTEIRO em decision_golden.json (heróis inclusos)
 
 
 def coletar_sinais():
@@ -99,10 +95,14 @@ def avaliar(casos, t: PolicyThresholds) -> dict:
 def main():
     print("① lendo sinais + desfecho de data/lab_casos.jsonl…")
     casos = coletar_sinais()
-    base = avaliar(casos, DEFAULT_THRESHOLDS)
-    print(f"   baseline: contenção {base['contencao_pct']}% · precisão da contenção {base['precisao_contencao_pct']}%")
+    # HOLDOUT determinístico: índices pares treinam, ímpares testam (reproduzível)
+    treino = [c for i, c in enumerate(casos) if i % 2 == 0]
+    teste = [c for i, c in enumerate(casos) if i % 2 == 1]
+    base_treino = avaliar(treino, DEFAULT_THRESHOLDS)
+    base_teste = avaliar(teste, DEFAULT_THRESHOLDS)
+    print(f"   baseline (teste): contenção {base_teste['contencao_pct']}% · precisão {base_teste['precisao_contencao_pct']}%")
 
-    print("② varrendo o grid…")
+    print(f"② varrendo o grid no TREINO ({len(treino)} casos)…")
     chaves = list(GRID)
     melhores = []
     testados = elegiveis = 0
@@ -112,9 +112,9 @@ def main():
             continue                          # assiste tem que ser faixa abaixo de resolve
         t = PolicyThresholds(**params)
         testados += 1
-        m = avaliar(casos, t)
-        # elegível: contrato golden exato E a precisão da contenção não cai
-        if m["precisao_contencao_pct"] + 1e-9 < base["precisao_contencao_pct"]:
+        m = avaliar(treino, t)
+        # elegível: contrato golden exato E a precisão da contenção não cai (no treino)
+        if m["precisao_contencao_pct"] + 1e-9 < base_treino["precisao_contencao_pct"]:
             continue
         if not golden_ok(t):
             continue
@@ -122,19 +122,24 @@ def main():
         melhores.append((m["contencao_pct"], m["precisao_contencao_pct"], params, m))
     melhores.sort(key=lambda x: (-x[0], -x[1]))
 
-    venceu = bool(melhores) and melhores[0][0] > base["contencao_pct"]
     best = melhores[0] if melhores else None
+    # o número que vale é o do TESTE (casos que a escolha nunca viu)
+    m_teste = avaliar(teste, PolicyThresholds(**best[2])) if best else None
+    venceu = bool(m_teste) and m_teste["contencao_pct"] > base_teste["contencao_pct"] \
+        and m_teste["precisao_contencao_pct"] + 1e-9 >= base_teste["precisao_contencao_pct"]
     out = {
         "gerado_em": datetime.now().isoformat(timespec="seconds"),
-        "amostra": len(casos),
+        "amostra": len(casos), "treino": len(treino), "teste": len(teste),
         "grid_testado": testados,
         "grid_elegivel": elegiveis,
-        "baseline": {"policy": DEFAULT_THRESHOLDS.model_dump(), **base},
-        "melhor": ({"policy": best[2], **best[3]} if best else None),
+        "baseline": {"policy": DEFAULT_THRESHOLDS.model_dump(), **base_teste},
+        "melhor": ({"policy": best[2], "treino": best[3], **m_teste} if best else None),
         "ganho_real": venceu,
-        "leitura": ("o grid achou policy com mais contenção SEM perder precisão nem contrato"
+        "leitura": ("o grid escolheu no treino e o ganho SE SUSTENTOU no teste (casos nunca vistos), "
+                    "sem perder precisão nem contrato"
                     if venceu else
-                    "a policy atual já está no ótimo do grid — recalibração confirmou o desenho"),
+                    "no teste (casos nunca vistos) o ganho do grid não se sustentou — a policy atual fica; "
+                    "resultado honesto é isto"),
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"③ {out['leitura']}")

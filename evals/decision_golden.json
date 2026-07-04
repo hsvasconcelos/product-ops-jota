@@ -2,73 +2,136 @@
   {
     "id": "deteccao_fraca",
     "descricao": "Atrito incerto (detecção baixa) — não se age sobre palpite (P4/P8).",
-    "criticality": 3.0, "trust_risk": 0.5, "resolvability": 0.7, "detection_confidence": 0.3,
+    "criticality": 3.0,
+    "trust_risk": 0.5,
+    "resolvability": 0.7,
+    "detection_confidence": 0.3,
     "expected_action": "no_intercept"
   },
   {
     "id": "trivial_resoluvel",
     "descricao": "Dúvida boba e resolúvel — resolver em background sem incomodar (P8).",
-    "criticality": 1.5, "trust_risk": 0.1, "resolvability": 0.8, "detection_confidence": 0.9,
+    "criticality": 1.5,
+    "trust_risk": 0.1,
+    "resolvability": 0.8,
+    "detection_confidence": 0.9,
     "expected_action": "ai_resolve_silent"
   },
   {
     "id": "trivial_sem_resolucao",
     "descricao": "Trivial e de baixo risco, mas a IA não resolve — custo não justifica interceptar (P8).",
-    "criticality": 1.5, "trust_risk": 0.1, "resolvability": 0.3, "detection_confidence": 0.9,
+    "criticality": 1.5,
+    "trust_risk": 0.1,
+    "resolvability": 0.3,
+    "detection_confidence": 0.9,
     "expected_action": "no_intercept"
   },
   {
     "id": "pix_chave_errada_irreversivel",
     "descricao": "Pix pra chave errada: dinheiro já saiu, a IA não desfaz. Confiança altíssima sem prova → humano (P4).",
-    "criticality": 4.5, "trust_risk": 0.95, "resolvability": 0.15, "detection_confidence": 0.9,
+    "criticality": 4.5,
+    "trust_risk": 0.95,
+    "resolvability": 0.15,
+    "detection_confidence": 0.9,
     "expected_action": "human_handoff"
   },
   {
     "id": "conta_invadida_seguranca",
     "descricao": "Suspeita de invasão de conta: alto risco de confiança que a IA não prova → humano de propósito (P4).",
-    "criticality": 5.0, "trust_risk": 0.9, "resolvability": 0.2, "detection_confidence": 0.85,
+    "criticality": 5.0,
+    "trust_risk": 0.9,
+    "resolvability": 0.2,
+    "detection_confidence": 0.85,
     "expected_action": "human_handoff"
   },
   {
     "id": "pix_documentado_resolve",
     "descricao": "Erro de Pix com procedimento claro na KB e detecção certa — IA resolve in-thread (P1).",
-    "criticality": 3.0, "trust_risk": 0.4, "resolvability": 0.85, "detection_confidence": 0.95,
+    "criticality": 3.0,
+    "trust_risk": 0.4,
+    "resolvability": 0.85,
+    "detection_confidence": 0.95,
     "expected_action": "ai_resolve"
   },
   {
     "id": "fala_tap_d1_acalma_com_fato",
     "descricao": "Insegurança Fala Tap (D1): mexe com dinheiro, mas há PROVA ancorada (venda aprovada) — IA resolve acalmando.",
-    "criticality": 3.2, "trust_risk": 0.65, "resolvability": 0.85, "detection_confidence": 0.75,
+    "criticality": 3.2,
+    "trust_risk": 0.65,
+    "resolvability": 0.85,
+    "detection_confidence": 0.75,
     "expected_action": "ai_resolve"
   },
   {
     "id": "acesso_pediu_humano_assiste",
     "descricao": "Acesso ao app, cliente pediu humano, resolução só parcial — IA assiste com humano no loop (como a c_real_001).",
-    "criticality": 3.3, "trust_risk": 0.65, "resolvability": 0.5, "detection_confidence": 0.75,
+    "criticality": 3.3,
+    "trust_risk": 0.65,
+    "resolvability": 0.5,
+    "detection_confidence": 0.75,
     "expected_action": "ai_assist"
   },
   {
     "id": "boleto_evento_resolve",
     "descricao": "Boleto duplicado com evento de sistema e procedimento de estorno — IA resolve (P1).",
-    "criticality": 3.5, "trust_risk": 0.6, "resolvability": 0.7, "detection_confidence": 0.95,
+    "criticality": 3.5,
+    "trust_risk": 0.6,
+    "resolvability": 0.7,
+    "detection_confidence": 0.95,
     "expected_action": "ai_resolve"
   },
   {
     "id": "resolucao_parcial_assiste",
     "descricao": "Atrito real, mas a IA só resolve em parte — assiste, não chuta sozinha (P1).",
-    "criticality": 3.0, "trust_risk": 0.4, "resolvability": 0.5, "detection_confidence": 0.75,
+    "criticality": 3.0,
+    "trust_risk": 0.4,
+    "resolvability": 0.5,
+    "detection_confidence": 0.75,
     "expected_action": "ai_assist"
   },
   {
     "id": "baixa_capacidade_humano",
     "descricao": "Detecção ok, mas a IA quase não tem como resolver — vai pra humano com contexto.",
-    "criticality": 3.0, "trust_risk": 0.3, "resolvability": 0.4, "detection_confidence": 0.6,
+    "criticality": 3.0,
+    "trust_risk": 0.3,
+    "resolvability": 0.4,
+    "detection_confidence": 0.6,
     "expected_action": "human_handoff"
   },
   {
     "id": "alta_criticidade_mas_resolvuvel",
     "descricao": "Severo, mas totalmente resolúvel e provável — IA resolve, e a criticidade só eleva a PRIORIDADE (P7).",
-    "criticality": 4.5, "trust_risk": 0.5, "resolvability": 0.9, "detection_confidence": 0.95,
+    "criticality": 4.5,
+    "trust_risk": 0.5,
+    "resolvability": 0.9,
+    "detection_confidence": 0.95,
+    "expected_action": "ai_resolve"
+  },
+  {
+    "id": "HERO-pix_key_loop",
+    "descricao": "caso-herói: loop de chave Pix (irreversibilidade é stakes, não incapacidade)",
+    "criticality": 3.12,
+    "trust_risk": 0.52,
+    "resolvability": 0.85,
+    "detection_confidence": 0.6,
+    "expected_action": "ai_resolve"
+  },
+  {
+    "id": "HERO-kyc_failed_onboarding",
+    "descricao": "caso-herói: KYC falhou no onboarding (estágio frágil, capacidade parcial)",
+    "criticality": 3.9,
+    "trust_risk": 0.34,
+    "resolvability": 0.45,
+    "detection_confidence": 1.0,
+    "expected_action": "ai_assist"
+  },
+  {
+    "id": "HERO-fala_tap_receipt_anxiety",
+    "descricao": "caso-herói: ansiedade de recebimento no Fala Tap (venda em curso)",
+    "criticality": 3.2,
+    "trust_risk": 0.65,
+    "resolvability": 0.9,
+    "detection_confidence": 0.6,
     "expected_action": "ai_resolve"
   }
 ]

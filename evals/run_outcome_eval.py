@@ -10,9 +10,11 @@ Escopo honesto:
   · o TEMA entra como dado (gold_theme): o eval do classificador já mede o
     tema; aqui a pergunta é só "dado o atrito, o desfecho foi lido certo?"
     (ablação — um erro não contamina a medição do outro).
-  · `system_confirmed` quase não dispara no lab: o dado sintético não emite
-    eventos de cura (só falha/progresso). O mecanismo existe e é testado em
-    unidade; em produção o backend emite (kyc.approved, settlement.released…).
+  · `system_confirmed`: o gerador emite eventos de cura em parte dos resolved
+    (P_CURE) usando os MESMOS nomes de outcome.CURE_EVENTS — logo, no sintético,
+    a cura é verdadeira POR CONSTRUÇÃO. O que este eval mede de honesto é o
+    MECANISMO (janela de 24h, precedência entre sinais, quem-falou-por-último),
+    não a taxa de cura de produção — essa só existe com backend real.
 
 Mapeamento derivado → gabarito (3 classes):
   resolvido_* → resolved · abandonado/nao_resolvido → abandoned · sem_resposta → no_response

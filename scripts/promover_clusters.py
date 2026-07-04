@@ -27,7 +27,7 @@ OUT = ROOT / "data" / "promocao.json"
 
 # ─── POLICY ──────────────────────────────────────────────────────────────────
 LIMIAR_PROMOCAO = 30      # cluster só entra na esteira com ≥N casos (dor real)
-TOP = 10                  # candidatos exibidos
+TOP = 15                  # candidatos exibidos
 
 # motivo do caso não-contido → destino da promoção (§8: os 3 destinos + o "por desenho")
 DESTINO = {
@@ -114,8 +114,8 @@ def main():
         "limiar_promocao": LIMIAR_PROMOCAO,
         "clusters_acima_do_limiar": len(candidatos),
         "candidatos": candidatos[:TOP],
-        "leitura": ("cada candidato promovido derruba um cluster INTEIRO do 'vai para humano' — "
-                    "é assim que a fatia humana cai sem afrouxar nenhuma régua"),
+        "leitura": ("cada candidato PROMOVÍVEL derruba um cluster inteiro do 'vai para humano'; "
+                    "os marcados 'por desenho' ficam com gente de propósito — derrubá-los seria errar"),
     }
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✓ {OUT} · {nao_contidos}/{total} não contidos · {len(candidatos)} clusters ≥{LIMIAR_PROMOCAO}")
