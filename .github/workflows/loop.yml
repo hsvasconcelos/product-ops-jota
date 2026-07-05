@@ -1,7 +1,7 @@
 name: loop-continuo
 
 # O "aprende" do diagrama rodando SOZINHO — governado.
-# Semanal (combina com o ritual semanal de triagem do loop): lê a telemetria,
+# Diário: lê a telemetria,
 # roda recalibração + esteira + detecção proposta, publica o boletim como
 # artefato do run e TENTA abrir um PR com a proposta. O PR é o gate (o CI roda
 # nele) e o merge é o sign-off humano — nunca commita na main.
@@ -16,7 +16,7 @@ name: loop-continuo
 
 on:
   schedule:
-    - cron: "0 9 * * 1"      # 06h BRT (09h UTC), toda segunda-feira
+    - cron: "0 9 * * *"      # 06h BRT (09h UTC), diariamente
   workflow_dispatch:
 
 permissions:
