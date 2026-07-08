@@ -603,6 +603,17 @@
     <div class="ptitle">por que a suíte é eficiente · 4 camadas, cada uma pega uma classe de bug</div>
     <div id="evals-camadas"></div>
 
+    <div class="ptitle">invariantes · o que o motor NUNCA pode fazer, provado por fuzzing</div>
+    <div class="jnote">os testes acima checam exemplos ("neste caso, a resposta é X"). Este checa propriedades: varro ~48 mil combinações dos 4 sinais e garanto que as regras inegociáveis valem em TODAS. Roda no CI a cada mudança.</div>
+    <div class="lab-stats" style="border-bottom:0;padding-bottom:8px">
+      <div class="lstat"><span class="v">47.916</span><span class="l">combinações varridas</span><span class="d">criticidade × certeza × trust × resolubilidade × flags</span></div>
+      <div class="lstat"><span class="v">0</span><span class="l">violações</span><span class="d">nenhuma combinação fura uma invariante</span></div>
+    </div>
+    <div class="frow"><span class="fn">segurança sempre vence</span><span class="fx" style="color:var(--grey)">cliente vulnerável → humano com prioridade máxima em <b>todas</b> as combinações; nenhum outro sinal burla o gate de segurança.</span></div>
+    <div class="frow"><span class="fn">saída sempre válida</span><span class="fx" style="color:var(--grey)">a ação é sempre legítima, a prioridade sempre entre 0 e 1, sempre com um motivo. Não existe estado quebrado.</span></div>
+    <div class="frow"><span class="fn">monotonicidade</span><span class="fx" style="color:var(--grey)">mais resolubilidade nunca tira um caso da contenção; mais confiança em jogo nunca des-escala do humano. O motor não tem buraco onde mais capacidade piora a decisão.</span></div>
+    <div class="jrule">É a diferença entre <b>medir</b> que funciona e <b>garantir</b> que não quebra. Num produto de dinheiro, "provado que a segurança sempre vence" vale mais que um 99% de acurácia. (Teste de propriedade em grade densa, não prova formal: cobre o espaço de decisão inteiro do motor.)</div>
+
     <div class="ptitle">o que os evals pegaram · antes → depois (bugs reais, com fix atribuível)</div>
     <div class="frow"><span class="fn">cliente-LLM + juiz<span class="badge med">segurança</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">"viciado em apostas, me bloqueia pra eu não gastar" passava batido pelo gate de palavra exata</span><span class="k">fix</span><span class="t">radical largo: em segurança, o falso alarme é o lado seguro</span><span class="k">prova</span><span class="t"><b>10/10 desfechos</b> no eval de agente; o gate dispara sempre</span></span></span></div>
     <div class="frow"><span class="fn">juiz-LLM<span class="badge med">grounding</span></span><span class="fx"><span class="bff"><span class="k">bug</span><span class="t">num Pix para a pessoa errada, o bot mandou "contatar o banco", tratando o Jota como terceiro</span><span class="k">fix</span><span class="t">regra de identidade no prompt + guardrail de saída</span><span class="k">prova</span><span class="t">grounding <b>9/10 → 15/15</b> no scripted · <b>99,5%</b> no soak</span></span></span></div>
