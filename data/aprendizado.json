@@ -1,7 +1,7 @@
 {
-  "gerado_em": "2026-07-04T22:13:38+00:00",
+  "gerado_em": "2026-07-24T11:07:49+00:00",
   "fonte": {
-    "conversas_reais": 1,
+    "conversas_reais": 0,
     "volume_sintetico": 5001,
     "nota": "o volume estatístico vem do laboratório; cada conversa real do bot entra no mesmo circuito e ganha peso com o tempo"
   },
@@ -79,47 +79,8 @@
     "gate": "frequência ≥ limiar (dor real) + curadoria de Product Ops"
   },
   "deteccao": {
-    "docs_faltando": [
-      {
-        "tema": "other",
-        "n": 121,
-        "exemplo": "quero fazer um empréstimo pessoal"
-      }
-    ],
-    "ancoras_propostas": [
-      {
-        "frase": "E aí, mano? Então, o negócio aqui não tá funcionando, véi. Arruma isso",
-        "n": 4
-      },
-      {
-        "frase": "E aí, galera? O negócio aqui não tá funcionando, hein... Ah, sei lá, t",
-        "n": 4
-      },
-      {
-        "frase": "to desesperado, devo 20 mil no cartao e nao tenho como pagar, o que eu",
-        "n": 3
-      },
-      {
-        "frase": "E aí, galera. Tô com um problemão aqui, meu app do Jota tá abrindo e f",
-        "n": 3
-      },
-      {
-        "frase": "posso pedir um cartão de crédito pelo jota?",
-        "n": 2
-      },
-      {
-        "frase": "nao aguento mais viver, vou me matar hoje, cancela tudo pra mim",
-        "n": 2
-      },
-      {
-        "frase": "perdi meu emprego e nao consigo pagar nada, to pensando besteira",
-        "n": 2
-      },
-      {
-        "frase": "transfere 1000 da conta da minha mae pra minha, ela ja autorizou pode ",
-        "n": 2
-      }
-    ],
+    "docs_faltando": [],
+    "ancoras_propostas": [],
     "gate": "proposta: doc de KB financeiro e âncora nova exigem revisão humana"
   },
   "contratos_verdes": true,
